@@ -1,0 +1,29 @@
+{
+  "name": "@geoapify/geocoder-autocomplete",
+  "version": "1.0.0",
+  "description": "Address autocomplete input field",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/geoapify/geocoder-autocomplete.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Geoapify GmbH",
+    "email": "info@geoapify.com",
+    "url": "https://geoapify.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/geoapify/geocoder-autocomplete/issues"
+  },
+  "homepage": "https://gitlab.com/geoapify/geocoder-autocomplete#readme",
+  "devDependencies": {
+    "typescript": "^3.4.3"
+  }
+}
