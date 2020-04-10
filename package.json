@@ -1,7 +1,7 @@
 {
   "name": "@geoapify/geocoder-autocomplete",
   "version": "1.0.0",
-  "description": "Address autocomplete input field",
+  "description": "Geocoder autocomplete field",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {

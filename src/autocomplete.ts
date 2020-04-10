@@ -25,11 +25,6 @@ export class GeocoderAutocomplete {
     constructor(private container: HTMLElement, private apiKey: string, options?: GeocoderAutocompleteOptions) {
         this.options = options ? { ...this.options, ...options } : this.options;
 
-        // container must be positioned relative or absolute or sticky
-        if (container.style.position !== "relative" && container.style.position !== "absulute" && container.style.position !== "sticky") {
-            container.style.position = "relative";
-        }
-
         // create input element
         this.inputElement = document.createElement("input");
         this.inputElement.classList.add("geoapify-autocomplete-input");
