@@ -16,8 +16,7 @@ export class GeocoderAutocomplete {
 
     private geocoderUrl = "https://test.geoapify.com/v1/geocode/autocomplete";
     private options: GeocoderAutocompleteOptions = {
-        limit: 5,
-        size: 'medium'
+        limit: 5
     };
 
     constructor(private container: HTMLElement, private apiKey: string, options?: GeocoderAutocompleteOptions) {
@@ -30,24 +29,16 @@ export class GeocoderAutocomplete {
 
         // create input element
         this.inputElement = document.createElement("input");
+        this.inputElement.classList.add("geoapify-autocomplete-input");
         this.inputElement.setAttribute("type", "text");
         this.inputElement.setAttribute("placeholder", this.options.placeholder || "Enter an address here");
-
-        const padding = this.options.size === 'small' ? 5 : (this.options.size === 'medium' ? 7 : 10);
-        const buttonSize = this.options.size === 'small' ? 20 : (this.options.size === 'medium' ? 24 : 24);
-        this.inputElement.style.padding = `${padding}px ${padding + buttonSize}px ${padding}px ${padding}px`;
-        this.inputElement.style.width = `calc(100% - ${padding * 2 + buttonSize + 3}px)`;
-
         this.container.appendChild(this.inputElement);
 
         // add clear button to input element
         this.inputClearButton = document.createElement("div");
-        this.inputClearButton.classList.add("close-button");
-        this.addIcon(this.inputClearButton, 'close', buttonSize);
+        this.inputClearButton.classList.add("geoapify-close-button");
+        this.addIcon(this.inputClearButton, 'close');
         this.inputClearButton.addEventListener("click", this.clearFieldAndNotify.bind(this), false);
-        this.inputClearButton.style.position = "absolute";
-        this.inputClearButton.style.right = "5px";
-        this.inputClearButton.style.top = "0";
 
         this.container.appendChild(this.inputClearButton);
 
@@ -57,7 +48,7 @@ export class GeocoderAutocomplete {
         document.addEventListener("click", (event) => {
             if (event.target !== this.inputElement) {
                 this.closeDropDownList();
-            } else if (!this.container.querySelector(".autocomplete-items")) {
+            } else if (!this.autocompleteItemsElement) {
                 // open dropdown list again
                 this.openDropdownAgain();
             }
@@ -136,8 +127,6 @@ export class GeocoderAutocomplete {
                 url += `&lat=${this.options.position.lat}&lon=${this.options.position.lon}`;
             }
 
-            console.log(url);
-
             fetch(url)
                 .then((response) => {
                     if (response.ok) {
@@ -149,20 +138,22 @@ export class GeocoderAutocomplete {
         });
 
         promise.then((data: any) => {
-            console.log(data);
-
             this.currentItems = data.features;
+
+            if (!this.currentItems.length) {
+                return;
+            }
 
             /*create a DIV element that will contain the items (values):*/
             this.autocompleteItemsElement = document.createElement("div");
-            this.autocompleteItemsElement.setAttribute("class", "autocomplete-items");
+            this.autocompleteItemsElement.setAttribute("class", "geoapify-autocomplete-items");
 
             /* Append the DIV element as a child of the autocomplete container:*/
             this.container.appendChild(this.autocompleteItemsElement);
             /* For each item in the results */
             data.features.forEach((feature: any, index: number) => {
                 /* Create a DIV element for each element: */
-                var itemElement = document.createElement("DIV");
+                var itemElement = document.createElement("div");
                 var valueIndex = feature.properties.formatted.toLowerCase()
                     .indexOf(currentValue.toLowerCase());
                 if (valueIndex >= 0) {
@@ -227,11 +218,11 @@ export class GeocoderAutocomplete {
         if (!items || !items.length) return false;
 
         for (var i = 0; i < items.length; i++) {
-            items[i].classList.remove("autocomplete-active");
+            items[i].classList.remove("active");
         }
 
         /* Add class "autocomplete-active" to the active element*/
-        items[index].classList.add("autocomplete-active");
+        items[index].classList.add("active");
 
         // Change input value and notify
         this.inputElement.value = this.currentItems[index].properties.formatted;
@@ -264,14 +255,14 @@ export class GeocoderAutocomplete {
         }
     }
 
-    private addIcon(element: HTMLElement, icon: string, size: number) {
+    private addIcon(element: HTMLElement, icon: string) {
         const icons: { [key: string]: string } = {
             'close': "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
         }
 
         var svgElement = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         svgElement.setAttribute('viewBox', "0 0 24 24");
-        svgElement.setAttribute('height', size.toString());
+        svgElement.setAttribute('height', "24");
 
         var iconElement = document.createElementNS("http://www.w3.org/2000/svg", 'path');
         iconElement.setAttribute("d", icons[icon]);
@@ -306,7 +297,6 @@ export interface GeoPosition {
 
 export interface GeocoderAutocompleteAppearance {
     placeholder?: string;
-    size?: 'small' | 'medium' | 'large';
 }
 
 
