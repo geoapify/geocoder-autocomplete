@@ -14,6 +14,9 @@ export class GeocoderAutocomplete {
     /* Active request promise reject function. To be able to cancel the promise when a new request comes */
     private currentPromiseReject: any;
 
+    private changeCallbacks: ((selectedOption: any) => any)[] = [];
+    private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
+
     private geocoderUrl = "https://test.geoapify.com/v1/geocode/autocomplete";
     private options: GeocoderAutocompleteOptions = {
         limit: 5
@@ -75,6 +78,25 @@ export class GeocoderAutocomplete {
         this.options.limit = limit;
     }
 
+    public on(operation: 'select' | 'suggestions', callback: (param: any) => any) {
+        if (operation === 'select' && this.changeCallbacks.indexOf(callback) < 0) {
+            this.changeCallbacks.push(callback);
+        }
+
+        if(operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) < 0) {
+            this.suggestionsChangeCallbacks.push(callback);
+        }
+    }
+
+    public off(operation: 'select' | 'suggestions', callback: (param: any) => any) {
+        if (operation === 'select' && this.changeCallbacks.indexOf(callback) >= 0) {
+            this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback) , 1);
+        }
+
+        if(operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) >= 0) {
+            this.suggestionsChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback) , 1);
+        }
+    }
 
     /* Execute a function when someone writes in the text field: */
     onUserInput(event: Event) {
@@ -105,7 +127,6 @@ export class GeocoderAutocomplete {
         const promise = new Promise((resolve, reject) => {
             this.currentPromiseReject = reject;
             let url = `${this.geocoderUrl}?text=${encodeURIComponent(currentValue)}&apiKey=${this.apiKey}`;
-
             // Add type of the location if set. Learn more about possible parameters on https://apidocs.geoapify.com/docs/geocoding/api/api
             if (this.options.type) {
                 url += `&type=${this.options.type}`;
@@ -127,6 +148,8 @@ export class GeocoderAutocomplete {
                 url += `&lat=${this.options.position.lat}&lon=${this.options.position.lon}`;
             }
 
+            console.log(url);
+
             fetch(url)
                 .then((response) => {
                     if (response.ok) {
@@ -139,6 +162,7 @@ export class GeocoderAutocomplete {
 
         promise.then((data: any) => {
             this.currentItems = data.features;
+            this.notifySuggestions(this.currentItems);
 
             if (!this.currentItems.length) {
                 return;
@@ -272,7 +296,11 @@ export class GeocoderAutocomplete {
     }
 
     private notifyValueSelected(feature: any) {
-        // notify here
+        this.changeCallbacks.forEach(callback => callback(feature));
+    }
+
+    private notifySuggestions(features: any) {
+        this.suggestionsChangeCallbacks.forEach(callback => callback(features));
     }
 
     private openDropdownAgain() {

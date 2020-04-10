@@ -15,6 +15,7 @@
     position: absolute;
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-top: none;
+    background-color: #fff;
     
     z-index: 99;
     top: 100%;
@@ -25,7 +26,6 @@
 .geoapify-autocomplete-items div {
     padding: 10px;
     cursor: pointer;
-    background-color: #fff;
 }
 
 .geoapify-autocomplete-items div:hover {
