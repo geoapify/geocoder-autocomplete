@@ -34,9 +34,9 @@ The container element must have `position: absolute;` or `position: relative;`
 ```
 ##### STEP 2. Initialize the autocomplete field
 
-TODO: Add example of import state!!!
-
 ```javascript
+import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
+
 const autocomplete = new GeocoderAutocomplete(
                         document.getElementById("autocomplete"), 
                         'YOUR_API_KEY', 
@@ -79,7 +79,7 @@ You can import the appropriate css-file to your styles:
 #### CountyCode
 2-digits [ISO 3166-1 Alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements) country code: `ad`, `ae`, `af`, `ag`, `ai`, `al`, `am`, `an`, `ao`, `ap`, `aq`, `ar`, `as`, `at`, `au`, `aw`, `az`, `ba`, `bb`, `bd`, `be`, `bf`, `bg`, `bh`, `bi`, `bj`, `bm`, `bn`, `bo`, `br`, `bs`, `bt`, `bv`, `bw`, `by`, `bz`, `ca`, `cc`, `cd`, `cf`, `cg`, `ch`, `ci`, `ck`, `cl`, `cm`, `cn`, `co`, `cr`, `cu`, `cv`, `cx`, `cy`, `cz`, `de`, `dj`, `dk`, `dm`, `do`, `dz`, `ec`, `ee`, `eg`, `eh`, `er`, `es`, `et`, `eu`, `fi`, `fj`, `fk`, `fm`, `fo`, `fr`, `ga`, `gb`, `gd`, `ge`, `gf`, `gh`, `gi`, `gl`, `gm`, `gn`, `gp`, `gq`, `gr`, `gs`, `gt`, `gu`, `gw`, `gy`, `hk`, `hm`, `hn`, `hr`, `ht`, `hu`, `id`, `ie`, `il`, `in`, `io`, `iq`, `ir`, `is`, `it`, `jm`, `jo`, `jp`, `ke`, `kg`, `kh`, `ki`, `km`, `kn`, `kp`, `kr`, `kw`, `ky`, `kz`, `la`, `lb`, `lc`, `li`, `lk`, `lr`, `ls`, `lt`, `lu`, `lv`, `ly`, `ma`, `mc`, `md`, `me`, `mg`, `mh`, `mk`, `ml`, `mm`, `mn`, `mo`, `mp`, `mq`, `mr`, `ms`, `mt`, `mu`, `mv`, `mw`, `mx`, `my`, `mz`, `na`, `nc`, `ne`, `nf`, `ng`, `ni`, `nl`, `no`, `np`, `nr`, `nu`, `nz`, `om`, `pa`, `pe`, `pf`, `pg`, `ph`, `pk`, `pl`, `pm`, `pr`, `ps`, `pt`, `pw`, `py`, `qa`, `re`, `ro`, `rs`, `ru`, `rw`, `sa`, `sb`, `sc`, `sd`, `se`, `sg`, `sh`, `si`, `sj`, `sk`, `sl`, `sm`, `sn`, `so`, `sr`, `st`, `sv`, `sy`, `sz`, `tc`, `td`, `tf`, `tg`, `th`, `tj`, `tk`, `tm`, `tn`, `to`, `tr`, `tt`, `tv`, `tw`, `tz`, `ua`, `ug`, `um`, `us`, `uy`, `uz`, `va`, `vc`, `ve`, `vg`, `vi`, `vn`, `vu`, `wf`, `ws`, `ye`, `yt`, `za`, `zm`, `zw`.
 
-Learn more about Geoapify Geocoder option on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding/getting-started/geocoding).
+Learn more about Geoapify Geocoder option on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding).
 
 #### Set option with API
 The library provides an API that allows to set **Geoapify Geocoder options** during runtime:
@@ -110,8 +110,8 @@ autocomplete.on('suggestions', (suggestions) => {
     // process suggestions here
 });
 ```
-The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type.
-Learn more about returned types on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding/getting-started/geocoding).
+The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. Properties of the feature contain information about address and location.
+Learn more about Geocoder result properties on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding/).
 ## Styling
 We provide several Themes within the library: 
 * `minimal` and `round-borders` - for webpages with light background color

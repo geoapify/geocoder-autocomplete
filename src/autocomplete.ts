@@ -78,18 +78,18 @@ export class GeocoderAutocomplete {
             this.changeCallbacks.push(callback);
         }
 
-        if(operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) < 0) {
+        if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) < 0) {
             this.suggestionsChangeCallbacks.push(callback);
         }
     }
 
     public off(operation: 'select' | 'suggestions', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) >= 0) {
-            this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback) , 1);
+            this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback), 1);
         }
 
-        if(operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) >= 0) {
-            this.suggestionsChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback) , 1);
+        if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) >= 0) {
+            this.suggestionsChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback), 1);
         }
     }
 
@@ -143,8 +143,6 @@ export class GeocoderAutocomplete {
                 url += `&lat=${this.options.position.lat}&lon=${this.options.position.lon}`;
             }
 
-            console.log(url);
-
             fetch(url)
                 .then((response) => {
                     if (response.ok) {
@@ -157,6 +155,7 @@ export class GeocoderAutocomplete {
 
         promise.then((data: any) => {
             this.currentItems = data.features;
+            console.log(this.currentItems);
             this.notifySuggestions(this.currentItems);
 
             if (!this.currentItems.length) {
@@ -172,18 +171,8 @@ export class GeocoderAutocomplete {
             /* For each item in the results */
             data.features.forEach((feature: any, index: number) => {
                 /* Create a DIV element for each element: */
-                var itemElement = document.createElement("div");
-                var valueIndex = feature.properties.formatted.toLowerCase()
-                    .indexOf(currentValue.toLowerCase());
-                if (valueIndex >= 0) {
-                    itemElement.innerHTML = feature.properties.formatted.substring(0, valueIndex) +
-                        `<strong>${feature.properties.formatted.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
-                        feature.properties.formatted.substring(valueIndex + currentValue.length);
-
-                } else {
-                    itemElement.innerHTML = feature.properties.formatted;
-
-                }
+                const itemElement = document.createElement("div");
+                itemElement.innerHTML = this.getStyledAddress(feature.properties, currentValue);
 
                 itemElement.addEventListener("click", (e) => {
                     event.stopPropagation();
@@ -196,6 +185,31 @@ export class GeocoderAutocomplete {
                 console.log(err);
             }
         });
+    }
+
+    private getStyledAddress(featureProperties: any, currentValue: string): string {
+        let mainPart;
+        let secondaryPart;
+        const parts = featureProperties.formatted.split(',').map((part: string) => part.trim());
+
+        if (featureProperties.name) {
+            mainPart = parts[0];
+            secondaryPart = parts.slice(1).join(', ');
+        } else {
+            const mainElements = Math.min(2, Math.max(parts.length - 2, 1));
+            mainPart = parts.slice(0, mainElements).join(', ');
+            secondaryPart = parts.slice(mainElements).join(', ');
+        }
+
+        const valueIndex = mainPart.toLowerCase().indexOf(currentValue.toLowerCase());
+        if (valueIndex >= 0) {
+            mainPart = mainPart.substring(0, valueIndex) +
+                `<strong>${mainPart.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
+                mainPart.substring(valueIndex + currentValue.length);
+
+        }
+
+        return `<span class="main-part">${mainPart}</span><span class="secondary-part">${secondaryPart}</span>`
     }
 
     private onUserKeyPress(event: KeyboardEvent) {
