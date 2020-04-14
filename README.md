@@ -125,4 +125,4 @@ However, you have aloso opportunity to style the component by youself. Here are 
 | `.geoapify-autocomplete-items .active` | Selected item in the dropdown list |
 | `.geoapify-close-button` | The clear button |
 
-# Find more Geoapify APIs, Playgrounds and code samples on [apidocs.geoapify.com](https://apidocs.geoapify.com).
+### Find more Geoapify APIs, Playgrounds and code samples on [apidocs.geoapify.com](https://apidocs.geoapify.com).

@@ -136,7 +136,7 @@ export class GeocoderAutocomplete {
             }
 
             if (this.options.countryCodes) {
-                url += `&lang=${this.options.countryCodes.join(',')}`;
+                url += `&countryCodes=${this.options.countryCodes.join(',')}`;
             }
 
             if (this.options.position) {
@@ -155,7 +155,6 @@ export class GeocoderAutocomplete {
 
         promise.then((data: any) => {
             this.currentItems = data.features;
-            console.log(this.currentItems);
             this.notifySuggestions(this.currentItems);
 
             if (!this.currentItems.length) {
@@ -319,12 +318,13 @@ export class GeocoderAutocomplete {
     }
 }
 
-export interface GeocoderAutocompleteOptions extends GeocoderAutocompleteAppearance {
-    type?: 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity';
-    lang?: 'en' | 'de' | 'it' | 'fr';
+export interface GeocoderAutocompleteOptions {
+    type?: LocationType;
+    lang?: SupportedLanguage;
     position?: GeoPosition;
     countryCodes?: CountyCode[];
     limit?: number;
+    placeholder?: string;
 }
 
 export interface GeoPosition {
@@ -332,9 +332,6 @@ export interface GeoPosition {
     lon: number;
 }
 
-export interface GeocoderAutocompleteAppearance {
-    placeholder?: string;
-}
-
-
+export type LocationType = 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity';
+export type SupportedLanguage = 'en' | 'de' | 'it' | 'fr';
 export type CountyCode = "ad" | "ae" | "af" | "ag" | "ai" | "al" | "am" | "an" | "ao" | "ap" | "aq" | "ar" | "as" | "at" | "au" | "aw" | "az" | "ba" | "bb" | "bd" | "be" | "bf" | "bg" | "bh" | "bi" | "bj" | "bm" | "bn" | "bo" | "br" | "bs" | "bt" | "bv" | "bw" | "by" | "bz" | "ca" | "cc" | "cd" | "cf" | "cg" | "ch" | "ci" | "ck" | "cl" | "cm" | "cn" | "co" | "cr" | "cu" | "cv" | "cx" | "cy" | "cz" | "de" | "dj" | "dk" | "dm" | "do" | "dz" | "ec" | "ee" | "eg" | "eh" | "er" | "es" | "et" | "eu" | "fi" | "fj" | "fk" | "fm" | "fo" | "fr" | "ga" | "gb" | "gd" | "ge" | "gf" | "gh" | "gi" | "gl" | "gm" | "gn" | "gp" | "gq" | "gr" | "gs" | "gt" | "gu" | "gw" | "gy" | "hk" | "hm" | "hn" | "hr" | "ht" | "hu" | "id" | "ie" | "il" | "in" | "io" | "iq" | "ir" | "is" | "it" | "jm" | "jo" | "jp" | "ke" | "kg" | "kh" | "ki" | "km" | "kn" | "kp" | "kr" | "kw" | "ky" | "kz" | "la" | "lb" | "lc" | "li" | "lk" | "lr" | "ls" | "lt" | "lu" | "lv" | "ly" | "ma" | "mc" | "md" | "me" | "mg" | "mh" | "mk" | "ml" | "mm" | "mn" | "mo" | "mp" | "mq" | "mr" | "ms" | "mt" | "mu" | "mv" | "mw" | "mx" | "my" | "mz" | "na" | "nc" | "ne" | "nf" | "ng" | "ni" | "nl" | "no" | "np" | "nr" | "nu" | "nz" | "om" | "pa" | "pe" | "pf" | "pg" | "ph" | "pk" | "pl" | "pm" | "pr" | "ps" | "pt" | "pw" | "py" | "qa" | "re" | "ro" | "rs" | "ru" | "rw" | "sa" | "sb" | "sc" | "sd" | "se" | "sg" | "sh" | "si" | "sj" | "sk" | "sl" | "sm" | "sn" | "so" | "sr" | "st" | "sv" | "sy" | "sz" | "tc" | "td" | "tf" | "tg" | "th" | "tj" | "tk" | "tm" | "tn" | "to" | "tr" | "tt" | "tv" | "tw" | "tz" | "ua" | "ug" | "um" | "us" | "uy" | "uz" | "va" | "vc" | "ve" | "vg" | "vi" | "vn" | "vu" | "wf" | "ws" | "ye" | "yt" | "za" | "zm" | "zw";
