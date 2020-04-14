@@ -20,9 +20,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://gitlab.com/geoapify/geocoder-autocomplete/issues"
+    "url": "https://github.com/geoapify/geocoder-autocomplete/issues"
   },
-  "homepage": "https://gitlab.com/geoapify/geocoder-autocomplete#readme",
+  "homepage": "https://github.com/geoapify/geocoder-autocomplete#readme",
   "devDependencies": {
     "typescript": "^3.4.3"
   }
