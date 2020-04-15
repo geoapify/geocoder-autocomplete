@@ -73,6 +73,10 @@ export class GeocoderAutocomplete {
         this.options.limit = limit;
     }
 
+    public setValue(value: string) {
+        this.inputElement.value = value;
+    }
+
     public on(operation: 'select' | 'suggestions', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) < 0) {
             this.changeCallbacks.push(callback);
