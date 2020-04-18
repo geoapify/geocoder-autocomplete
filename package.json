@@ -1,6 +1,6 @@
 {
   "name": "@geoapify/geocoder-autocomplete",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Geocoder autocomplete field",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +12,17 @@
     "type": "git",
     "url": "git+https://git@github.com/geoapify/geocoder-autocomplete.git"
   },
-  "keywords": ["geocoding", "address", "autocomplete", "search", "city", "country", "state", "amenity", "location"],
+  "keywords": [
+    "geocoding",
+    "address",
+    "autocomplete",
+    "search",
+    "city",
+    "country",
+    "state",
+    "amenity",
+    "location"
+  ],
   "author": {
     "name": "Geoapify GmbH",
     "email": "info@geoapify.com",
