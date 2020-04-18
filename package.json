@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/geoapify/geocoder-autocomplete.git"
+    "url": "git+https://git@github.com/geoapify/geocoder-autocomplete.git"
   },
   "keywords": ["geocoding", "address", "autocomplete", "search", "city", "country", "state", "amenity", "location"],
   "author": {

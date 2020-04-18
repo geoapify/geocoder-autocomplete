@@ -74,6 +74,12 @@ export class GeocoderAutocomplete {
     }
 
     public setValue(value: string) {
+        if (!value) {
+            this.inputClearButton.classList.remove("visible");
+        } else {
+            this.inputClearButton.classList.add("visible");
+        }
+
         this.inputElement.value = value;
     }
 
