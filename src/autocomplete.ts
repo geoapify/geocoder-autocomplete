@@ -17,7 +17,7 @@ export class GeocoderAutocomplete {
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
 
-    private geocoderUrl = "https://test.geoapify.com/v1/geocode/autocomplete";
+    private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
     private options: GeocoderAutocompleteOptions = {
         limit: 5
     };
