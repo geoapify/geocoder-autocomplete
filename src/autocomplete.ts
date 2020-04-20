@@ -14,6 +14,9 @@ export class GeocoderAutocomplete {
     /* Active request promise reject function. To be able to cancel the promise when a new request comes */
     private currentPromiseReject: any;
 
+    /* We set timeout before sending a request to avoid unnecessary calls */
+    private currentTimeout: number;
+
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
 
@@ -117,6 +120,13 @@ export class GeocoderAutocomplete {
             this.currentPromiseReject({
                 canceled: true
             });
+            this.currentPromiseReject = null;
+        }
+
+        // Cancel previous timeout
+        if (this.currentTimeout) {
+            window.clearTimeout(this.currentTimeout);
+            this.currentTimeout = null;
         }
 
         if (!currentValue) {
@@ -128,72 +138,74 @@ export class GeocoderAutocomplete {
         this.inputClearButton.classList.add("visible");
 
 
-        /* Create a new promise and send geocoding request */
-        const promise = new Promise((resolve, reject) => {
-            this.currentPromiseReject = reject;
-            let url = `${this.geocoderUrl}?text=${encodeURIComponent(currentValue)}&apiKey=${this.apiKey}`;
-            // Add type of the location if set. Learn more about possible parameters on https://apidocs.geoapify.com/docs/geocoding/api/api
-            if (this.options.type) {
-                url += `&type=${this.options.type}`;
-            }
+        this.currentTimeout = window.setTimeout(() => {
+            /* Create a new promise and send geocoding request */
+            const promise = new Promise((resolve, reject) => {
+                this.currentPromiseReject = reject;
+                let url = `${this.geocoderUrl}?text=${encodeURIComponent(currentValue)}&apiKey=${this.apiKey}`;
+                // Add type of the location if set. Learn more about possible parameters on https://apidocs.geoapify.com/docs/geocoding/api/api
+                if (this.options.type) {
+                    url += `&type=${this.options.type}`;
+                }
 
-            if (this.options.limit) {
-                url += `&limit=${this.options.limit}`;
-            }
+                if (this.options.limit) {
+                    url += `&limit=${this.options.limit}`;
+                }
 
-            if (this.options.lang) {
-                url += `&lang=${this.options.lang}`;
-            }
+                if (this.options.lang) {
+                    url += `&lang=${this.options.lang}`;
+                }
 
-            if (this.options.countryCodes) {
-                url += `&countryCodes=${this.options.countryCodes.join(',')}`;
-            }
+                if (this.options.countryCodes) {
+                    url += `&countryCodes=${this.options.countryCodes.join(',')}`;
+                }
 
-            if (this.options.position) {
-                url += `&lat=${this.options.position.lat}&lon=${this.options.position.lon}`;
-            }
+                if (this.options.position) {
+                    url += `&lat=${this.options.position.lat}&lon=${this.options.position.lon}`;
+                }
 
-            fetch(url)
-                .then((response) => {
-                    if (response.ok) {
-                        response.json().then(data => resolve(data));
-                    } else {
-                        response.json().then(data => reject(data));
-                    }
-                });
-        });
-
-        promise.then((data: any) => {
-            this.currentItems = data.features;
-            this.notifySuggestions(this.currentItems);
-
-            if (!this.currentItems.length) {
-                return;
-            }
-
-            /*create a DIV element that will contain the items (values):*/
-            this.autocompleteItemsElement = document.createElement("div");
-            this.autocompleteItemsElement.setAttribute("class", "geoapify-autocomplete-items");
-
-            /* Append the DIV element as a child of the autocomplete container:*/
-            this.container.appendChild(this.autocompleteItemsElement);
-            /* For each item in the results */
-            data.features.forEach((feature: any, index: number) => {
-                /* Create a DIV element for each element: */
-                const itemElement = document.createElement("div");
-                itemElement.innerHTML = this.getStyledAddress(feature.properties, currentValue);
-
-                itemElement.addEventListener("click", (e) => {
-                    event.stopPropagation();
-                    this.setValueAndNotify(this.currentItems[index])
-                });
-                this.autocompleteItemsElement.appendChild(itemElement);
+                fetch(url)
+                    .then((response) => {
+                        if (response.ok) {
+                            response.json().then(data => resolve(data));
+                        } else {
+                            response.json().then(data => reject(data));
+                        }
+                    });
             });
-        }, (err) => {
-            if (!err.canceled) {
-                console.log(err);
-            }
-        });
+
+            promise.then((data: any) => {
+                this.currentItems = data.features;
+                this.notifySuggestions(this.currentItems);
+
+                if (!this.currentItems.length) {
+                    return;
+                }
+
+                /*create a DIV element that will contain the items (values):*/
+                this.autocompleteItemsElement = document.createElement("div");
+                this.autocompleteItemsElement.setAttribute("class", "geoapify-autocomplete-items");
+
+                /* Append the DIV element as a child of the autocomplete container:*/
+                this.container.appendChild(this.autocompleteItemsElement);
+                /* For each item in the results */
+                data.features.forEach((feature: any, index: number) => {
+                    /* Create a DIV element for each element: */
+                    const itemElement = document.createElement("div");
+                    itemElement.innerHTML = this.getStyledAddress(feature.properties, currentValue);
+
+                    itemElement.addEventListener("click", (e) => {
+                        event.stopPropagation();
+                        this.setValueAndNotify(this.currentItems[index])
+                    });
+                    this.autocompleteItemsElement.appendChild(itemElement);
+                });
+            }, (err) => {
+                if (!err.canceled) {
+                    console.log(err);
+                }
+            });
+        }, 100);
     }
 
     private getStyledAddress(featureProperties: any, currentValue: string): string {
@@ -284,6 +296,21 @@ export class GeocoderAutocomplete {
         event.stopPropagation();
         this.inputElement.value = '';
         this.inputClearButton.classList.remove("visible");
+
+        // Cancel previous request
+        if (this.currentPromiseReject) {
+            this.currentPromiseReject({
+                canceled: true
+            });
+            this.currentPromiseReject = null;
+        }
+
+        // Cancel previous timeout
+        if (this.currentTimeout) {
+            window.clearTimeout(this.currentTimeout);
+            this.currentTimeout = null;
+        }
+
         this.closeDropDownList();
 
         // notify here
