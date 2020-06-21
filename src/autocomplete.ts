@@ -25,8 +25,23 @@ export class GeocoderAutocomplete {
         limit: 5
     };
 
+    private BY_COUNTRYCODE = 'countrycode';
+    private BY_RECT = 'rect';
+    private BY_CIRCLE = 'circle';
+    private BY_PROXIMITY = 'proximity';
+
     constructor(private container: HTMLElement, private apiKey: string, options?: GeocoderAutocompleteOptions) {
         this.options = options ? { ...this.options, ...options } : this.options;
+        this.options.filter = this.options.filter || {};
+        this.options.bias = this.options.bias || {};
+
+        if (this.options.countryCodes) {
+            this.addFilterByCountry(this.options.countryCodes);
+        }
+
+        if (this.options.position) {
+            this.addBiasByProximity(this.options.position);
+        }
 
         // create input element
         this.inputElement = document.createElement("input");
@@ -60,15 +75,17 @@ export class GeocoderAutocomplete {
         this.options.type = type;
     }
 
-    public setLang(lang: 'en' | 'de' | 'it' | 'fr') {
+    public setLang(lang: SupportedLanguage) {
         this.options.lang = lang;
     }
 
     public setCountryCodes(codes: CountyCode[]) {
+        console.warn("WARNING! Obsolete function called. Function setCountryCodes() has been deprecated, please use the new addFilterByCountry() function instead!");
         this.options.countryCodes = codes;
     }
 
     public setPosition(position: GeoPosition) {
+        console.warn("WARNING! Obsolete function called. Function setPosition() has been deprecated, please use the new addBiasByProximity() function instead!");
         this.options.position = position;
     }
 
@@ -84,6 +101,42 @@ export class GeocoderAutocomplete {
         }
 
         this.inputElement.value = value;
+    }
+
+    public addFilterByCountry(codes: ByCountryCodeOptions) {
+        this.options.filter[this.BY_COUNTRYCODE] = codes;
+    }
+
+    public addFilterByCircle(filterByCircle: ByCircleOptions) {
+        this.options.filter[this.BY_CIRCLE] = filterByCircle;
+    }
+
+    public addFilterByRect(filterByRect: ByRectOptions) {
+        this.options.filter[this.BY_RECT] = filterByRect;
+    }
+
+    public clearFilters() {
+        this.options.filter = {};
+    }
+
+    public addBiasByCountry(codes: ByCountryCodeOptions) {
+        this.options.bias[this.BY_COUNTRYCODE] = codes;
+    }
+
+    public addBiasByCircle(biasByCircle: ByCircleOptions) {
+        this.options.bias[this.BY_CIRCLE] = biasByCircle;
+    }
+
+    public addBiasByRect(biasByRect: ByRectOptions) {
+        this.options.bias[this.BY_RECT] = biasByRect;
+    }
+
+    public addBiasByProximity(biasByProximity: ByProximityOptions) {
+        this.options.bias[this.BY_PROXIMITY] = biasByProximity;
+    }
+
+    public clearBias() {
+        this.options.bias = {};
     }
 
     public on(operation: 'select' | 'suggestions', callback: (param: any) => any) {
@@ -142,27 +195,7 @@ export class GeocoderAutocomplete {
             /* Create a new promise and send geocoding request */
             const promise = new Promise((resolve, reject) => {
                 this.currentPromiseReject = reject;
-                let url = `${this.geocoderUrl}?text=${encodeURIComponent(currentValue)}&apiKey=${this.apiKey}`;
-                // Add type of the location if set. Learn more about possible parameters on https://apidocs.geoapify.com/docs/geocoding/api/api
-                if (this.options.type) {
-                    url += `&type=${this.options.type}`;
-                }
-
-                if (this.options.limit) {
-                    url += `&limit=${this.options.limit}`;
-                }
-
-                if (this.options.lang) {
-                    url += `&lang=${this.options.lang}`;
-                }
-
-                if (this.options.countryCodes) {
-                    url += `&countryCodes=${this.options.countryCodes.join(',')}`;
-                }
-
-                if (this.options.position) {
-                    url += `&lat=${this.options.position.lat}&lon=${this.options.position.lon}`;
-                }
+                let url = this.generateUrl(currentValue);
 
                 fetch(url)
                     .then((response) => {
@@ -353,15 +386,88 @@ export class GeocoderAutocomplete {
         event.initEvent('input', true, true);
         this.inputElement.dispatchEvent(event);
     }
+
+    private generateUrl(value: string): string {
+        let url = `${this.geocoderUrl}?text=${encodeURIComponent(value)}&apiKey=${this.apiKey}`;
+        // Add type of the location if set. Learn more about possible parameters on https://apidocs.geoapify.com/docs/geocoding/api/api
+        if (this.options.type) {
+            url += `&type=${this.options.type}`;
+        }
+
+        if (this.options.limit) {
+            url += `&limit=${this.options.limit}`;
+        }
+
+        if (this.options.lang) {
+            url += `&lang=${this.options.lang}`;
+        }
+
+        const filters = [];
+        const filterByCountryCodes: ByCountryCodeOptions = this.options.filter[this.BY_COUNTRYCODE] as ByCountryCodeOptions;
+        const filterByCircle: ByCircleOptions = this.options.filter[this.BY_CIRCLE] as ByCircleOptions;
+        const filterByRect: ByRectOptions = this.options.filter[this.BY_RECT] as ByRectOptions;
+
+        if (filterByCountryCodes && filterByCountryCodes.length) {
+            filters.push(`countrycode:${filterByCountryCodes.join(',').toLowerCase()}`);
+        }
+
+        if (filterByCircle && this.isLatitude(filterByCircle.lat) && this.isLongitude(filterByCircle.lon) && filterByCircle.radiusMeters > 0) {
+            filters.push(`circle:${filterByCircle.lon},${filterByCircle.lat},${filterByCircle.radiusMeters}`);
+        }
+
+        if (filterByRect && this.isLatitude(filterByRect.lat1) && this.isLongitude(filterByRect.lon1) && this.isLatitude(filterByRect.lat2) && this.isLongitude(filterByRect.lon2)) {
+            filters.push(`rect:${filterByRect.lon1},${filterByRect.lat1},${filterByRect.lon2},${filterByRect.lat2}`);
+        }
+        url += filters.length ? `&filter=${filters.join('|')}` : '';
+        
+        const bias = [];
+        const biasByCountryCodes: ByCountryCodeOptions = this.options.bias[this.BY_COUNTRYCODE] as ByCountryCodeOptions;
+        const biasByCircle: ByCircleOptions = this.options.bias[this.BY_CIRCLE] as ByCircleOptions;
+        const biasByRect: ByRectOptions = this.options.bias[this.BY_RECT] as ByRectOptions;
+        const biasByProximity: ByProximityOptions = this.options.bias[this.BY_PROXIMITY] as ByProximityOptions;
+
+        if (biasByCountryCodes && biasByCountryCodes.length) {
+            bias.push(`countrycode:${biasByCountryCodes.join(',').toLowerCase()}`);
+        }
+
+        if (biasByCircle && this.isLatitude(biasByCircle.lat) && this.isLongitude(biasByCircle.lon) && biasByCircle.radiusMeters > 0) {
+            bias.push(`circle:${biasByCircle.lon},${biasByCircle.lat},${biasByCircle.radiusMeters}`);
+        }
+
+        if (biasByRect && this.isLatitude(biasByRect.lat1) && this.isLongitude(biasByRect.lon1) && this.isLatitude(biasByRect.lat2) && this.isLongitude(biasByRect.lon2)) {
+            bias.push(`rect:${biasByRect.lon1},${biasByRect.lat1},${biasByRect.lon2},${biasByRect.lat2}`);
+        }
+
+        if (biasByProximity && this.isLatitude(biasByProximity.lat) && this.isLongitude(biasByProximity.lon)) {
+            bias.push(`proximity:${biasByProximity.lon},${biasByProximity.lat}`);
+        }
+
+        url += bias.length ? `&bias=${bias.join('|')}` : '';
+
+        return url;
+    }
+
+    private isLatitude(num: any) {
+        return num !== '' && num !== null && isFinite(num) && Math.abs(num) <= 90;
+    }
+
+    private isLongitude(num: any) {
+        return num !== '' && num !== null && isFinite(num) && Math.abs(num) <= 180;
+    }
 }
 
 export interface GeocoderAutocompleteOptions {
     type?: LocationType;
     lang?: SupportedLanguage;
-    position?: GeoPosition;
-    countryCodes?: CountyCode[];
     limit?: number;
     placeholder?: string;
+
+    filter?: {[key: string] : ByCircleOptions | ByCountryCodeOptions | ByRectOptions},
+    bias?: {[key: string] : ByCircleOptions | ByCountryCodeOptions | ByRectOptions | ByProximityOptions},
+
+    // to remove in the next version
+    position?: GeoPosition;
+    countryCodes?: CountyCode[];
 }
 
 export interface GeoPosition {
@@ -369,6 +475,27 @@ export interface GeoPosition {
     lon: number;
 }
 
+export type ByCountryCodeOptions = CountyCode[];
+
+export interface ByProximityOptions {
+    lon: number;
+    lat: number;
+}
+
+export interface ByCircleOptions {
+    lon: number;
+    lat: number;
+    radiusMeters: number;
+}
+
+export interface ByRectOptions {
+    lon1: number;
+    lat1: number;
+    lon2: number;
+    lat2: number;
+}
+
+
 export type LocationType = 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity';
-export type SupportedLanguage = 'en' | 'de' | 'it' | 'fr';
-export type CountyCode = "ad" | "ae" | "af" | "ag" | "ai" | "al" | "am" | "an" | "ao" | "ap" | "aq" | "ar" | "as" | "at" | "au" | "aw" | "az" | "ba" | "bb" | "bd" | "be" | "bf" | "bg" | "bh" | "bi" | "bj" | "bm" | "bn" | "bo" | "br" | "bs" | "bt" | "bv" | "bw" | "by" | "bz" | "ca" | "cc" | "cd" | "cf" | "cg" | "ch" | "ci" | "ck" | "cl" | "cm" | "cn" | "co" | "cr" | "cu" | "cv" | "cx" | "cy" | "cz" | "de" | "dj" | "dk" | "dm" | "do" | "dz" | "ec" | "ee" | "eg" | "eh" | "er" | "es" | "et" | "eu" | "fi" | "fj" | "fk" | "fm" | "fo" | "fr" | "ga" | "gb" | "gd" | "ge" | "gf" | "gh" | "gi" | "gl" | "gm" | "gn" | "gp" | "gq" | "gr" | "gs" | "gt" | "gu" | "gw" | "gy" | "hk" | "hm" | "hn" | "hr" | "ht" | "hu" | "id" | "ie" | "il" | "in" | "io" | "iq" | "ir" | "is" | "it" | "jm" | "jo" | "jp" | "ke" | "kg" | "kh" | "ki" | "km" | "kn" | "kp" | "kr" | "kw" | "ky" | "kz" | "la" | "lb" | "lc" | "li" | "lk" | "lr" | "ls" | "lt" | "lu" | "lv" | "ly" | "ma" | "mc" | "md" | "me" | "mg" | "mh" | "mk" | "ml" | "mm" | "mn" | "mo" | "mp" | "mq" | "mr" | "ms" | "mt" | "mu" | "mv" | "mw" | "mx" | "my" | "mz" | "na" | "nc" | "ne" | "nf" | "ng" | "ni" | "nl" | "no" | "np" | "nr" | "nu" | "nz" | "om" | "pa" | "pe" | "pf" | "pg" | "ph" | "pk" | "pl" | "pm" | "pr" | "ps" | "pt" | "pw" | "py" | "qa" | "re" | "ro" | "rs" | "ru" | "rw" | "sa" | "sb" | "sc" | "sd" | "se" | "sg" | "sh" | "si" | "sj" | "sk" | "sl" | "sm" | "sn" | "so" | "sr" | "st" | "sv" | "sy" | "sz" | "tc" | "td" | "tf" | "tg" | "th" | "tj" | "tk" | "tm" | "tn" | "to" | "tr" | "tt" | "tv" | "tw" | "tz" | "ua" | "ug" | "um" | "us" | "uy" | "uz" | "va" | "vc" | "ve" | "vg" | "vi" | "vn" | "vu" | "wf" | "ws" | "ye" | "yt" | "za" | "zm" | "zw";
+export type SupportedLanguage = "ab" | "aa" | "af" | "ak" | "sq" | "am" | "ar" | "an" | "hy" | "as" | "av" | "ae" | "ay" | "az" | "bm" | "ba" | "eu" | "be" | "bn" | "bh" | "bi" | "bs" | "br" | "bg" | "my" | "ca" | "ch" | "ce" | "ny" | "zh" | "cv" | "kw" | "co" | "cr" | "hr" | "cs" | "da" | "dv" | "nl" | "en" | "eo" | "et" | "ee" | "fo" | "fj" | "fi" | "fr" | "ff" | "gl" | "ka" | "de" | "el" | "gn" | "gu" | "ht" | "ha" | "he" | "hz" | "hi" | "ho" | "hu" | "ia" | "id" | "ie" | "ga" | "ig" | "ik" | "io" | "is" | "it" | "iu" | "ja" | "jv" | "kl" | "kn" | "kr" | "ks" | "kk" | "km" | "ki" | "rw" | "ky" | "kv" | "kg" | "ko" | "ku" | "kj" | "la" | "lb" | "lg" | "li" | "ln" | "lo" | "lt" | "lu" | "lv" | "gv" | "mk" | "mg" | "ms" | "ml" | "mt" | "mi" | "mr" | "mh" | "mn" | "na" | "nv" | "nb" | "nd" | "ne" | "ng" | "nn" | "no" | "ii" | "nr" | "oc" | "oj" | "cu" | "om" | "or" | "os" | "pa" | "pi" | "fa" | "pl" | "ps" | "pt" | "qu" | "rm" | "rn" | "ro" | "ru" | "sa" | "sc" | "sd" | "se" | "sm" | "sg" | "sr" | "gd" | "sn" | "si" | "sk" | "sl" | "so" | "st" | "es" | "su" | "sw" | "ss" | "sv" | "ta" | "te" | "tg" | "th" | "ti" | "bo" | "tk" | "tl" | "tn" | "to" | "tr" | "ts" | "tt" | "tw" | "ty" | "ug" | "uk" | "ur" | "uz" | "ve" | "vi" | "vo" | "wa" | "cy" | "wo" | "fy" | "xh" | "yi" | "yo" | "za";
+export type CountyCode = "none"| "auto" | "ad" | "ae" | "af" | "ag" | "ai" | "al" | "am" | "an" | "ao" | "ap" | "aq" | "ar" | "as" | "at" | "au" | "aw" | "az" | "ba" | "bb" | "bd" | "be" | "bf" | "bg" | "bh" | "bi" | "bj" | "bm" | "bn" | "bo" | "br" | "bs" | "bt" | "bv" | "bw" | "by" | "bz" | "ca" | "cc" | "cd" | "cf" | "cg" | "ch" | "ci" | "ck" | "cl" | "cm" | "cn" | "co" | "cr" | "cu" | "cv" | "cx" | "cy" | "cz" | "de" | "dj" | "dk" | "dm" | "do" | "dz" | "ec" | "ee" | "eg" | "eh" | "er" | "es" | "et" | "eu" | "fi" | "fj" | "fk" | "fm" | "fo" | "fr" | "ga" | "gb" | "gd" | "ge" | "gf" | "gh" | "gi" | "gl" | "gm" | "gn" | "gp" | "gq" | "gr" | "gs" | "gt" | "gu" | "gw" | "gy" | "hk" | "hm" | "hn" | "hr" | "ht" | "hu" | "id" | "ie" | "il" | "in" | "io" | "iq" | "ir" | "is" | "it" | "jm" | "jo" | "jp" | "ke" | "kg" | "kh" | "ki" | "km" | "kn" | "kp" | "kr" | "kw" | "ky" | "kz" | "la" | "lb" | "lc" | "li" | "lk" | "lr" | "ls" | "lt" | "lu" | "lv" | "ly" | "ma" | "mc" | "md" | "me" | "mg" | "mh" | "mk" | "ml" | "mm" | "mn" | "mo" | "mp" | "mq" | "mr" | "ms" | "mt" | "mu" | "mv" | "mw" | "mx" | "my" | "mz" | "na" | "nc" | "ne" | "nf" | "ng" | "ni" | "nl" | "no" | "np" | "nr" | "nu" | "nz" | "om" | "pa" | "pe" | "pf" | "pg" | "ph" | "pk" | "pl" | "pm" | "pr" | "ps" | "pt" | "pw" | "py" | "qa" | "re" | "ro" | "rs" | "ru" | "rw" | "sa" | "sb" | "sc" | "sd" | "se" | "sg" | "sh" | "si" | "sj" | "sk" | "sl" | "sm" | "sn" | "so" | "sr" | "st" | "sv" | "sy" | "sz" | "tc" | "td" | "tf" | "tg" | "th" | "tj" | "tk" | "tm" | "tn" | "to" | "tr" | "tt" | "tv" | "tw" | "tz" | "ua" | "ug" | "um" | "us" | "uy" | "uz" | "va" | "vc" | "ve" | "vg" | "vi" | "vn" | "vu" | "wf" | "ws" | "ye" | "yt" | "za" | "zm" | "zw";
