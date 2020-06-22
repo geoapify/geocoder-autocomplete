@@ -4,3 +4,7 @@ export {LocationType} from './autocomplete';
 export {SupportedLanguage} from './autocomplete';
 export {GeoPosition} from './autocomplete';
 export {CountyCode} from './autocomplete';
+export {ByCountryCodeOptions} from './autocomplete';
+export {ByCircleOptions} from './autocomplete';
+export {ByProximityOptions} from './autocomplete';
+export {ByRectOptions} from './autocomplete';
