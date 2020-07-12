@@ -75,6 +75,7 @@ You can import the appropriate css-file to your styles:
 | lang | LanguageCode | Results language |
 | limit | number | The maximal number of returned suggestions |
 | placeholder | string | An input field placeholder |
+| skipIcons | boolean | Don't add icons to suggestions |
 | filter | FilterOptions | Filter places by country, boundary, circle |
 | bias | BiasOptions | Prefer places by country, boundary, circle, location | 
 | ~~position~~ | GeoPosition | Prefered search position |
@@ -200,6 +201,9 @@ However, you have also opportunity to style the component by yourself. Here are 
 | `.geoapify-autocomplete-input ` | The input element |
 | `.geoapify-autocomplete-items` | The dropdown list |
 | `.geoapify-autocomplete-items .active` | Selected item in the dropdown list |
+| `.geoapify-autocomplete-item` | The dropdown list item|
+| `.geoapify-autocomplete-item.icon` | The dropdown list item icon |
+| `.geoapify-autocomplete-item.text` | The dropdown list item text |
 | `.geoapify-close-button` | The clear button |
 
 ### Find more Geoapify APIs, Playgrounds and code samples on [apidocs.geoapify.com](https://apidocs.geoapify.com).

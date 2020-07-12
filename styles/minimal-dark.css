@@ -44,6 +44,25 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+.geoapify-autocomplete-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.geoapify-autocomplete-item .icon {
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+    color: #aaa;
+}
+
+.geoapify-autocomplete-item .icon.emoji {
+    color: unset;
+    font-size: 20px;
+    opacity: 0.9;
+}
+
 .geoapify-close-button {
     position: absolute;
     right: 5px;
