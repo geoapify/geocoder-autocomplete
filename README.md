@@ -3,7 +3,11 @@ Geoapify Geocoder Autocomplete is a JavaScript(TypeScript) library that provides
 * adds an input field to a given container;
 * makes calls to Geocoding API on user input;
 * shows place suggestions in a dropdown list;
-* notify about suggestions change and selection.
+* notifies on suggestions change;
+* makes a call to Place Details API to get more information and geometry on user selection if is not skipped;  
+* notifies on selection change. Returns [Geocoding API](https://apidocs.geoapify.com/docs/geocoding/api/api) object or [Place Details API object](https://apidocs.geoapify.com/docs/place-details/feature/details-feature) depending on options set.
+
+The library makes a call to [Geoapify Place Details API](https://apidocs.geoapify.com/docs/place-details) on user select events. The API lets to get detailed information about the place selected as well as place category and place geometry (building polygon or region boundary). Note, that the Place Details API call costs an additional 'geocoding & places' request. Use the `skipDetails` option to switch the functionality off.
 
 You can also:
 * specify a location type - **country**, **state**, **city**, **postcode**, **street**, **amenity**;
@@ -76,6 +80,7 @@ You can import the appropriate css-file to your styles:
 | limit | number | The maximal number of returned suggestions |
 | placeholder | string | An input field placeholder |
 | skipIcons | boolean | Don't add icons to suggestions |
+| skipDetails | boolean | Skip Place Details API call on selection change |
 | filter | FilterOptions | Filter places by country, boundary, circle |
 | bias | BiasOptions | Prefer places by country, boundary, circle, location | 
 | ~~position~~ | GeoPosition | Prefered search position |

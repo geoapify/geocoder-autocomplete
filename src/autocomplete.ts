@@ -16,6 +16,9 @@ export class GeocoderAutocomplete {
     /* Active request promise reject function. To be able to cancel the promise when a new request comes */
     private currentPromiseReject: any;
 
+    /* Active place details request promise reject function */
+    private currentPlaceDetailsPromiseReject: any;
+
     /* We set timeout before sending a request to avoid unnecessary calls */
     private currentTimeout: number;
 
@@ -23,6 +26,8 @@ export class GeocoderAutocomplete {
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
 
     private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
+    private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
+
     private options: GeocoderAutocompleteOptions = {
         limit: 5
     };
@@ -437,7 +442,50 @@ export class GeocoderAutocomplete {
     }
 
     private notifyValueSelected(feature: any) {
-        this.changeCallbacks.forEach(callback => callback(feature));
+
+        // Cancel previous place details request
+        if (this.currentPlaceDetailsPromiseReject) {
+            this.currentPlaceDetailsPromiseReject({
+                canceled: true
+            });
+            this.currentPlaceDetailsPromiseReject = null;
+        }
+
+        if (this.options.skipDetails || !feature) {
+            this.changeCallbacks.forEach(callback => callback(feature));
+        } else {
+            const promise = new Promise((resolve, reject) => {
+                this.currentPlaceDetailsPromiseReject = reject;
+                let url = this.generatePlacesUrlUrl(feature.properties.place_id);
+
+                fetch(url)
+                    .then((response) => {
+                        if (response.ok) {
+                            response.json().then(data => resolve(data));
+                        } else {
+                            response.json().then(data => reject(data));
+                        }
+                    });
+            });
+
+
+            promise.then((data: any) => {
+
+                if (!data.features.length) {
+                    this.changeCallbacks.forEach(callback => callback(feature));
+                    return;
+                }
+
+                const placeDetails = data.features[0];
+                this.changeCallbacks.forEach(callback => callback(placeDetails));
+                this.currentPlaceDetailsPromiseReject = null;
+
+            }, (err) => {
+                if (!err.canceled) {
+                    console.log(err);
+                }
+            });
+        }
     }
 
     private notifySuggestions(features: any) {
@@ -448,6 +496,10 @@ export class GeocoderAutocomplete {
         const event = document.createEvent('Event');
         event.initEvent('input', true, true);
         this.inputElement.dispatchEvent(event);
+    }
+
+    private generatePlacesUrlUrl(placeId: string): string {
+        return `${this.placeDetailsUrl}?id=${placeId}&apiKey=${this.apiKey}`;
     }
 
     private generateUrl(value: string): string {
@@ -529,6 +581,7 @@ export interface GeocoderAutocompleteOptions {
     bias?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions | ByProximityOptions },
 
     skipIcons?: boolean;
+    skipDetails?: boolean;
 
     // to remove in the next version
     position?: GeoPosition;
