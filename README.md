@@ -79,7 +79,7 @@ You can import the appropriate css-file to your styles:
 | lang | LanguageCode | Results language |
 | limit | number | The maximal number of returned suggestions |
 | placeholder | string | An input field placeholder |
-| debounceDelay | number | A delay between user input and API call to prevent unnecessary calls. The default values is 100ms. |
+| debounceDelay | number | A delay between user input and the API call to prevent unnecessary calls. The default value is 100ms. |
 | skipIcons | boolean | Don't add icons to suggestions |
 | skipDetails | boolean | Skip Place Details API call on selection change |
 | filter | FilterOptions | Filter places by country, boundary, circle |
