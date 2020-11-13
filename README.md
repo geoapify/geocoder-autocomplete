@@ -79,6 +79,7 @@ You can import the appropriate css-file to your styles:
 | lang | LanguageCode | Results language |
 | limit | number | The maximal number of returned suggestions |
 | placeholder | string | An input field placeholder |
+| debounceDelay | number | Control the rate of API calls |
 | skipIcons | boolean | Don't add icons to suggestions |
 | skipDetails | boolean | Skip Place Details API call on selection change |
 | filter | FilterOptions | Filter places by country, boundary, circle |
