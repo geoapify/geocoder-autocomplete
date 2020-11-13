@@ -29,7 +29,8 @@ export class GeocoderAutocomplete {
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
 
     private options: GeocoderAutocompleteOptions = {
-        limit: 5
+        limit: 5,
+        debounceDelay: 100
     };
 
     private BY_COUNTRYCODE = 'countrycode';
@@ -260,7 +261,7 @@ export class GeocoderAutocomplete {
                     console.log(err);
                 }
             });
-        }, 100);
+        }, this.options.debounceDelay);
     }
 
     private getStyledAddress(featureProperties: any, currentValue: string): string {
@@ -576,6 +577,7 @@ export interface GeocoderAutocompleteOptions {
     lang?: SupportedLanguage;
     limit?: number;
     placeholder?: string;
+    debounceDelay?: number;
 
     filter?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions },
     bias?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions | ByProximityOptions },
