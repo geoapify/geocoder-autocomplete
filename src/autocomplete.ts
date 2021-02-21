@@ -24,6 +24,7 @@ export class GeocoderAutocomplete {
 
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
+    private focusChangeCallbacks: ((options?: any) => any)[] = [];
 
     private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
@@ -68,6 +69,7 @@ export class GeocoderAutocomplete {
 
         this.inputElement.addEventListener('input', this.onUserInput.bind(this), false);
         this.inputElement.addEventListener('keydown', this.onUserKeyPress.bind(this), false);
+        this.inputElement.addEventListener('focus', this.onUserFocus.bind(this), false);
 
         document.addEventListener("click", (event) => {
             if (event.target !== this.inputElement) {
@@ -147,7 +149,7 @@ export class GeocoderAutocomplete {
         this.options.bias = {};
     }
 
-    public on(operation: 'select' | 'suggestions', callback: (param: any) => any) {
+    public on(operation: 'select' | 'suggestions' | 'focus', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) < 0) {
             this.changeCallbacks.push(callback);
         }
@@ -155,9 +157,13 @@ export class GeocoderAutocomplete {
         if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) < 0) {
             this.suggestionsChangeCallbacks.push(callback);
         }
+
+        if (operation === 'focus' && this.focusChangeCallbacks.indexOf(callback) < 0) {
+            this.focusChangeCallbacks.push(callback);
+        }
     }
 
-    public off(operation: 'select' | 'suggestions', callback: (param: any) => any) {
+    public off(operation: 'select' | 'suggestions' | 'focus', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) >= 0) {
             this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback), 1);
         }
@@ -165,6 +171,14 @@ export class GeocoderAutocomplete {
         if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) >= 0) {
             this.suggestionsChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback), 1);
         }
+
+        if (operation === 'focus' && this.focusChangeCallbacks.indexOf(callback) < 0) {
+            this.focusChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback), 1);
+        }
+    }
+
+    onUserFocus() { 
+        this.focusChangeCallbacks.forEach(callback => callback());
     }
 
     /* Execute a function when someone writes in the text field: */

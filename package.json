@@ -1,6 +1,6 @@
 {
-  "name": "@geoapify/geocoder-autocomplete",
-  "version": "1.2.1",
+  "name": "@sector-labs/geocoder-autocomplete",
+  "version": "1.2.1-sl.1",
   "description": "Geocoder autocomplete field",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
