@@ -500,7 +500,11 @@ export class GeocoderAutocomplete {
     }
 
     private generatePlacesUrlUrl(placeId: string): string {
-        return `${this.placeDetailsUrl}?id=${placeId}&apiKey=${this.apiKey}`;
+        let url = `${this.placeDetailsUrl}?id=${placeId}&apiKey=${this.apiKey}`;
+        if (this.options.lang) {
+            url += `&lang=${this.options.lang}`;
+        }
+        return url;
     }
 
     private generateUrl(value: string): string {
