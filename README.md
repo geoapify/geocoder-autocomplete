@@ -84,8 +84,6 @@ You can import the appropriate css-file to your styles:
 | skipDetails | boolean | Skip Place Details API call on selection change |
 | filter | FilterOptions | Filter places by country, boundary, circle |
 | bias | BiasOptions | Prefer places by country, boundary, circle, location | 
-| ~~position~~ | GeoPosition | Prefered search position |
-| ~~countryCodes~~ | CountyCode[] | Limit the search by countries |
 
 #### LanguageCode
 2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code: `ab`, `aa`, `af`, `ak`, `sq`, `am`, `ar`, `an`, `hy`, `as`, `av`, `ae`, `ay`, `az`, `bm`, `ba`, `eu`, `be`, `bn`, `bh`, `bi`, `bs`, `br`, `bg`, `my`, `ca`, `ch`, `ce`, `ny`, `zh`, `cv`, `kw`, `co`, `cr`, `hr`, `cs`, `da`, `dv`, `nl`, `en`, `eo`, `et`, `ee`, `fo`, `fj`, `fi`, `fr`, `ff`, `gl`, `ka`, `de`, `el`, `gn`, `gu`, `ht`, `ha`, `he`, `hz`, `hi`, `ho`, `hu`, `ia`, `id`, `ie`, `ga`, `ig`, `ik`, `io`, `is`, `it`, `iu`, `ja`, `jv`, `kl`, `kn`, `kr`, `ks`, `kk`, `km`, `ki`, `rw`, `ky`, `kv`, `kg`, `ko`, `ku`, `kj`, `la`, `lb`, `lg`, `li`, `ln`, `lo`, `lt`, `lu`, `lv`, `gv`, `mk`, `mg`, `ms`, `ml`, `mt`, `mi`, `mr`, `mh`, `mn`, `na`, `nv`, `nb`, `nd`, `ne`, `ng`, `nn`, `no`, `ii`, `nr`, `oc`, `oj`, `cu`, `om`, `or`, `os`, `pa`, `pi`, `fa`, `pl`, `ps`, `pt`, `qu`, `rm`, `rn`, `ro`, `ru`, `sa`, `sc`, `sd`, `se`, `sm`, `sg`, `sr`, `gd`, `sn`, `si`, `sk`, `sl`, `so`, `st`, `es`, `su`, `sw`, `ss`, `sv`, `ta`, `te`, `tg`, `th`, `ti`, `bo`, `tk`, `tl`, `tn`, `to`, `tr`, `ts`, `tt`, `tw`, `ty`, `ug`, `uk`, `ur`, `uz`, `ve`, `vi`, `vo`, `wa`, `cy`, `wo`, `fy`, `xh`, `yi`, `yo`, `za`.
@@ -184,6 +182,51 @@ const autocomplete = new GeocoderAutocomplete(...);
 autocomplete.setValue(value);
 ```
 
+## Hooks and suggestions filter
+By adding preprocessing and post-processing hooks and suggestions filter you can change the entered/displayed values and suggestions list:
+* **Preprocess Hook** - you can modify the text to search. For example, if you expect that the user enters a street name you can add a city or postcode to search streets in the city.
+* **Postprocess Hook** - you can modify the text that will be displayed in the input field and suggestions list. For example, you can show only a street name.
+* **Suggestions Filter** - allows filtering some suggestions. It lets to avoid duplicated results when you modify the address with a post-process hook. For example, suggestions may contain several addresses with the same street name, they will be duplicated when not the whole address but only the street name is shown.
+
+```javascript
+
+// add preprocess hook
+autocomplete.setPreprocessHook((value: string) => {
+    // return augmented value here
+    return `${value} ${someAdditionalInfo}`
+});
+
+// remove the hook
+autocomplete.setPreprocessHook(null);
+
+autocomplete.setPostprocessHook((feature) => {
+    // feature is GeoJSON feature containing structured address
+    // return a part of the address to be displayed
+    return feature.properties.street;
+});
+
+// remove the hook
+autocomplete.setPostprocessHook(null);
+
+autocomplete.setSuggestionsFilter((features: any[]) => {
+    // features is an array of GeoJSON features, that contains suggestions
+    // return filtered array
+    const processedStreets = [];
+    const filtered = features.filter(feature => {
+        if (!feature.properties.street || processedStreets.indexOf(feature.properties.street) >= 0) {
+            return false;
+        } else {
+            processedStreets.push(feature.properties.street);
+            return true;
+        }
+    });
+    return filtered;
+});
+
+// remove the filter
+autocomplete.setSuggestionsFilter(null);
+
+```
 ## Geocoder Autocomplete events
 The Geocoder Autocomplete can notify when the list of suggestions is changed or a selection happened:
 ```javascript

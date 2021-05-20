@@ -25,6 +25,10 @@ export class GeocoderAutocomplete {
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
 
+    private preprocessHook?: (value: string) => string;
+    private postprocessHook?: (feature: any) => string;
+    private suggestionsFilter?: (suggetions: any[]) => any[];
+
     private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
 
@@ -167,9 +171,21 @@ export class GeocoderAutocomplete {
         }
     }
 
+    public setSuggestionsFilter(suggestionsFilterFunc?: (suggestions: any[]) => any[]) {
+        this.suggestionsFilter = suggestionsFilterFunc;
+    }
+
+    public setPreprocessHook(preprocessHookFunc?: (value: string) => string) {
+        this.preprocessHook = preprocessHookFunc;
+    }
+
+    public setPostprocessHook(postprocessHookFunc?: (value: string) => string) {
+        this.postprocessHook = postprocessHookFunc;
+    }
+
     /* Execute a function when someone writes in the text field: */
     onUserInput(event: Event) {
-        var currentValue = this.inputElement.value;
+        let currentValue = this.inputElement.value;
 
         /* Close any already open dropdown list */
         this.closeDropDownList();
@@ -203,6 +219,11 @@ export class GeocoderAutocomplete {
             /* Create a new promise and send geocoding request */
             const promise = new Promise((resolve, reject) => {
                 this.currentPromiseReject = reject;
+
+                if (this.preprocessHook && typeof this.preprocessHook === 'function') {
+                    currentValue = this.preprocessHook(currentValue);
+                }
+
                 let url = this.generateUrl(currentValue);
 
                 fetch(url)
@@ -217,6 +238,11 @@ export class GeocoderAutocomplete {
 
             promise.then((data: any) => {
                 this.currentItems = data.features;
+
+                if (this.currentItems && this.currentItems.length && this.suggestionsFilter && typeof this.suggestionsFilter === 'function') {
+                    this.currentItems = this.suggestionsFilter(this.currentItems);
+                }
+
                 this.notifySuggestions(this.currentItems);
 
                 if (!this.currentItems.length) {
@@ -230,7 +256,7 @@ export class GeocoderAutocomplete {
                 /* Append the DIV element as a child of the autocomplete container:*/
                 this.container.appendChild(this.autocompleteItemsElement);
                 /* For each item in the results */
-                data.features.forEach((feature: any, index: number) => {
+                this.currentItems.forEach((feature: any, index: number) => {
                     /* Create a DIV element for each element: */
                     const itemElement = document.createElement("div");
                     itemElement.classList.add('geoapify-autocomplete-item');
@@ -247,7 +273,14 @@ export class GeocoderAutocomplete {
 
                     const textElement = document.createElement("span");
                     textElement.classList.add('address');
-                    textElement.innerHTML = this.getStyledAddress(feature.properties, currentValue);
+
+                    if (this.postprocessHook && typeof this.postprocessHook === 'function') {
+                        const value = this.postprocessHook(feature);
+                        textElement.innerHTML = this.getStyledAddressSingleValue(value, currentValue);
+                    } else {
+                        textElement.innerHTML = this.getStyledAddress(feature.properties, currentValue);
+                    }
+
                     itemElement.appendChild(textElement);
 
                     itemElement.addEventListener("click", (e) => {
@@ -262,6 +295,21 @@ export class GeocoderAutocomplete {
                 }
             });
         }, this.options.debounceDelay);
+    }
+
+    private getStyledAddressSingleValue(value: string, currentValue: string): string {
+
+        let displayValue = value;
+
+        const valueIndex = (displayValue || '').toLowerCase().indexOf(currentValue.toLowerCase());
+        if (valueIndex >= 0) {
+            displayValue = displayValue.substring(0, valueIndex) +
+                `<strong>${displayValue.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
+                displayValue.substring(valueIndex + currentValue.length);
+
+        }
+
+        return `<span class="main-part">${displayValue}</span>`
     }
 
     private getStyledAddress(featureProperties: any, currentValue: string): string {
@@ -335,13 +383,25 @@ export class GeocoderAutocomplete {
         items[index].classList.add("active");
 
         // Change input value and notify
-        this.inputElement.value = this.currentItems[index].properties.formatted;
+
+        if (this.postprocessHook && typeof this.postprocessHook === 'function') {
+            this.inputElement.value = this.postprocessHook(this.currentItems[index]);
+        } else {
+            this.inputElement.value = this.currentItems[index].properties.formatted;
+        }
+
         this.notifyValueSelected(this.currentItems[index]);
     }
 
 
     private setValueAndNotify(feature: any) {
-        this.inputElement.value = feature.properties.formatted;
+        if (this.postprocessHook && typeof this.postprocessHook === 'function') {
+            this.inputElement.value = this.postprocessHook(feature);
+        } else {
+            this.inputElement.value = feature.properties.formatted;
+        }
+
+
         this.notifyValueSelected(feature);
 
         /* Close the list of autocompleted values: */
@@ -618,7 +678,6 @@ export interface ByRectOptions {
     lon2: number;
     lat2: number;
 }
-
 
 export type LocationType = 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity';
 export type SupportedLanguage = "ab" | "aa" | "af" | "ak" | "sq" | "am" | "ar" | "an" | "hy" | "as" | "av" | "ae" | "ay" | "az" | "bm" | "ba" | "eu" | "be" | "bn" | "bh" | "bi" | "bs" | "br" | "bg" | "my" | "ca" | "ch" | "ce" | "ny" | "zh" | "cv" | "kw" | "co" | "cr" | "hr" | "cs" | "da" | "dv" | "nl" | "en" | "eo" | "et" | "ee" | "fo" | "fj" | "fi" | "fr" | "ff" | "gl" | "ka" | "de" | "el" | "gn" | "gu" | "ht" | "ha" | "he" | "hz" | "hi" | "ho" | "hu" | "ia" | "id" | "ie" | "ga" | "ig" | "ik" | "io" | "is" | "it" | "iu" | "ja" | "jv" | "kl" | "kn" | "kr" | "ks" | "kk" | "km" | "ki" | "rw" | "ky" | "kv" | "kg" | "ko" | "ku" | "kj" | "la" | "lb" | "lg" | "li" | "ln" | "lo" | "lt" | "lu" | "lv" | "gv" | "mk" | "mg" | "ms" | "ml" | "mt" | "mi" | "mr" | "mh" | "mn" | "na" | "nv" | "nb" | "nd" | "ne" | "ng" | "nn" | "no" | "ii" | "nr" | "oc" | "oj" | "cu" | "om" | "or" | "os" | "pa" | "pi" | "fa" | "pl" | "ps" | "pt" | "qu" | "rm" | "rn" | "ro" | "ru" | "sa" | "sc" | "sd" | "se" | "sm" | "sg" | "sr" | "gd" | "sn" | "si" | "sk" | "sl" | "so" | "st" | "es" | "su" | "sw" | "ss" | "sv" | "ta" | "te" | "tg" | "th" | "ti" | "bo" | "tk" | "tl" | "tn" | "to" | "tr" | "ts" | "tt" | "tw" | "ty" | "ug" | "uk" | "ur" | "uz" | "ve" | "vi" | "vo" | "wa" | "cy" | "wo" | "fy" | "xh" | "yi" | "yo" | "za";
