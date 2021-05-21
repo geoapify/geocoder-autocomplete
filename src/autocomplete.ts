@@ -186,6 +186,7 @@ export class GeocoderAutocomplete {
     /* Execute a function when someone writes in the text field: */
     onUserInput(event: Event) {
         let currentValue = this.inputElement.value;
+        let userEnteredValue = this.inputElement.value;
 
         /* Close any already open dropdown list */
         this.closeDropDownList();
@@ -276,9 +277,9 @@ export class GeocoderAutocomplete {
 
                     if (this.postprocessHook && typeof this.postprocessHook === 'function') {
                         const value = this.postprocessHook(feature);
-                        textElement.innerHTML = this.getStyledAddressSingleValue(value, currentValue);
+                        textElement.innerHTML = this.getStyledAddressSingleValue(value, userEnteredValue);
                     } else {
-                        textElement.innerHTML = this.getStyledAddress(feature.properties, currentValue);
+                        textElement.innerHTML = this.getStyledAddress(feature.properties, userEnteredValue);
                     }
 
                     itemElement.appendChild(textElement);
