@@ -1,11 +1,11 @@
 # Geoapify Geocoder Autocomplete
-Geoapify Geocoder Autocomplete is a JavaScript(TypeScript) library that provides autocomplete functionality for the [Geoapify Geocoding API](https://www.geoapify.com/api/geocoding-api/):
+Geoapify Geocoder Autocomplete is a JavaScript(TypeScript) library that provides autocomplete functionality for the [Geoapify Geocoding API](https://www.geoapify.com/geocoding-api/):
 * adds an input field to a given container;
 * makes calls to Geocoding API on user input;
 * shows place suggestions in a dropdown list;
 * notifies on suggestions change;
 * makes a call to Place Details API to get more information and geometry on user selection if is not skipped;  
-* notifies on selection change. Returns [Geocoding API](https://apidocs.geoapify.com/docs/geocoding/api/api) object or [Place Details API object](https://apidocs.geoapify.com/docs/place-details/feature/details-feature) depending on options set.
+* notifies on selection change. Returns [Geocoding API](https://apidocs.geoapify.com/docs/geocoding/api/) object or [Place Details API object](https://apidocs.geoapify.com/docs/place-details/feature) depending on options set.
 
 The library makes a call to [Geoapify Place Details API](https://apidocs.geoapify.com/docs/place-details) on user select events. The API lets to get detailed information about the place selected as well as place category and place geometry (building polygon or region boundary). Note, that the Place Details API call costs an additional 'geocoding & places' request. Use the `skipDetails` option to switch the functionality off.
 
@@ -23,7 +23,7 @@ You can also:
 ##### STEP 0. Get an API key from Geoapify
 You will need an API key to execute Geoapify Geocoding requests.
 Register and get an API key for Free on [myprojects.geoapify.com](https://myprojects.geoapify.com/).
-Geoapify has a [Freemium pricing model](https://www.geoapify.com/api-pricing/). You can start for Free and extend when you need it.
+Geoapify has a [Freemium pricing model](https://www.geoapify.com/pricing/). You can start for Free and extend when you need it.
 
 ##### STEP 1. Install the Geocoder Autocomplete package
 
