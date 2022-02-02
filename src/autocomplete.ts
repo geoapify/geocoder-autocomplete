@@ -24,6 +24,7 @@ export class GeocoderAutocomplete {
 
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
+    private inputCallbacks: ((input: string) => any) [] = [];
 
     private preprocessHook?: (value: string) => string;
     private postprocessHook?: (feature: any) => string;
@@ -151,7 +152,7 @@ export class GeocoderAutocomplete {
         this.options.bias = {};
     }
 
-    public on(operation: 'select' | 'suggestions', callback: (param: any) => any) {
+    public on(operation: 'select' | 'suggestions' | 'input', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) < 0) {
             this.changeCallbacks.push(callback);
         }
@@ -159,15 +160,23 @@ export class GeocoderAutocomplete {
         if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) < 0) {
             this.suggestionsChangeCallbacks.push(callback);
         }
+
+        if (operation === 'input' && this.inputCallbacks.indexOf(callback) < 0) {
+            this.inputCallbacks.push(callback);
+        }
     }
 
-    public off(operation: 'select' | 'suggestions', callback: (param: any) => any) {
+    public off(operation: 'select' | 'suggestions' | 'input', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) >= 0) {
             this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback), 1);
         }
 
         if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) >= 0) {
             this.suggestionsChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback), 1);
+        }
+
+        if (operation === 'input' && this.inputCallbacks.indexOf(callback) >= 0) {
+            this.inputCallbacks.splice(this.inputCallbacks.indexOf(callback), 1);
         }
     }
 
@@ -187,6 +196,8 @@ export class GeocoderAutocomplete {
     onUserInput(event: Event) {
         let currentValue = this.inputElement.value;
         let userEnteredValue = this.inputElement.value;
+
+        this.inputCallbacks.forEach(callback => callback(currentValue));
 
         /* Close any already open dropdown list */
         this.closeDropDownList();
@@ -342,7 +353,7 @@ export class GeocoderAutocomplete {
         if (this.autocompleteItemsElement) {
 
             const itemElements: HTMLCollectionOf<HTMLDivElement> = this.autocompleteItemsElement.getElementsByTagName("div");
-            if (event.keyCode == 40) {
+            if (event.code === 'ArrowDown') {
                 event.preventDefault();
 
                 /*If the arrow DOWN key is pressed, increase the focusedItemIndex variable:*/
@@ -350,7 +361,7 @@ export class GeocoderAutocomplete {
                 if (this.focusedItemIndex >= itemElements.length) this.focusedItemIndex = 0;
                 /*and and make the current item more visible:*/
                 this.setActive(itemElements, this.focusedItemIndex);
-            } else if (event.keyCode == 38) {
+            } else if (event.code === 'ArrowUp') {
                 event.preventDefault();
 
                 /*If the arrow UP key is pressed, decrease the focusedItemIndex variable:*/
@@ -358,15 +369,18 @@ export class GeocoderAutocomplete {
                 if (this.focusedItemIndex < 0) this.focusedItemIndex = (itemElements.length - 1);
                 /*and and make the current item more visible:*/
                 this.setActive(itemElements, this.focusedItemIndex);
-            } else if (event.keyCode == 13) {
+            } else if (event.code === "Enter") {
                 /* If the ENTER key is pressed and value as selected, close the list*/
                 event.preventDefault();
                 if (this.focusedItemIndex > -1) {
                     this.closeDropDownList();
                 }
+            } else if (event.code === "Escape") {
+                /* If the ESC key is presses, close the list */
+                this.closeDropDownList();
             }
         } else {
-            if (event.keyCode == 40) {
+            if (event.code == 'ArrowDown') {
                 /* Open dropdown list again */
                 this.openDropdownAgain();
             }
