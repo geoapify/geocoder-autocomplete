@@ -236,6 +236,9 @@ autocomplete.on('select', (location) => {
 autocomplete.on('suggestions', (suggestions) => {
     // process suggestions here
 });
+autocomplete.on('input', (userInput) => {
+    // process user input here
+});
 ```
 The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. Properties of the feature contain information about address and location.
 Learn more about Geocoder result properties on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding/).
