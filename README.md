@@ -5,9 +5,9 @@ Geoapify Geocoder Autocomplete is a JavaScript(TypeScript) library that provides
 * shows place suggestions in a dropdown list;
 * notifies on suggestions change;
 * makes a call to Place Details API to get more information and geometry on user selection if is not skipped;  
-* notifies on selection change. Returns [Geocoding API](https://apidocs.geoapify.com/docs/geocoding/api/) object or [Place Details API object](https://apidocs.geoapify.com/docs/place-details/feature) depending on options set.
+* notifies on selection change. Returns [Geocoding API](https://apidocs.geoapify.com/docs/geocoding/) object or [Place Details API object](https://apidocs.geoapify.com/docs/place-details/) depending on options set.
 
-The library makes a call to [Geoapify Place Details API](https://apidocs.geoapify.com/docs/place-details) on user select events. The API lets to get detailed information about the place selected as well as place category and place geometry (building polygon or region boundary). Note, that the Place Details API call costs an additional 'geocoding & places' request. Use the `skipDetails` option to switch the functionality off.
+The library makes a call to [Geoapify Place Details API](https://apidocs.geoapify.com/docs/place-details/) on user select events. The API lets to get detailed information about the place selected as well as place category and place geometry (building polygon or region boundary). Note, that the Place Details API call costs an additional 'geocoding & places' request. Use the `skipDetails` option to switch the functionality off.
 
 You can also:
 * specify a location type - **country**, **state**, **city**, **postcode**, **street**, **amenity**;
@@ -16,7 +16,7 @@ You can also:
 * select a language for search results;
 * change result number shown in the dropdown list.
 
-# [Live demo](https://apidocs.geoapify.com/playground/geocoding)
+# [Live demo](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
 
 ## Add Geocoder Autocomplete to your project
 
@@ -172,6 +172,10 @@ autocomplete.addBiasByRect(biasByRect);
 autocomplete.addBiasByProximity(biasByProximity);
 autocomplete.clearBias();
 
+// get and change dropdown list state
+autocomplete.isOpen();
+autocomplete.open();
+autocomplete.close();
 ```
 
 #### Set display value
@@ -233,11 +237,29 @@ The Geocoder Autocomplete can notify when the list of suggestions is changed or 
 autocomplete.on('select', (location) => {
     // check selected location here 
 });
+
 autocomplete.on('suggestions', (suggestions) => {
     // process suggestions here
 });
+
 autocomplete.on('input', (userInput) => {
     // process user input here
+});
+
+autocomplete.on('open', () => {
+    // dropdown list is opened 
+});
+
+autocomplete.on('close', () => {
+    // dropdown list is closed 
+});
+
+autocomplete.once('open', () => {
+    // dropdown list is opened, one time callback
+});
+
+autocomplete.once('close', () => {
+    // dropdown list is closed, one time callback
 });
 ```
 The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. Properties of the feature contain information about address and location.

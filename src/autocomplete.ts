@@ -25,6 +25,8 @@ export class GeocoderAutocomplete {
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
     private inputCallbacks: ((input: string) => any) [] = [];
+    private openCallbacks: ((opened: boolean) => any) [] = [];
+    private closeCallbacks: ((opened: boolean) => any) [] = [];
 
     private preprocessHook?: (value: string) => string;
     private postprocessHook?: (feature: any) => string;
@@ -152,7 +154,7 @@ export class GeocoderAutocomplete {
         this.options.bias = {};
     }
 
-    public on(operation: 'select' | 'suggestions' | 'input', callback: (param: any) => any) {
+    public on(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) < 0) {
             this.changeCallbacks.push(callback);
         }
@@ -164,9 +166,17 @@ export class GeocoderAutocomplete {
         if (operation === 'input' && this.inputCallbacks.indexOf(callback) < 0) {
             this.inputCallbacks.push(callback);
         }
+
+        if (operation === 'close' && this.closeCallbacks.indexOf(callback) < 0) {
+            this.closeCallbacks.push(callback);
+        }
+
+        if (operation === 'open' && this.openCallbacks.indexOf(callback) < 0) {
+            this.openCallbacks.push(callback);
+        }        
     }
 
-    public off(operation: 'select' | 'suggestions' | 'input', callback: (param: any) => any) {
+    public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) >= 0) {
             this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback), 1);
         }
@@ -178,6 +188,26 @@ export class GeocoderAutocomplete {
         if (operation === 'input' && this.inputCallbacks.indexOf(callback) >= 0) {
             this.inputCallbacks.splice(this.inputCallbacks.indexOf(callback), 1);
         }
+
+        if (operation === 'close' && this.closeCallbacks.indexOf(callback) >= 0) {
+            this.closeCallbacks.splice(this.closeCallbacks.indexOf(callback), 1);
+        }
+
+        if (operation === 'open' && this.openCallbacks.indexOf(callback) >= 0) {
+            this.openCallbacks.splice(this.openCallbacks.indexOf(callback), 1);
+        }
+    }
+
+    public once(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => any) {
+        this.on(operation, callback);
+
+        const current = this;
+        const currentListener = () => {
+            current.off(operation, callback);
+            current.off(operation, currentListener);
+        }
+
+        this.on(operation, currentListener);
     }
 
     public setSuggestionsFilter(suggestionsFilterFunc?: (suggestions: any[]) => any[]) {
@@ -190,6 +220,20 @@ export class GeocoderAutocomplete {
 
     public setPostprocessHook(postprocessHookFunc?: (value: string) => string) {
         this.postprocessHook = postprocessHookFunc;
+    }
+
+    public isOpen(): boolean {
+        return !!this.autocompleteItemsElement;
+    }
+
+    public close() {
+        this.closeDropDownList();
+    }
+
+    public open() {
+        if (!this.isOpen()) {
+            this.openDropdownAgain();
+        }
     }
 
     /* Execute a function when someone writes in the text field: */
@@ -264,6 +308,8 @@ export class GeocoderAutocomplete {
                 /*create a DIV element that will contain the items (values):*/
                 this.autocompleteItemsElement = document.createElement("div");
                 this.autocompleteItemsElement.setAttribute("class", "geoapify-autocomplete-items");
+
+                this.notifyOpened();
 
                 /* Append the DIV element as a child of the autocomplete container:*/
                 this.container.appendChild(this.autocompleteItemsElement);
@@ -452,6 +498,7 @@ export class GeocoderAutocomplete {
         if (this.autocompleteItemsElement) {
             this.container.removeChild(this.autocompleteItemsElement);
             this.autocompleteItemsElement = null;
+            this.notifyClosed();
         }
     }
 
@@ -566,6 +613,14 @@ export class GeocoderAutocomplete {
 
     private notifySuggestions(features: any) {
         this.suggestionsChangeCallbacks.forEach(callback => callback(features));
+    }
+
+    private notifyOpened() {
+        this.openCallbacks.forEach(callback => callback(true));
+    }
+
+    private notifyClosed() {
+        this.closeCallbacks.forEach(callback => callback(false));
     }
 
     private openDropdownAgain() {
