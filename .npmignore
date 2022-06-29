@@ -2,3 +2,5 @@ src
 tsconfig.json
 *.tgz
 .vscode/*
+rollup.config.js
+postcss.config.cjs

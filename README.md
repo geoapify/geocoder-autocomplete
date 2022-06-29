@@ -18,14 +18,16 @@ You can also:
 
 # [Live demo](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
 
-## Add Geocoder Autocomplete to your project
+## Add Geocoder Autocomplete to your project or webpage
 
 ##### STEP 0. Get an API key from Geoapify
 You will need an API key to execute Geoapify Geocoding requests.
 Register and get an API key for Free on [myprojects.geoapify.com](https://myprojects.geoapify.com/).
 Geoapify has a [Freemium pricing model](https://www.geoapify.com/pricing/). You can start for Free and extend when you need it.
 
-##### STEP 1. Install the Geocoder Autocomplete package
+##### STEP 1. Add the Geocoder Autocomplete package
+
+* **Option 1**. Install  the Geocoder Autocomplete package with NPM or Yarn project manager:
 
 ```
 npm install @geoapify/geocoder-autocomplete
@@ -33,6 +35,23 @@ npm install @geoapify/geocoder-autocomplete
 yarn add @geoapify/geocoder-autocomplete
 ```
 
+* **Option 2**. Refer to the Geocoder Autocomplete library as a UMD module (for CMS websites, including WordPress):
+```html
+<html>
+    <head>
+        <script src=".../index.min.js"></script>
+        <link rel="stylesheet" type="text/css" href=".../minimal.css">
+        ...
+    </head>
+...
+</html>
+```
+
+You can use [UNPKG](https://unpkg.com/) to refer or download the library:
+
+```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/dist/index.min.js```
+
+```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/style/minimal.css```
 ##### STEP 2. Add a container element to webpage
 The autocomplete input will be added into the container element and will take the element full width:
 ```html
@@ -46,6 +65,7 @@ The container element must have `position: absolute;` or `position: relative;`
 ```
 ##### STEP 3. Initialize the autocomplete field
 
+* **Option 1**. Import the Geocoder Autocomplete types when you use it as a module:
 ```javascript
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 
@@ -62,7 +82,24 @@ autocomplete.on('suggestions', (suggestions) => {
     // process suggestions here
 });
 ```
-##### STEP 4. Import Geoapify autocomplete styles:
+
+* **Option 2**. Refer to the Geocoder Autocomplete as `autocomplete` when you added it as a script:
+```javascript
+const autocompleteInput = new autocomplete.GeocoderAutocomplete(
+                        document.getElementById("autocomplete"), 
+                        'YOUR_API_KEY', 
+                        { /* Geocoder options */ });
+
+autocompleteInput.on('select', (location) => {
+    // check selected location here 
+});
+
+autocompleteInput.on('suggestions', (suggestions) => {
+    // process suggestions here
+});
+```
+
+##### STEP 4. Choose Geoapify autocomplete styles:
 We provide several Themes within the library: 
 * `minimal` and `round-borders` - for webpages with light background color
 * `minimal-dark` and `round-borders-dark` for webpages with dark background color. 
@@ -70,6 +107,10 @@ We provide several Themes within the library:
 You can import the appropriate css-file to your styles:
 ```css
  @import "~@geoapify/geocoder-autocomplete/styles/minimal.css";
+```
+or as a link in a HTML-file:
+```html
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@^1/style/minimal.css">
 ```
 ## Geoapify Geocoder options
 #### GeocoderAutocompleteOptions
