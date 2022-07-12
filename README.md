@@ -16,10 +16,10 @@ You can also:
 * select a language for search results;
 * change result number shown in the dropdown list.
 
-# [Live demo](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
+## [Live demo](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
 
+## [JSFiddle demo](https://jsfiddle.net/Geoapify/jsgw53z8/)
 ## Add Geocoder Autocomplete to your project or webpage
-
 ##### STEP 0. Get an API key from Geoapify
 You will need an API key to execute Geoapify Geocoding requests.
 Register and get an API key for Free on [myprojects.geoapify.com](https://myprojects.geoapify.com/).
@@ -51,7 +51,7 @@ You can use [UNPKG](https://unpkg.com/) to refer or download the library:
 
 ```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/dist/index.min.js```
 
-```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/style/minimal.css```
+```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/styles/minimal.css```
 ##### STEP 2. Add a container element to webpage
 The autocomplete input will be added into the container element and will take the element full width:
 ```html
@@ -110,7 +110,7 @@ You can import the appropriate css-file to your styles:
 ```
 or as a link in a HTML-file:
 ```html
-<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@^1/style/minimal.css">
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@^1/styles/minimal.css">
 ```
 ## Geoapify Geocoder options
 #### GeocoderAutocompleteOptions
