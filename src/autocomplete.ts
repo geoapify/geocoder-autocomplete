@@ -176,25 +176,35 @@ export class GeocoderAutocomplete {
         }        
     }
 
-    public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => any) {
+    public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback?: (param: any) => any) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) >= 0) {
             this.changeCallbacks.splice(this.changeCallbacks.indexOf(callback), 1);
+        } else if (operation === 'select' && !callback) {
+            this.changeCallbacks = [];
         }
 
         if (operation === 'suggestions' && this.suggestionsChangeCallbacks.indexOf(callback) >= 0) {
             this.suggestionsChangeCallbacks.splice(this.suggestionsChangeCallbacks.indexOf(callback), 1);
+        } else if (operation === 'suggestions' && !callback) {
+            this.suggestionsChangeCallbacks = [];
         }
 
         if (operation === 'input' && this.inputCallbacks.indexOf(callback) >= 0) {
             this.inputCallbacks.splice(this.inputCallbacks.indexOf(callback), 1);
+        } else if (operation === 'input' && !callback) {
+            this.inputCallbacks = [];
         }
 
         if (operation === 'close' && this.closeCallbacks.indexOf(callback) >= 0) {
             this.closeCallbacks.splice(this.closeCallbacks.indexOf(callback), 1);
+        } else if (operation === 'close' && !callback) {
+            this.closeCallbacks = [];
         }
 
         if (operation === 'open' && this.openCallbacks.indexOf(callback) >= 0) {
             this.openCallbacks.splice(this.openCallbacks.indexOf(callback), 1);
+        } else if (operation === 'open' && !callback) {
+            this.openCallbacks = [];
         }
     }
 

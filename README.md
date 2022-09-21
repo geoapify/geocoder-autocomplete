@@ -273,7 +273,8 @@ autocomplete.setSuggestionsFilter(null);
 
 ```
 ## Geocoder Autocomplete events
-The Geocoder Autocomplete can notify when the list of suggestions is changed or a selection happened:
+You can add event listeners to the Geocoder Autocomplete:
+
 ```javascript
 autocomplete.on('select', (location) => {
     // check selected location here 
@@ -303,7 +304,17 @@ autocomplete.once('close', () => {
     // dropdown list is closed, one time callback
 });
 ```
-The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. Properties of the feature contain information about address and location.
+The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. The feature properties contain information about address and location.
+
+Use `off()` function to remove event listerers:
+```javascript
+// remove open event
+autocomplete.off('open', this.onOpen);
+
+// remove all open events
+autocomplete.off('open');
+```
+
 Learn more about Geocoder result properties on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding/).
 ## Styling
 We provide several Themes within the library: 
