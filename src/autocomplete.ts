@@ -24,9 +24,9 @@ export class GeocoderAutocomplete {
 
     private changeCallbacks: ((selectedOption: any) => any)[] = [];
     private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
-    private inputCallbacks: ((input: string) => any) [] = [];
-    private openCallbacks: ((opened: boolean) => any) [] = [];
-    private closeCallbacks: ((opened: boolean) => any) [] = [];
+    private inputCallbacks: ((input: string) => any)[] = [];
+    private openCallbacks: ((opened: boolean) => any)[] = [];
+    private closeCallbacks: ((opened: boolean) => any)[] = [];
 
     private preprocessHook?: (value: string) => string;
     private postprocessHook?: (feature: any) => string;
@@ -178,7 +178,7 @@ export class GeocoderAutocomplete {
 
         if (operation === 'open' && this.openCallbacks.indexOf(callback) < 0) {
             this.openCallbacks.push(callback);
-        }        
+        }
     }
 
     public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback?: (param: any) => any) {
@@ -308,17 +308,18 @@ export class GeocoderAutocomplete {
             });
 
             promise.then((data: any) => {
+
+                if (data.features && data.features.length &&
+                    data?.query?.parsed &&
+                    (this.options.allowNonVerifiedHouseNumber || this.options.allowNonVerifiedStreet)) {
+
+                    this.extendByNonVerifiedValues(data.features, data?.query?.parsed);
+                }
+
                 this.currentItems = data.features;
 
                 if (this.currentItems && this.currentItems.length && this.suggestionsFilter && typeof this.suggestionsFilter === 'function') {
                     this.currentItems = this.suggestionsFilter(this.currentItems);
-                }
-
-                if (this.currentItems && this.currentItems.length && 
-                    data?.query?.parsed &&
-                    (this.options.allowNonVerifiedHouseNumber || this.options.allowNonVerifiedStreet)) {
-
-                    this.extendByNonVerifiedValues(this.currentItems, data?.query?.parsed);
                 }
 
                 this.notifySuggestions(this.currentItems);
@@ -378,7 +379,7 @@ export class GeocoderAutocomplete {
     }
 
     private addHouseNumberToFormatted(featureProperties: any, street: string, housenumber: string) {
-        const houseNumberAndStreetFormatsPerCountry: {[key: string]: string[]} = {
+        const houseNumberAndStreetFormatsPerCountry: { [key: string]: string[] } = {
             "{{{road}}} {{{house_number}}}": ["af", "ai", "al", "ao", "ar", "at", "aw", "ax", "ba", "be", "bg", "bi", "bo", "bq", "br", "bs", "bt", "bv", "bw", "cf", "ch", "cl", "cm", "co", "cr", "cu", "cv", "cw", "cy", "cz", "de", "dk", "do", "ec", "ee", "eh", "er", "et", "fi", "fo", "gd", "ge", "gl", "gq", "gr", "gt", "gw", "hn", "hr", "ht", "hu", "id", "il", "ir", "is", "jo", "ki", "km", "kp", "kw", "lc", "li", "lr", "lt", "lv", "ly", "me", "mk", "ml", "mn", "mo", "mx", "ni", "nl", "no", "np", "pa", "pe", "pl", "ps", "pt", "pw", "py", "qa", "ro", "rs", "ru", "sb", "sd", "se", "si", "sj", "sk", "so", "sr", "ss", "st", "sv", "sx", "sz", "td", "tj", "tl", "tr", "um", "uz", "uy", "vc", "ve", "vu", "ws"],
             "{{{house_number}}} {{{road}}}": ["ad", "ae", "ag", "am", "as", "au", "az", "bb", "bd", "bf", "bh", "bl", "bm", "bz", "ca", "cc", "ci", "ck", "cn", "cx", "dj", "dm", "dz", "eg", "fj", "fk", "fm", "fr", "ga", "gb", "gf", "gg", "gh", "gi", "gm", "gn", "gp", "gs", "gu", "gy", "hk", "hm", "ie", "im", "io", "iq", "je", "jm", "jp", "ke", "kh", "kn", "kr", "ky", "lb", "lk", "ls", "lu", "ma", "mc", "mf", "mh", "mg", "mm", "mp", "ms", "mt", "mq", "mv", "mw", "my", "na", "nc", "ne", "nf", "ng", "nr", "nu", "nz", "om", "pf", "pg", "ph", "pk", "pm", "pr", "re", "rw", "sa", "sc", "sg", "sh", "sl", "sn", "tc", "tf", "th", "tk", "tn", "to", "tt", "tv", "tw", "tz", "ug", "us", "vg", "vi", "wf", "yt", "za", "zm", "zw"],
             "{{{road}}}, {{{house_number}}}": ["by", "es", "it", "kg", "kz", "md", "mz", "sm", "sy", "ua", "va"],
@@ -415,18 +416,18 @@ export class GeocoderAutocomplete {
                 this.addHouseNumberToFormatted(feature.properties, null, parsedAddress.housenumber)
                 feature.properties.nonVerifiedParts = ["housenumber"];
             } else if (parsedAddress.street && parsedAddress.housenumber &&
-                this.options.allowNonVerifiedStreet && 
-                (feature.properties.rank.match_type === "match_by_city_or_disrict" || feature.properties.rank.match_type === "match_by_postcode")) {                      
+                this.options.allowNonVerifiedStreet &&
+                (feature.properties.rank.match_type === "match_by_city_or_disrict" || feature.properties.rank.match_type === "match_by_postcode")) {
                 // add housenumber and street
                 this.addHouseNumberToFormatted(feature.properties, parsedAddress.street, parsedAddress.housenumber)
                 feature.properties.nonVerifiedParts = ["housenumber", "street"];
             } else if (parsedAddress.street &&
-                this.options.allowNonVerifiedStreet && 
+                this.options.allowNonVerifiedStreet &&
                 (feature.properties.rank.match_type === "match_by_city_or_disrict" || feature.properties.rank.match_type === "match_by_postcode")) {
                 // add street
                 feature.properties.street = parsedAddress.street.replace(/(^\w|\s\w|[-]\w)/g, (m: string) => m.toUpperCase());
 
-                feature.properties.address_line1 = feature.properties.street ;
+                feature.properties.address_line1 = feature.properties.street;
                 feature.properties.address_line2 = feature.properties.formatted;
 
                 feature.properties.formatted = feature.properties.street + ", " + feature.properties.formatted;
@@ -472,7 +473,7 @@ export class GeocoderAutocomplete {
                 mainPart = mainPart.substring(0, valueIndex) +
                     `<strong>${mainPart.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
                     mainPart.substring(valueIndex + currentValue.length);
-    
+
             }
         }
 
@@ -503,7 +504,12 @@ export class GeocoderAutocomplete {
                 /* If the ENTER key is pressed and value as selected, close the list*/
                 event.preventDefault();
                 if (this.focusedItemIndex > -1) {
-                    this.closeDropDownList();
+                    if (this.options.skipSelectionOnArrowKey) {
+                        // select the location if it wasn't selected by navigation
+                        this.setValueAndNotify(this.currentItems[this.focusedItemIndex]);
+                    } else {
+                        this.closeDropDownList();
+                    }
                 }
             } else if (event.code === "Escape") {
                 /* If the ESC key is presses, close the list */
@@ -527,15 +533,15 @@ export class GeocoderAutocomplete {
         /* Add class "autocomplete-active" to the active element*/
         items[index].classList.add("active");
 
-        // Change input value and notify
-
-        if (this.postprocessHook && typeof this.postprocessHook === 'function') {
-            this.inputElement.value = this.postprocessHook(this.currentItems[index]);
-        } else {
-            this.inputElement.value = this.currentItems[index].properties.formatted;
+        if (!this.options.skipSelectionOnArrowKey) {
+            // Change input value and notify
+            if (this.postprocessHook && typeof this.postprocessHook === 'function') {
+                this.inputElement.value = this.postprocessHook(this.currentItems[index]);
+            } else {
+                this.inputElement.value = this.currentItems[index].properties.formatted;
+            }
+            this.notifyValueSelected(this.currentItems[index]);
         }
-
-        this.notifyValueSelected(this.currentItems[index]);
     }
 
 
@@ -809,6 +815,7 @@ export interface GeocoderAutocompleteOptions {
 
     skipIcons?: boolean;
     skipDetails?: boolean;
+    skipSelectionOnArrowKey?: boolean;
 
     // to remove in the next version
     position?: GeoPosition;

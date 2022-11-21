@@ -123,6 +123,7 @@ or as a link in a HTML-file:
 | debounceDelay | number | A delay between user input and the API call to prevent unnecessary calls. The default value is 100ms. |
 | skipIcons | boolean | Don't add icons to suggestions |
 | skipDetails | boolean | Skip Place Details API call on selection change |
+| skipSelectionOnArrowKey | boolean | Don't choose the location with the arrow keys |
 | filter | FilterOptions | Filter places by country, boundary, circle, place |
 | bias | BiasOptions | Prefer places by country, boundary, circle, location |
 | allowNonVerifiedHouseNumber | boolean | Allow the addition of house numbers that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. | 
@@ -139,7 +140,7 @@ Name | Filter | Filter Value | Description | Examples
 By circle | *circle* | `{ lon: number ,lat: number, radiusMeters: number }`  | Search places inside the circle | `filter['circle'] = {lon: -87.770231, lat: 41.878968, radiusMeters: 5000}`
 By rectangle | *rect* | `{ lon1: number ,lat1: number, lon2: number ,lat2: number}`  | Search places inside the rectangle | `filter['rect'] = {lon1: 89.097540, lat1: 39.668983, lon2: -88.399274, lat2: 40.383412}`
 By country | *countrycode* | `CountyCode[]`  | Search places in the countries | `filter['countrycode'] = ['de', 'fr', 'es']`
-By place | *place* | `string` | Search for places within a given city or postal code. For example, search for streets within a city. Use the 'place_id' returned by a another search to specify a filter. | `filter['place'] = '51ac66e77e9826274059f9426dc08c114840f00101f901dcf3000000000000c00208'`
+By place | *place* | `string` | Search for places within a given city or postal code. For example, search for streets within a city. Use the 'place_id' returned by another search to specify a filter. | `filter['place'] = '51ac66e77e9826274059f9426dc08c114840f00101f901dcf3000000000000c00208'`
 
 You can provide filters as initial options or add by calling a function:
 ```
