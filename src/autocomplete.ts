@@ -44,6 +44,7 @@ export class GeocoderAutocomplete {
     private BY_RECT = 'rect';
     private BY_CIRCLE = 'circle';
     private BY_PROXIMITY = 'proximity';
+    private BY_PLACE = 'place';
 
     constructor(private container: HTMLElement, private apiKey: string, options?: GeocoderAutocompleteOptions) {
         this.options = options ? { ...this.options, ...options } : this.options;
@@ -128,6 +129,10 @@ export class GeocoderAutocomplete {
 
     public addFilterByRect(filterByRect: ByRectOptions) {
         this.options.filter[this.BY_RECT] = filterByRect;
+    }
+
+    public addFilterByPlace(filterByPlace: string) {
+        this.options.filter[this.BY_PLACE] = filterByPlace;
     }
 
     public clearFilters() {
@@ -309,6 +314,13 @@ export class GeocoderAutocomplete {
                     this.currentItems = this.suggestionsFilter(this.currentItems);
                 }
 
+                if (this.currentItems && this.currentItems.length && 
+                    data?.query?.parsed &&
+                    (this.options.allowNonVerifiedHouseNumber || this.options.allowNonVerifiedStreet)) {
+
+                    this.extendByNonVerifiedValues(this.currentItems, data?.query?.parsed);
+                }
+
                 this.notifySuggestions(this.currentItems);
 
                 if (!this.currentItems.length) {
@@ -365,8 +377,65 @@ export class GeocoderAutocomplete {
         }, this.options.debounceDelay);
     }
 
-    private getStyledAddressSingleValue(value: string, currentValue: string): string {
+    private addHouseNumberToFormatted(featureProperties: any, street: string, housenumber: string) {
+        const houseNumberAndStreetFormatsPerCountry: {[key: string]: string[]} = {
+            "{{{road}}} {{{house_number}}}": ["af", "ai", "al", "ao", "ar", "at", "aw", "ax", "ba", "be", "bg", "bi", "bo", "bq", "br", "bs", "bt", "bv", "bw", "cf", "ch", "cl", "cm", "co", "cr", "cu", "cv", "cw", "cy", "cz", "de", "dk", "do", "ec", "ee", "eh", "er", "et", "fi", "fo", "gd", "ge", "gl", "gq", "gr", "gt", "gw", "hn", "hr", "ht", "hu", "id", "il", "ir", "is", "jo", "ki", "km", "kp", "kw", "lc", "li", "lr", "lt", "lv", "ly", "me", "mk", "ml", "mn", "mo", "mx", "ni", "nl", "no", "np", "pa", "pe", "pl", "ps", "pt", "pw", "py", "qa", "ro", "rs", "ru", "sb", "sd", "se", "si", "sj", "sk", "so", "sr", "ss", "st", "sv", "sx", "sz", "td", "tj", "tl", "tr", "um", "uz", "uy", "vc", "ve", "vu", "ws"],
+            "{{{house_number}}} {{{road}}}": ["ad", "ae", "ag", "am", "as", "au", "az", "bb", "bd", "bf", "bh", "bl", "bm", "bz", "ca", "cc", "ci", "ck", "cn", "cx", "dj", "dm", "dz", "eg", "fj", "fk", "fm", "fr", "ga", "gb", "gf", "gg", "gh", "gi", "gm", "gn", "gp", "gs", "gu", "gy", "hk", "hm", "ie", "im", "io", "iq", "je", "jm", "jp", "ke", "kh", "kn", "kr", "ky", "lb", "lk", "ls", "lu", "ma", "mc", "mf", "mh", "mg", "mm", "mp", "ms", "mt", "mq", "mv", "mw", "my", "na", "nc", "ne", "nf", "ng", "nr", "nu", "nz", "om", "pf", "pg", "ph", "pk", "pm", "pr", "re", "rw", "sa", "sc", "sg", "sh", "sl", "sn", "tc", "tf", "th", "tk", "tn", "to", "tt", "tv", "tw", "tz", "ug", "us", "vg", "vi", "wf", "yt", "za", "zm", "zw"],
+            "{{{road}}}, {{{house_number}}}": ["by", "es", "it", "kg", "kz", "md", "mz", "sm", "sy", "ua", "va"],
+            "{{{house_number}}}, {{{road}}}": ["bj", "bn", "cd", "cg", "in", "la", "mr", "mu", "tg", "tm", "vn", "ye"]
+        }
 
+        const format = Object.keys(houseNumberAndStreetFormatsPerCountry).find(key => houseNumberAndStreetFormatsPerCountry[key].indexOf(featureProperties.country_code) >= 0) || "{{{road}}} {{{house_number}}}";
+
+        if (street) {
+            // add street and housenumber
+            featureProperties.street = street.replace(/(^\w|\s\w|[-]\w)/g, m => m.toUpperCase());
+
+            featureProperties.housenumber = housenumber;
+            const addressPart = format.replace("{{{road}}}", featureProperties.street).replace("{{{house_number}}}", housenumber);
+            featureProperties.address_line1 = addressPart;
+            featureProperties.address_line2 = featureProperties.formatted;
+
+            featureProperties.formatted = addressPart + ", " + featureProperties.formatted;
+        } else {
+            // add house number only
+            featureProperties.housenumber = housenumber;
+            const addressPart = format.replace("{{{road}}}", featureProperties.street).replace("{{{house_number}}}", housenumber);
+
+            featureProperties.address_line1 = featureProperties.address_line1.replace(featureProperties.street, addressPart);;
+            featureProperties.formatted = featureProperties.formatted.replace(featureProperties.street, addressPart);
+        }
+    }
+
+    private extendByNonVerifiedValues(features: any, parsedAddress: any) {
+        features.forEach((feature: any) => {
+            if (parsedAddress.housenumber &&
+                this.options.allowNonVerifiedHouseNumber && feature.properties.rank.match_type === "match_by_street") {
+                // add housenumber
+                this.addHouseNumberToFormatted(feature.properties, null, parsedAddress.housenumber)
+                feature.properties.nonVerifiedParts = ["housenumber"];
+            } else if (parsedAddress.street && parsedAddress.housenumber &&
+                this.options.allowNonVerifiedStreet && 
+                (feature.properties.rank.match_type === "match_by_city_or_disrict" || feature.properties.rank.match_type === "match_by_postcode")) {                      
+                // add housenumber and street
+                this.addHouseNumberToFormatted(feature.properties, parsedAddress.street, parsedAddress.housenumber)
+                feature.properties.nonVerifiedParts = ["housenumber", "street"];
+            } else if (parsedAddress.street &&
+                this.options.allowNonVerifiedStreet && 
+                (feature.properties.rank.match_type === "match_by_city_or_disrict" || feature.properties.rank.match_type === "match_by_postcode")) {
+                // add street
+                feature.properties.street = parsedAddress.street.replace(/(^\w|\s\w|[-]\w)/g, (m: string) => m.toUpperCase());
+
+                feature.properties.address_line1 = feature.properties.street ;
+                feature.properties.address_line2 = feature.properties.formatted;
+
+                feature.properties.formatted = feature.properties.street + ", " + feature.properties.formatted;
+                feature.properties.nonVerifiedParts = ["street"];
+            }
+        });
+    }
+
+    private getStyledAddressSingleValue(value: string, currentValue: string): string {
         let displayValue = value;
 
         const valueIndex = (displayValue || '').toLowerCase().indexOf(currentValue.toLowerCase());
@@ -374,15 +443,14 @@ export class GeocoderAutocomplete {
             displayValue = displayValue.substring(0, valueIndex) +
                 `<strong>${displayValue.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
                 displayValue.substring(valueIndex + currentValue.length);
-
         }
 
         return `<span class="main-part">${displayValue}</span>`
     }
 
     private getStyledAddress(featureProperties: any, currentValue: string): string {
-        let mainPart;
-        let secondaryPart;
+        let mainPart: string;
+        let secondaryPart: string;
         const parts = featureProperties.formatted.split(',').map((part: string) => part.trim());
 
         if (featureProperties.name) {
@@ -394,12 +462,18 @@ export class GeocoderAutocomplete {
             secondaryPart = parts.slice(mainElements).join(', ');
         }
 
-        const valueIndex = mainPart.toLowerCase().indexOf(currentValue.toLowerCase());
-        if (valueIndex >= 0) {
-            mainPart = mainPart.substring(0, valueIndex) +
-                `<strong>${mainPart.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
-                mainPart.substring(valueIndex + currentValue.length);
-
+        if (featureProperties.nonVerifiedParts && featureProperties.nonVerifiedParts.length) {
+            featureProperties.nonVerifiedParts.forEach((part: string) => {
+                mainPart = mainPart.replace(featureProperties[part], `<span class="non-verified">${featureProperties[part]}</span>`);
+            });
+        } else {
+            const valueIndex = mainPart.toLowerCase().indexOf(currentValue.toLowerCase());
+            if (valueIndex >= 0) {
+                mainPart = mainPart.substring(0, valueIndex) +
+                    `<strong>${mainPart.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
+                    mainPart.substring(valueIndex + currentValue.length);
+    
+            }
         }
 
         return `<span class="main-part">${mainPart}</span><span class="secondary-part">${secondaryPart}</span>`
@@ -666,6 +740,7 @@ export class GeocoderAutocomplete {
         const filterByCountryCodes: ByCountryCodeOptions = this.options.filter[this.BY_COUNTRYCODE] as ByCountryCodeOptions;
         const filterByCircle: ByCircleOptions = this.options.filter[this.BY_CIRCLE] as ByCircleOptions;
         const filterByRect: ByRectOptions = this.options.filter[this.BY_RECT] as ByRectOptions;
+        const filterByPlace: string = this.options.filter[this.BY_PLACE] as string;
 
         if (filterByCountryCodes && filterByCountryCodes.length) {
             filters.push(`countrycode:${filterByCountryCodes.join(',').toLowerCase()}`);
@@ -678,6 +753,12 @@ export class GeocoderAutocomplete {
         if (filterByRect && this.isLatitude(filterByRect.lat1) && this.isLongitude(filterByRect.lon1) && this.isLatitude(filterByRect.lat2) && this.isLongitude(filterByRect.lon2)) {
             filters.push(`rect:${filterByRect.lon1},${filterByRect.lat1},${filterByRect.lon2},${filterByRect.lat2}`);
         }
+
+        if (filterByPlace) {
+            filters.push(`place:${filterByPlace}`);
+        }
+
+
         url += filters.length ? `&filter=${filters.join('|')}` : '';
 
         const bias = [];
@@ -723,7 +804,7 @@ export interface GeocoderAutocompleteOptions {
     placeholder?: string;
     debounceDelay?: number;
 
-    filter?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions },
+    filter?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions | string },
     bias?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions | ByProximityOptions },
 
     skipIcons?: boolean;
@@ -732,6 +813,10 @@ export interface GeocoderAutocompleteOptions {
     // to remove in the next version
     position?: GeoPosition;
     countryCodes?: CountyCode[];
+
+    // extend results with non verified values if needed
+    allowNonVerifiedHouseNumber?: boolean;
+    allowNonVerifiedStreet?: boolean;
 }
 
 export interface GeoPosition {

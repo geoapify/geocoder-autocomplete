@@ -81,6 +81,10 @@
     color: rgba(0, 0, 0, 0.6);
 }
 
+.geoapify-autocomplete-items .main-part .non-verified {
+    color:  #ff4848;
+}
+
 .geoapify-autocomplete-items .secondary-part {
     margin-left: 10px;
     font-size: small;

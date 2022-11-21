@@ -123,8 +123,10 @@ or as a link in a HTML-file:
 | debounceDelay | number | A delay between user input and the API call to prevent unnecessary calls. The default value is 100ms. |
 | skipIcons | boolean | Don't add icons to suggestions |
 | skipDetails | boolean | Skip Place Details API call on selection change |
-| filter | FilterOptions | Filter places by country, boundary, circle |
-| bias | BiasOptions | Prefer places by country, boundary, circle, location | 
+| filter | FilterOptions | Filter places by country, boundary, circle, place |
+| bias | BiasOptions | Prefer places by country, boundary, circle, location |
+| allowNonVerifiedHouseNumber | boolean | Allow the addition of house numbers that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. | 
+| allowNonVerifiedStreet | boolean | Allow the addition of streets that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. |
 
 #### LanguageCode
 2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code: `ab`, `aa`, `af`, `ak`, `sq`, `am`, `ar`, `an`, `hy`, `as`, `av`, `ae`, `ay`, `az`, `bm`, `ba`, `eu`, `be`, `bn`, `bh`, `bi`, `bs`, `br`, `bg`, `my`, `ca`, `ch`, `ce`, `ny`, `zh`, `cv`, `kw`, `co`, `cr`, `hr`, `cs`, `da`, `dv`, `nl`, `en`, `eo`, `et`, `ee`, `fo`, `fj`, `fi`, `fr`, `ff`, `gl`, `ka`, `de`, `el`, `gn`, `gu`, `ht`, `ha`, `he`, `hz`, `hi`, `ho`, `hu`, `ia`, `id`, `ie`, `ga`, `ig`, `ik`, `io`, `is`, `it`, `iu`, `ja`, `jv`, `kl`, `kn`, `kr`, `ks`, `kk`, `km`, `ki`, `rw`, `ky`, `kv`, `kg`, `ko`, `ku`, `kj`, `la`, `lb`, `lg`, `li`, `ln`, `lo`, `lt`, `lu`, `lv`, `gv`, `mk`, `mg`, `ms`, `ml`, `mt`, `mi`, `mr`, `mh`, `mn`, `na`, `nv`, `nb`, `nd`, `ne`, `ng`, `nn`, `no`, `ii`, `nr`, `oc`, `oj`, `cu`, `om`, `or`, `os`, `pa`, `pi`, `fa`, `pl`, `ps`, `pt`, `qu`, `rm`, `rn`, `ro`, `ru`, `sa`, `sc`, `sd`, `se`, `sm`, `sg`, `sr`, `gd`, `sn`, `si`, `sk`, `sl`, `so`, `st`, `es`, `su`, `sw`, `ss`, `sv`, `ta`, `te`, `tg`, `th`, `ti`, `bo`, `tk`, `tl`, `tn`, `to`, `tr`, `ts`, `tt`, `tw`, `ty`, `ug`, `uk`, `ur`, `uz`, `ve`, `vi`, `vo`, `wa`, `cy`, `wo`, `fy`, `xh`, `yi`, `yo`, `za`.
@@ -137,6 +139,7 @@ Name | Filter | Filter Value | Description | Examples
 By circle | *circle* | `{ lon: number ,lat: number, radiusMeters: number }`  | Search places inside the circle | `filter['circle'] = {lon: -87.770231, lat: 41.878968, radiusMeters: 5000}`
 By rectangle | *rect* | `{ lon1: number ,lat1: number, lon2: number ,lat2: number}`  | Search places inside the rectangle | `filter['rect'] = {lon1: 89.097540, lat1: 39.668983, lon2: -88.399274, lat2: 40.383412}`
 By country | *countrycode* | `CountyCode[]`  | Search places in the countries | `filter['countrycode'] = ['de', 'fr', 'es']`
+By place | *place* | `string` | Search for places within a given city or postal code. For example, search for streets within a city. Use the 'place_id' returned by a another search to specify a filter. | `filter['place'] = '51ac66e77e9826274059f9426dc08c114840f00101f901dcf3000000000000c00208'`
 
 You can provide filters as initial options or add by calling a function:
 ```
@@ -204,6 +207,7 @@ autocomplete.setLimit(options.limit);
 autocomplete.addFilterByCountry(codes);
 autocomplete.addFilterByCircle(filterByCircle);
 autocomplete.addFilterByRect(filterByRect);
+autocomplete.addFilterByPlace(placeId);
 autocomplete.clearFilters()
 
 // set bias
@@ -316,6 +320,34 @@ autocomplete.off('open');
 ```
 
 Learn more about Geocoder result properties on [Geoapify Documentation page](https://apidocs.geoapify.com/docs/geocoding/).
+
+## Working with non-verified values
+If you are considering using the Geocoder Autocomplete library to collect postal addresses, it is best to make it more tolerant and allow adding non-verified address parts - house numbers and streets.
+For example, it may occur that new streets or houses are not yet included in the databases. Therefore, restricting customer addresses will not be a proper strategy.
+To allow users to add non-verified address parts, use the allowNonVerifiedHouseNumber and allowNonVerifiedStreet parameters.
+
+### How does it work?
+The API returns a parsed address, the found address, and a match type as results. Using this data, the library extends the result by adding missing values, such as house numbers.
+The non-verified part has a "non-verified" class which makes the text red by default.
+The GPS coordinates of the results will point to the actual results and should be adjusted by the user if necessary.
+
+In addition, the result object is extended by the list of non-verified properties. For example:
+```json
+{
+    "type": "Feature",
+    "properties": {
+	...
+        "address_line1": "Bürgermeister-Heinrich-Straße 60",
+        "address_line2": "93077 Bad Abbach, Germany",
+        "housenumber": "60",
+        "nonVerifiedParts": [
+            "housenumber"
+        ]
+    },
+   ...
+}
+```
+
 ## Styling
 We provide several Themes within the library: 
 * `minimal` and `round-borders` - for webpages with light background color
@@ -331,5 +363,6 @@ However, you have also opportunity to style the component by yourself. Here are 
 | `.geoapify-autocomplete-item.icon` | The dropdown list item icon |
 | `.geoapify-autocomplete-item.text` | The dropdown list item text |
 | `.geoapify-close-button` | The clear button |
+| `.geoapify-autocomplete-items .main-part .non-verified` | A portion of the street address could not be verified by Geocoder |
 
 ### Find more Geoapify APIs, Playgrounds and code samples on [apidocs.geoapify.com](https://apidocs.geoapify.com).
