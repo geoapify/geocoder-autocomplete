@@ -119,6 +119,10 @@ export class GeocoderAutocomplete {
         this.inputElement.value = value;
     }
 
+    public getValue() {
+        return this.inputElement.value;
+    }
+
     public addFilterByCountry(codes: ByCountryCodeOptions) {
         this.options.filter[this.BY_COUNTRYCODE] = codes;
     }
@@ -664,7 +668,7 @@ export class GeocoderAutocomplete {
             this.currentPlaceDetailsPromiseReject = null;
         }
 
-        if (this.options.skipDetails || !feature) {
+        if (this.options.skipDetails || !feature || feature.properties.nonVerifiedParts?.length) {
             this.changeCallbacks.forEach(callback => callback(feature));
         } else {
             const promise = new Promise((resolve, reject) => {

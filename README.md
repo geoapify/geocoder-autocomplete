@@ -224,12 +224,14 @@ autocomplete.open();
 autocomplete.close();
 ```
 
-#### Set display value
+#### Setting and getting display value
 You can also set initial value or change display value:
 ```javascript
 const autocomplete = new GeocoderAutocomplete(...);
 
 autocomplete.setValue(value);
+
+const displayValue = autocomplete.getValue();
 ```
 
 ## Hooks and suggestions filter
