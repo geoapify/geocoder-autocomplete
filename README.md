@@ -513,4 +513,9 @@ Furthermore, the result object is expanded to include a list of non-verified pro
 ```
 
 This extended result object provides transparency by clearly indicating which address components are non-verified, allowing for informed decision-making and customization based on the level of validation required for your specific use case.
-### Find more Geoapify APIs, Playgrounds and code samples on [apidocs.geoapify.com](https://apidocs.geoapify.com).
+
+## License
+This library is open-source and released under the MIT License.
+
+## Contributions and Support
+We welcome contributions from the developer community. If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request on [GitHub](https://github.com/geoapify/geocoder-autocomplete).
