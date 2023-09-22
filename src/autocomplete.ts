@@ -22,15 +22,18 @@ export class GeocoderAutocomplete {
     /* We set timeout before sending a request to avoid unnecessary calls */
     private currentTimeout: number;
 
-    private changeCallbacks: ((selectedOption: any) => any)[] = [];
-    private suggestionsChangeCallbacks: ((options: any[]) => any)[] = [];
-    private inputCallbacks: ((input: string) => any)[] = [];
-    private openCallbacks: ((opened: boolean) => any)[] = [];
-    private closeCallbacks: ((opened: boolean) => any)[] = [];
+    private changeCallbacks: ((selectedOption: any) => void)[] = [];
+    private suggestionsChangeCallbacks: ((options: any[]) => void)[] = [];
+    private inputCallbacks: ((input: string) => void)[] = [];
+    private openCallbacks: ((opened: boolean) => void)[] = [];
+    private closeCallbacks: ((opened: boolean) => void)[] = [];
 
     private preprocessHook?: (value: string) => string;
     private postprocessHook?: (feature: any) => string;
     private suggestionsFilter?: (suggetions: any[]) => any[];
+
+    private sendGeocoderRequestAlt?: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>;
+    private sendPlaceDetailsRequestAlt?: (feature: any, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>;
 
     private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
@@ -163,7 +166,7 @@ export class GeocoderAutocomplete {
         this.options.bias = {};
     }
 
-    public on(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => any) {
+    public on(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => void) {
         if (operation === 'select' && this.changeCallbacks.indexOf(callback) < 0) {
             this.changeCallbacks.push(callback);
         }
@@ -230,15 +233,43 @@ export class GeocoderAutocomplete {
     }
 
     public setSuggestionsFilter(suggestionsFilterFunc?: (suggestions: any[]) => any[]) {
-        this.suggestionsFilter = suggestionsFilterFunc;
+        if (suggestionsFilterFunc && typeof suggestionsFilterFunc === 'function') {
+            this.suggestionsFilter = suggestionsFilterFunc;
+        } else {
+            this.suggestionsFilter = null;
+        }
     }
 
     public setPreprocessHook(preprocessHookFunc?: (value: string) => string) {
-        this.preprocessHook = preprocessHookFunc;
+        if (preprocessHookFunc && typeof preprocessHookFunc === 'function') {
+            this.preprocessHook = preprocessHookFunc;
+        } else {
+            this.preprocessHook = null;
+        }
     }
 
     public setPostprocessHook(postprocessHookFunc?: (value: string) => string) {
-        this.postprocessHook = postprocessHookFunc;
+        if (postprocessHookFunc && typeof postprocessHookFunc === 'function') {
+            this.postprocessHook = postprocessHookFunc;
+        } else {
+            this.postprocessHook = null;
+        }
+    }
+
+    public setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>) {
+        if (sendGeocoderRequestFunc && typeof sendGeocoderRequestFunc === 'function') {
+            this.sendGeocoderRequestAlt = sendGeocoderRequestFunc;
+        } else {
+            this.sendGeocoderRequestAlt = null;
+        }
+    }
+
+    public setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: any, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>) {
+        if (sendPlaceDetailsRequestFunc && typeof sendPlaceDetailsRequestFunc === 'function') {
+            this.sendPlaceDetailsRequestAlt = sendPlaceDetailsRequestFunc;
+        } else {
+            this.sendPlaceDetailsRequestAlt = null;
+        }
     }
 
     public isOpen(): boolean {
@@ -253,6 +284,52 @@ export class GeocoderAutocomplete {
         if (!this.isOpen()) {
             this.openDropdownAgain();
         }
+    }
+
+    public sendGeocoderRequest(value: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.currentPromiseReject = reject;
+
+            let url = this.generateUrl(value);
+
+            fetch(url)
+                .then((response) => {
+                    if (response.ok) {
+                        response.json().then(data => resolve(data));
+                    } else {
+                        response.json().then(data => reject(data));
+                    }
+                });
+        });
+    }
+
+    public sendPlaceDetailsRequest(feature: any): Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            if (feature.properties.datasource?.sourcename !== 'openstreetmap' || !feature.properties.place_id) {
+                // only OSM data has detailed information; return the original object if the source is different from OSM
+                resolve(feature);
+                return;
+            }
+            
+            this.currentPlaceDetailsPromiseReject = reject;
+            let url = this.generatePlacesUrlUrl(feature.properties.place_id);
+
+            fetch(url)
+                .then((response) => {
+                    if (response.ok) {
+                        response.json().then(data => {
+                            if (!data.features.length) {
+                                resolve(feature);
+                            }
+
+                            resolve(data.features[0]);
+                        });
+                    } else {
+                        response.json().then(data => reject(data));
+                    }
+                });
+        });
     }
 
     /* Execute a function when someone writes in the text field: */
@@ -292,24 +369,17 @@ export class GeocoderAutocomplete {
 
         this.currentTimeout = window.setTimeout(() => {
             /* Create a new promise and send geocoding request */
-            const promise = new Promise((resolve, reject) => {
-                this.currentPromiseReject = reject;
+            if (this.preprocessHook && typeof this.preprocessHook === 'function') {
+                currentValue = this.preprocessHook(currentValue);
+            }
 
-                if (this.preprocessHook && typeof this.preprocessHook === 'function') {
-                    currentValue = this.preprocessHook(currentValue);
-                }
+            let promise;
 
-                let url = this.generateUrl(currentValue);
-
-                fetch(url)
-                    .then((response) => {
-                        if (response.ok) {
-                            response.json().then(data => resolve(data));
-                        } else {
-                            response.json().then(data => reject(data));
-                        }
-                    });
-            });
+            if (this.sendGeocoderRequestAlt) {
+                promise = this.sendGeocoderRequestAlt(currentValue, this);
+            } else {
+                promise = this.sendGeocoderRequest(currentValue);
+            }
 
             promise.then((data: any) => {
 
@@ -668,38 +738,26 @@ export class GeocoderAutocomplete {
             this.currentPlaceDetailsPromiseReject = null;
         }
 
-        if (this.options.skipDetails || !feature || feature.properties.nonVerifiedParts?.length) {
+        if (!this.options.addDetails || !feature || feature.properties.nonVerifiedParts?.length) {
             this.changeCallbacks.forEach(callback => callback(feature));
         } else {
-            const promise = new Promise((resolve, reject) => {
-                this.currentPlaceDetailsPromiseReject = reject;
-                let url = this.generatePlacesUrlUrl(feature.properties.place_id);
 
-                fetch(url)
-                    .then((response) => {
-                        if (response.ok) {
-                            response.json().then(data => resolve(data));
-                        } else {
-                            response.json().then(data => reject(data));
-                        }
-                    });
-            });
+            let promise;
 
+            if (this.sendPlaceDetailsRequestAlt) {
+                promise = this.sendPlaceDetailsRequestAlt(feature, this)
+            } else {
+                promise = this.sendPlaceDetailsRequest(feature); 
+            }
 
-            promise.then((data: any) => {
-
-                if (!data.features.length) {
-                    this.changeCallbacks.forEach(callback => callback(feature));
-                    return;
-                }
-
-                const placeDetails = data.features[0];
-                this.changeCallbacks.forEach(callback => callback(placeDetails));
+            promise.then((detailesFeature: any) => {
+                this.changeCallbacks.forEach(callback => callback(detailesFeature));
                 this.currentPlaceDetailsPromiseReject = null;
-
             }, (err) => {
                 if (!err.canceled) {
                     console.log(err);
+                    this.changeCallbacks.forEach(callback => callback(feature));
+                    this.currentPlaceDetailsPromiseReject = null;
                 }
             });
         }
@@ -818,7 +876,14 @@ export interface GeocoderAutocompleteOptions {
     bias?: { [key: string]: ByCircleOptions | ByCountryCodeOptions | ByRectOptions | ByProximityOptions },
 
     skipIcons?: boolean;
+
+/**
+ * @deprecated The property should not be used; it is true by default. Use the addDetails property to add details.
+ */
     skipDetails?: boolean;
+
+    addDetails?: boolean;
+
     skipSelectionOnArrowKey?: boolean;
 
     // to remove in the next version

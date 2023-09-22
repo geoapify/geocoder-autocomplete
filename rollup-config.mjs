@@ -1,9 +1,13 @@
-import pkg from './package.json';
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import {readFileSync} from 'node:fs';
+
+// TODO: Replace this with a regular import when ESLint adds support for import assertions.
+// See: https://rollupjs.org/guide/en/#importing-packagejson
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
 
 export const nodeResolve = resolve({
   browser: true,
@@ -16,11 +20,16 @@ export default [{
     {
       file: pkg.minimized,
       name: "autocomplete",
-      format: 'umd'
+      format: 'umd',
+      sourcemap: true,
+			freeze: false,
+			esModule: false
     },
     {
       file: pkg.module,
-      format: 'es'
+      format: 'es',
+      sourcemap: true,
+			freeze: false
     }
   ],
   plugins: [

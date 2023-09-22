@@ -65,5 +65,5 @@
     "resolveJsonModule": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/__tests__/*", "dist", "rollup.config.js"]
+  "exclude": ["node_modules", "**/__tests__/*", "dist", "rollup-config.mjs"]
 }

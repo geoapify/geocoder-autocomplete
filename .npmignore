@@ -1,6 +1,7 @@
 src
+img
 tsconfig.json
 *.tgz
 .vscode/*
-rollup.config.js
+rollup-config.mjs
 postcss.config.cjs
