@@ -2,6 +2,8 @@
 
 The Geoapify Geocoder Autocomplete is a JavaScript (TypeScript) library designed to enhance web applications and HTML pages by adding advanced **address autocomplete** functionality and **address autofill** input fields. It harnesses the power of the [Geoapify Geocoding API](https://www.geoapify.com/geocoding-api/) to provide accurate and efficient address search capabilities, making it an essential tool for enhancing the geolocation services of web-based applications.
 
+![Geocoder Autocomplete](https://github.com/geoapify/geocoder-autocomplete/blob/9b46b3e458d18b45e2957298e8833f830ed6252a/img/address-autocomplete-example.png?raw=true)
+
 * **Customizable Address Input**: Easily embed address input fields within your web application by adding them to provided HTML containers (e.g., `DIV` elements), allowing for flexible integration and styling.
 * **API Integration Flexibility**: By default, the library seamlessly connects to the [Geoapify Address Autocomplete API](https://www.geoapify.com/address-autocomplete/) to retrieve address suggestions. However, developers have the freedom to integrate and combine other third-party Address Search APIs, allowing for extensive customization and the incorporation of multiple data sources.
 * **Search Customization**: Tailor your address search with precision by adding filters and bias parameters. This level of customization empowers developers to fine-tune search queries, ensuring more accurate and relevant address suggestions for users.
@@ -484,7 +486,7 @@ In real-world scenarios, it's possible that newly constructed streets or houses 
 
 To accommodate users and enable the inclusion of non-verified address parts, you can leverage the `allowNonVerifiedHouseNumber` and `allowNonVerifiedStreet` parameters. These settings empower users to contribute address details that may not yet be officially validated, fostering flexibility and completeness in your address data collection process.
 
-### How It Functions
+### How it works
 
 The library operates by utilizing the API to retrieve essential address details, including the parsed address, the located address, and a match type as results. Using this information as a foundation, the library enhances the result by filling in missing values, such as house numbers, to provide a more complete and user-friendly address representation.
 
