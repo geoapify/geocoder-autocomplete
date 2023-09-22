@@ -115,6 +115,12 @@ or as a link in a HTML-file:
 ```html
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@^1/styles/minimal.css">
 ```
+
+## Transitioning from 1.x: Replacing `skipDetails` with `addDetails`
+
+When transitioning from the 1.x version of the library to the 2.x version, it's important to note that the `skipDetails` option has been replaced by the `addDetails` option. This change enhances the clarity of the parameter, as it now explicitly indicates whether you want to include or exclude additional details in the search results. To maintain compatibility with the updated version, make sure to adjust your code accordingly by using the `addDetails` option when needed for your address search functionality.
+
+So, if you require place details in your search results, you should set the `addDetails` option to `true`.
 ## Documentation
 
 Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, usage examples, advanced features, and more. You'll find the information you need to seamlessly integrate address autocomplete and enhance your web-based geolocation services and user experiences.
