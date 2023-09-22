@@ -128,7 +128,7 @@ Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, u
 
 | Option | Type | Description |
 | ------ | ------ | ------ |
-| constructor | `GeocoderAutocomplete(<HTMLElement> el, <String> geoapifyApiKey, <GeocoderAutocompleteOptions> options?)` | `GeocoderAutocomplete(document.getElementById('autocomplete'), 'sdf45dfg68879fhsdgs346dfhdj', { lang: 'it' }`
+| constructor | *GeocoderAutocomplete(<HTMLElement> el, <String> geoapifyApiKey, <GeocoderAutocompleteOptions> options?)* | *GeocoderAutocomplete(document.getElementById('autocomplete'), 'sdf45dfg68879fhsdgs346dfhdj', { lang: 'it' }*
 
 ### GeocoderAutocompleteOptions
 | Option | Type | Description |
@@ -213,36 +213,36 @@ Here's a description of the API methods:
 
 | Method                                  | Description                                                         |
 |-----------------------------------------|---------------------------------------------------------------------|
-| `setType(type: 'country' or 'state' or 'city' or 'postcode' or 'street' or 'amenity'): void` | Sets the type of location for address suggestions. |
-| `setLang(lang: SupportedLanguage): void` | Sets the language for address suggestions. |
-| `setCountryCodes(codes: CountyCode[]): void` | Sets specific country codes to filter address suggestions. |
-| `setPosition(position: GeoPosition = {lat: number; lon: number}): void` | Sets the geographic position to influence suggestions based on proximity.|
-| `setLimit(limit: number): void` | Sets the maximum number of suggestions to display. |
-| `setValue(value: string): void` | Sets the value of the input field programmatically. |
-| `getValue(): string` | Retrieves the current value of the input field. |
-| `addFilterByCountry(codes: CountyCode[]): void` | Adds a filter to include or exclude suggestions based on specific country codes. |
-| `addFilterByCircle(filterByCircle: ByCircleOptions = {lon: number; lat: number; radiusMeters: number }): void` | Adds a circular filter to include or exclude suggestions within a specified geographic area. |
-| `addFilterByRect(filterByRect: ByRectOptions = { lon1: number; lat1: number; lon2: number; lat2: number}): void` | Adds a rectangular filter to include or exclude suggestions within a specified geographic area. |
-| `addFilterByPlace(filterByPlace: string): void` | Adds a filter to include or exclude suggestions based on a specific place or location. |
-| `clearFilters(): void` | Clears all previously added filters. |
-| `addBiasByCountry(codes: CountyCode[]): void` | Adds a bias to prioritize suggestions from specific countries. |
-| `addBiasByCircle(biasByCircle: ByCircleOptions = {lon: number; lat: number; radiusMeters: number }): void` | Adds a circular bias to prioritize suggestions within a specified geographic area. |
-| `addBiasByRect(biasByRect: ByRectOptions = { lon1: number; lat1: number; lon2: number; lat2: number}): void` | Adds a rectangular bias to prioritize suggestions within a specified geographic area. |
-| `addBiasByProximity(biasByProximity: ByProximityOptions = { lon: number; lat: number }): void` | Adds a bias based on proximity to a specific location. |
-| `clearBias(): void` | Clears all previously added biases. |
-| `setSuggestionsFilter(suggestionsFilterFunc?: (suggestions: GeoJSON.Feature[]) => GeoJSON.Feature[]): void` | Sets a custom filter function for suggestions. |
-| `setPreprocessHook(preprocessHookFunc?: (value: string) => string): void` | Sets a preprocessing hook to modify the input value before sending a request. |
-| `setPostprocessHook(postprocessHookFunc?: (value: string) => string): void` | Sets a post-processing hook to modify the suggestion values after retrieval. |
-| `isOpen(): boolean` | Checks if the suggestions dropdown is currently open. |
-| `close(): void` | Manually closes the suggestions dropdown. |
-| `open(): void` | Manually opens the suggestions dropdown. |
-| `sendGeocoderRequest(value: string): Promise<GeoJSON.FeatureCollection>` | Sends a geocoder request based on the provided value and returns a Promise with the response in [GeoJSON FeatureCollection](https://en.wikipedia.org/wiki/GeoJSON) format containing suggestions. |
-| `sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>` | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
-| `setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void` | Sets a custom function to send geocoder requests. |
-| `setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void` | Sets a custom function to send place details requests. |
-| `on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback: (param: any) => void): void` | Attaches event listeners to various operations such as selection, suggestions, input changes, and dropdown open/close. |
-| `off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback?: (param: any) => void): void` | Detaches previously attached event listeners. |
-| `once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback: (param: any) => void): void` | Attaches a one-time event listener that triggers only once for the specified operation. |
+| *setType(type: 'country' or 'state' or 'city' or 'postcode' or 'street' or 'amenity'): void* | Sets the type of location for address suggestions. |
+| *setLang(lang: SupportedLanguage): void* | Sets the language for address suggestions. |
+| *setCountryCodes(codes: CountyCode[]): void* | Sets specific country codes to filter address suggestions. |
+| *setPosition(position: GeoPosition = {lat: number; lon: number}): void* | Sets the geographic position to influence suggestions based on proximity.|
+| *setLimit(limit: number): void* | Sets the maximum number of suggestions to display. |
+| *setValue(value: string): void* | Sets the value of the input field programmatically. |
+| *getValue(): string* | Retrieves the current value of the input field. |
+| *addFilterByCountry(codes: CountyCode[]): void* | Adds a filter to include or exclude suggestions based on specific country codes. |
+| *addFilterByCircle(filterByCircle: ByCircleOptions = {lon: number; lat: number; radiusMeters: number }): void* | Adds a circular filter to include or exclude suggestions within a specified geographic area. |
+| *addFilterByRect(filterByRect: ByRectOptions = { lon1: number; lat1: number; lon2: number; lat2: number}): void* | Adds a rectangular filter to include or exclude suggestions within a specified geographic area. |
+| *addFilterByPlace(filterByPlace: string): void* | Adds a filter to include or exclude suggestions based on a specific place or location. |
+| *clearFilters(): void* | Clears all previously added filters. |
+| *addBiasByCountry(codes: CountyCode[]): void* | Adds a bias to prioritize suggestions from specific countries. |
+| *addBiasByCircle(biasByCircle: ByCircleOptions = {lon: number; lat: number; radiusMeters: number }): void* | Adds a circular bias to prioritize suggestions within a specified geographic area. |
+| *addBiasByRect(biasByRect: ByRectOptions = { lon1: number; lat1: number; lon2: number; lat2: number}): void* | Adds a rectangular bias to prioritize suggestions within a specified geographic area. |
+| *addBiasByProximity(biasByProximity: ByProximityOptions = { lon: number; lat: number }): void* | Adds a bias based on proximity to a specific location. |
+| *clearBias(): void* | Clears all previously added biases. |
+| *setSuggestionsFilter(suggestionsFilterFunc?: (suggestions: GeoJSON.Feature[]) => GeoJSON.Feature[]): void* | Sets a custom filter function for suggestions. |
+| *setPreprocessHook(preprocessHookFunc?: (value: string) => string): void* | Sets a preprocessing hook to modify the input value before sending a request. |
+| *setPostprocessHook(postprocessHookFunc?: (value: string) => string): void* | Sets a post-processing hook to modify the suggestion values after retrieval. |
+| *isOpen(): boolean* | Checks if the suggestions dropdown is currently open. |
+| *close(): void* | Manually closes the suggestions dropdown. |
+| *open(): void* | Manually opens the suggestions dropdown. |
+| *sendGeocoderRequest(value: string): Promise<GeoJSON.FeatureCollection>* | Sends a geocoder request based on the provided value and returns a Promise with the response in [GeoJSON FeatureCollection](https://en.wikipedia.org/wiki/GeoJSON) format containing suggestions. |
+| *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
+| *setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. |
+| *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. |
+| *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, and dropdown open/close. |
+| *off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback?: (param: any) => void): void* | Detaches previously attached event listeners. |
+| *once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback: (param: any) => void): void* | Attaches a one-time event listener that triggers only once for the specified operation. |
 
 #### Example. Setting Geocoder options
 The library offers a flexible API that enables the dynamic configuration of Geoapify Geocoder options at runtime:
