@@ -79,7 +79,7 @@
 }
 
 .geoapify-close-button.visible {
-    display: flex;
+    display: inline-flex;
 }
 
 .geoapify-close-button {
