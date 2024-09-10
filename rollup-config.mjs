@@ -27,7 +27,7 @@ export default [{
     },
     {
       file: pkg.module,
-      format: 'es',
+      format: 'esm',
       sourcemap: true,
 			freeze: false
     }
