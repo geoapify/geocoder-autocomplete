@@ -30,7 +30,13 @@ export default [{
       format: 'esm',
       sourcemap: true,
 			freeze: false
-    }
+    },
+    {
+      file: pkg.main,
+      format: 'cjs',
+      sourcemap: true,
+      freeze: false
+    },
   ],
   plugins: [
     json(),
