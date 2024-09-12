@@ -2,7 +2,7 @@
   "name": "@geoapify/geocoder-autocomplete",
   "version": "2.0.2",
   "description": "Postal address autocomplete input field",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
   "minimized": "dist/index.min.js",
   "module": "dist/index.min.esm.js",
