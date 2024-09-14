@@ -1,0 +1,48 @@
+.address-collection-container {
+    max-width: 500px;
+    margin: auto;
+}
+
+.autocomplete-container {
+    position: relative;
+}
+
+.address-row {
+    display: flex;
+    flex-direction: row;
+
+    margin-bottom: 10px;
+}
+
+.address-row  .main-part {
+    flex: 1
+}
+
+.small-input {
+    width: 90px;
+}
+
+.margin-right {
+    margin-right: 10px
+}
+
+.message-container {
+    margin-top: 10px;
+}
+
+.button-container {
+    margin-top: 20px;
+    text-align: right
+}
+
+.warning-input {
+    border-color: #ffb610;
+}
+
+.message-container {
+    color: grey;
+}
+
+.geoapify-autocomplete-input {
+    width: calc(100%) !important;
+}
