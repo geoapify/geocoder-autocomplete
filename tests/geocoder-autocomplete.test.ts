@@ -313,6 +313,6 @@ function clickOutside() {
 function selectDropdownItem(container: HTMLDivElement, itemIndex: number) {
     const dropdown = container.querySelector('.geoapify-autocomplete-items');
     const items = dropdown?.querySelectorAll('.geoapify-autocomplete-item');
-    let firstItem = items[itemIndex] as HTMLDivElement;
-    firstItem.click();
+    let selectedItem = items[itemIndex] as HTMLDivElement;
+    selectedItem.click();
 }
