@@ -121,6 +121,127 @@ describe('GeocoderAutocomplete', () => {
         expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
         expect(autocomplete.getValue()).toBe('123')
     });
+    it('changeCallbacks is triggered properly', async () => {
+        // testing on('select', x)
+        const selectSpy = jest.fn();
+        autocomplete.on('select', selectSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(autocomplete.getValue()).toBe(mockResponseWithData.features[0].text);
+        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features[0]);
+        // testing off('select', x)
+        autocomplete.off('select', selectSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 1);
+        expect(selectSpy).toHaveBeenCalledTimes(1);
+        expect(autocomplete.getValue()).toBe(mockResponseWithData.features[1].text);
+
+        // testing once('select', x)
+        autocomplete.once('select', selectSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(autocomplete.getValue()).toBe(mockResponseWithData.features[0].text);
+        expect(selectSpy).toHaveBeenNthCalledWith(2, mockResponseWithData.features[0]);
+
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 1);
+        expect(selectSpy).toHaveBeenCalledTimes(2);
+
+    });
+    it('suggestionsChangeCallbacks is triggered properly', async () => {
+        // testing on('suggestions', x)
+        const suggestionChangeSpy = jest.fn();
+        autocomplete.on('suggestions', suggestionChangeSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(autocomplete.getValue()).toBe(mockResponseWithData.features[0].text);
+        expect(suggestionChangeSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features);
+        // testing off('suggestions', x)
+        autocomplete.off('suggestions', suggestionChangeSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 1);
+        expect(suggestionChangeSpy).toHaveBeenCalledTimes(1);
+        expect(autocomplete.getValue()).toBe(mockResponseWithData.features[1].text);
+
+        // testing once('suggestions', x)
+        autocomplete.once('suggestions', suggestionChangeSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(autocomplete.getValue()).toBe(mockResponseWithData.features[0].text);
+        expect(suggestionChangeSpy).toHaveBeenNthCalledWith(2, mockResponseWithData.features);
+
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 1);
+        expect(suggestionChangeSpy).toHaveBeenCalledTimes(2);
+    });
+    it('inputCallbacks is triggered properly', async () => {
+        // testing on('input', x)
+        const inputChangeSpy = jest.fn();
+        autocomplete.on('input', inputChangeSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(autocomplete.getValue()).toBe("123");
+        expect(inputChangeSpy).toHaveBeenNthCalledWith(1, "123");
+        // testing off('input', x)
+        autocomplete.off('input', inputChangeSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(inputChangeSpy).toHaveBeenCalledTimes(1);
+        expect(autocomplete.getValue()).toBe("123");
+
+        // testing once('input', x)
+        autocomplete.once('input', inputChangeSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(autocomplete.getValue()).toBe("123");
+        expect(inputChangeSpy).toHaveBeenNthCalledWith(2, "123");
+
+        await inputValueAndPopulateDropdown(container);
+        expect(inputChangeSpy).toHaveBeenCalledTimes(2);
+    });
+    it('closeCallbacks is triggered properly', async () => {
+        // testing on('close', x)
+        const closeSpy = jest.fn();
+        autocomplete.on('close', closeSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(closeSpy).toHaveBeenNthCalledWith(1, false);
+        // testing off('close', x)
+        autocomplete.off('close', closeSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(closeSpy).toHaveBeenCalledTimes(1);
+
+        // testing once('close', x)
+        autocomplete.once('close', closeSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(closeSpy).toHaveBeenNthCalledWith(2, false);
+
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(closeSpy).toHaveBeenCalledTimes(2);
+    });
+    it('openCallbacks is triggered properly', async () => {
+        // testing on('open', x)
+        const openSpy = jest.fn();
+        autocomplete.on('open', openSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(openSpy).toHaveBeenNthCalledWith(1, true);
+        // testing off('open', x)
+        autocomplete.off('open', openSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(openSpy).toHaveBeenCalledTimes(1);
+
+        // testing once('open', x)
+        autocomplete.once('open', openSpy);
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(openSpy).toHaveBeenNthCalledWith(2, true);
+
+        await inputValueAndPopulateDropdown(container);
+        selectDropdownItem(container, 0);
+        expect(openSpy).toHaveBeenCalledTimes(2);
+    });
 });
 
 function getPrivateProperty(object: any, field: any) {
@@ -187,4 +308,11 @@ function clickOutside() {
     document.body.appendChild(outsideElement);
     outsideElement.click(); // Simulate click on the outside eleme
     document.body.removeChild(outsideElement);
+}
+
+function selectDropdownItem(container: HTMLDivElement, itemIndex: number) {
+    const dropdown = container.querySelector('.geoapify-autocomplete-items');
+    const items = dropdown?.querySelectorAll('.geoapify-autocomplete-item');
+    let firstItem = items[itemIndex] as HTMLDivElement;
+    firstItem.click();
 }
