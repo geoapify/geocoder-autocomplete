@@ -8,6 +8,7 @@
   "module": "dist/index.min.esm.js",
   "scripts": {
     "test": "jest",
+    "test-coverage": "jest --coverage",
     "build": "tsc",
     "build-all": "npm run build && npm run build-minimized",
     "build-minimized": "rollup -c rollup-config.mjs",

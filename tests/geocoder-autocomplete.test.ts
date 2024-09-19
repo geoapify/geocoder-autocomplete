@@ -198,11 +198,16 @@ describe('GeocoderAutocomplete', () => {
     });
     it('closeCallbacks is triggered properly', async () => {
         // testing on('close', x)
+        autocomplete.setValue("");
+        if(autocomplete.isOpen()) {
+            autocomplete.close();
+        }
         const closeSpy = jest.fn();
         autocomplete.on('close', closeSpy);
         await inputValueAndPopulateDropdown(container);
         selectDropdownItem(container, 0);
         expect(closeSpy).toHaveBeenNthCalledWith(1, false);
+        expect(closeSpy).toHaveBeenCalledTimes(1);
         // testing off('close', x)
         autocomplete.off('close', closeSpy);
         await inputValueAndPopulateDropdown(container);
@@ -241,6 +246,71 @@ describe('GeocoderAutocomplete', () => {
         await inputValueAndPopulateDropdown(container);
         selectDropdownItem(container, 0);
         expect(openSpy).toHaveBeenCalledTimes(2);
+    });
+    it('addFilterByCountry should work properly', async () => {
+        autocomplete.clearFilters();
+        autocomplete.addFilterByCountry(['ae']);
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=countrycode:ae&bias=proximity:10,20");
+    });
+    it('addFilterByCircle should work properly', async () => {
+        autocomplete.clearFilters();
+        autocomplete.addFilterByCircle({
+            lon: 30,
+            lat: 40,
+            radiusMeters: 40
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=circle:30,40,40&bias=proximity:10,20");
+    });
+    it('addFilterByRect should work properly', async () => {
+        autocomplete.clearFilters();
+        autocomplete.addFilterByRect({
+            lon1: 40,
+            lat1: 40,
+            lon2: 40,
+            lat2: 40
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=rect:40,40,40,40&bias=proximity:10,20");
+    });
+    it('addFilterByPlace should work properly', async () => {
+        autocomplete.clearFilters();
+        autocomplete.addFilterByPlace("placeX");
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=place:placeX&bias=proximity:10,20");
+    });
+    it('addBiasByCountry should work properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        autocomplete.addBiasByCountry(['ae']);
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&bias=countrycode:ae");
+    });
+    it('addBiasByCircle should work properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        autocomplete.addBiasByCircle({
+            lon: 30,
+            lat: 40,
+            radiusMeters: 40
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&bias=circle:30,40,40");
+    });
+    it('addBiasByRect should work properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        autocomplete.addBiasByRect({
+            lon1: 40,
+            lat1: 40,
+            lon2: 40,
+            lat2: 40
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&bias=rect:40,40,40,40");
+    });
+    it('addBiasByProximity should work properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        autocomplete.addBiasByProximity({
+            lon: 10,
+            lat: 20
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&bias=proximity:10,20");
     });
 });
 
@@ -291,16 +361,19 @@ async function wait(millis: number) {
     await new Promise(res => setTimeout(res, millis));
 }
 
-async function inputValueAndPopulateDropdown(container: HTMLDivElement) {
+async function inputValueAndExpectTheRequest(container: HTMLDivElement, request: string) {
+    fetchMock.resetMocks();
     fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithData));
 
     inputText(container, "123");
 
-    await wait(5000);
+    await wait(1000);
 
-    expect(fetchMock).toHaveBeenCalledWith(
-        "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=countrycode:ad&bias=proximity:10,20"
-    );
+    expect(fetchMock).toHaveBeenCalledWith(request);
+}
+
+async function inputValueAndPopulateDropdown(container: HTMLDivElement) {
+    await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=countrycode:ad&bias=proximity:10,20");
 }
 
 function clickOutside() {
