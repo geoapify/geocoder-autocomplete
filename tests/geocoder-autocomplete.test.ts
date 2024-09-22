@@ -55,6 +55,12 @@ const mockResponseWithData = {
     ]
 };
 
+const mockResponseWithData2 = {
+    features: [
+        { properties: { result_type: 'street', country_code: 'ad', formatted: '555 Main St' }, text: '555 Main St' }
+    ]
+};
+
 const mockEmptyResponse = {
     features: [] as string[]
 };
@@ -247,6 +253,7 @@ describe('GeocoderAutocomplete', () => {
         selectDropdownItem(container, 0);
         expect(openSpy).toHaveBeenCalledTimes(2);
     });
+
     it('addFilterByCountry should work properly', async () => {
         autocomplete.clearFilters();
         autocomplete.addFilterByCountry(['ae']);
@@ -311,6 +318,104 @@ describe('GeocoderAutocomplete', () => {
             lat: 20
         });
         await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&bias=proximity:10,20");
+        autocomplete.clearBias();
+    });
+    it('open/close works properly', async () => {
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        autocomplete.close();
+        await wait(1000);
+        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+        expect(autocomplete.getValue()).toBe('123')
+
+        autocomplete.open();
+        expect(container.querySelector('.geoapify-autocomplete-items')).toBeDefined();
+
+        autocomplete.close();
+        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+    });
+    it('setSuggestionsFilter works properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        const suggestionChangeSpy = jest.fn();
+        autocomplete.on('suggestions', suggestionChangeSpy);
+
+        autocomplete.setSuggestionsFilter((items) => items.filter(item => item.properties.formatted.includes("Main")));
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+
+        expect(suggestionChangeSpy).toHaveBeenCalledTimes(1);
+        expect(suggestionChangeSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features.filter(item => item.properties.formatted.includes("Main")));
+
+        suggestionChangeSpy.mockReset();
+        autocomplete.setSuggestionsFilter(null);
+
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        expect(suggestionChangeSpy).toHaveBeenCalledTimes(1);
+        expect(suggestionChangeSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features);
+    });
+    it('setPreprocessHook works properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+
+        autocomplete.setPreprocessHook(item => item + "_test");
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123_test&apiKey=XXXXX&limit=5");
+
+        autocomplete.setPreprocessHook(null);
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+    });
+    it('setPostprocessHook works properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+
+        autocomplete.setPostprocessHook((feature: any) => {
+            return "test_" + feature.properties.formatted;
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        expect(getDropDownItemValue(container, 0)).toBe("test_<strong>123</strong> Main St");
+        autocomplete.setPostprocessHook(null);
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        expect(getDropDownItemValue(container, 0)).toBe("<strong>123</strong> Main St");
+    });
+    it('setSendGeocoderRequestFunc works properly', async () => {
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+
+        autocomplete.setSendGeocoderRequestFunc((value: string, geocoderAutocomplete: GeocoderAutocomplete) => {
+            return new Promise((resolve) => {
+                resolve(mockResponseWithData2);
+            });
+        });
+        await inputValueAndDontExpectTheRequest(container);
+        expect(getDropDownItemValue(container, 0)).toBe("555 Main St");
+
+        autocomplete.setSendGeocoderRequestFunc(null);
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        expect(getDropDownItemValue(container, 0)).toBe("<strong>123</strong> Main St");
+    });
+    it('setSendPlaceDetailsRequestFunc works properly', async () => {
+        autocomplete.setAddDetails(true);
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+
+        const selectSpy = jest.fn();
+        autocomplete.on('select', selectSpy);
+
+        autocomplete.setSendPlaceDetailsRequestFunc((value: string, geocoderAutocomplete: GeocoderAutocomplete) => {
+            return new Promise((resolve) => {
+                resolve(mockResponseWithData2);
+            });
+        });
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        selectDropdownItem(container, 0);
+        await wait(1000);
+        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithData2);
+
+        selectSpy.mockReset();
+        autocomplete.setSendPlaceDetailsRequestFunc(null);
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        selectDropdownItem(container, 0);
+        await wait(1000);
+        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features[0]);
+        autocomplete.setAddDetails(false);
     });
 });
 
@@ -372,6 +477,15 @@ async function inputValueAndExpectTheRequest(container: HTMLDivElement, request:
     expect(fetchMock).toHaveBeenCalledWith(request);
 }
 
+async function inputValueAndDontExpectTheRequest(container: HTMLDivElement) {
+    fetchMock.resetMocks();
+    inputText(container, "123");
+
+    await wait(1000);
+
+    expect(fetchMock).toHaveBeenCalledTimes(0);
+}
+
 async function inputValueAndPopulateDropdown(container: HTMLDivElement) {
     await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=countrycode:ad&bias=proximity:10,20");
 }
@@ -384,8 +498,18 @@ function clickOutside() {
 }
 
 function selectDropdownItem(container: HTMLDivElement, itemIndex: number) {
+    let selectedItem = getDropDownItem(container, itemIndex);
+    selectedItem.click();
+}
+
+function getDropDownItem(container: HTMLDivElement, itemIndex: number) {
     const dropdown = container.querySelector('.geoapify-autocomplete-items');
     const items = dropdown?.querySelectorAll('.geoapify-autocomplete-item');
-    let selectedItem = items[itemIndex] as HTMLDivElement;
-    selectedItem.click();
+    return items[itemIndex] as HTMLDivElement;
+}
+
+function getDropDownItemValue(container: HTMLDivElement, itemIndex: number) {
+    let selectedItem = getDropDownItem(container, itemIndex);
+    let spanItem = selectedItem.getElementsByClassName("main-part")[0];
+    return spanItem.innerHTML;
 }

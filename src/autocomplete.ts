@@ -98,6 +98,10 @@ export class GeocoderAutocomplete {
         this.options.lang = lang;
     }
 
+    public setAddDetails(addDetails: boolean) {
+        this.options.addDetails = addDetails;
+    }
+
     public setCountryCodes(codes: CountyCode[]) {
         console.warn("WARNING! Obsolete function called. Function setCountryCodes() has been deprecated, please use the new addFilterByCountry() function instead!");
         this.options.countryCodes = codes;
