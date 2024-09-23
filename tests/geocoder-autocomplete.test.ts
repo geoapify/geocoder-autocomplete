@@ -61,6 +61,26 @@ const mockResponseWithData2 = {
     ]
 };
 
+const mockResponseWithDataOSM = {
+    features: [
+        { properties: { result_type: 'street', country_code: 'ad', formatted: '123 Main St', datasource: {sourcename: 'openstreetmap'}, place_id: 'placeId'}, text: '123 Main St'},
+    ]
+};
+
+const mockResponseWithDataParsed = {
+    features: [
+        { properties: { result_type: 'street', country_code: 'ad', formatted: '123 Main St', rank: {match_type: 'match_by_street'}, address_line1: 'address line 1'}, text: '123 Main St' },
+        { properties: { result_type: 'street', country_code: 'ad', formatted: '123 Elm St' , rank: {match_type: 'match_by_city_or_disrict'}, address_line1: 'address lin 1'}, text: '123 Elm St' }
+    ],
+    query: {
+        parsed: {
+            housenumber: 'test_housenumber',
+            street: 'test_street',
+
+        }
+    }
+};
+
 const mockEmptyResponse = {
     features: [] as string[]
 };
@@ -417,6 +437,72 @@ describe('GeocoderAutocomplete', () => {
         expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features[0]);
         autocomplete.setAddDetails(false);
     });
+    it('sendPlaceDetailsRequest works properly', async () => {
+        autocomplete.setAddDetails(true);
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        fetchMock.resetMocks();
+
+        const selectSpy = jest.fn();
+        autocomplete.on('select', selectSpy);
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
+
+        autocomplete.setSendPlaceDetailsRequestFunc(null);
+        inputText(container, "123");
+        await wait(1000);
+
+        selectDropdownItem(container, 0);
+        await wait(1000);
+        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithDataOSM.features[0]);
+        expect(fetchMock).toHaveBeenCalledWith("https://api.geoapify.com/v2/place-details?id=placeId&apiKey=XXXXX");
+        autocomplete.setAddDetails(false);
+    });
+    it('addFeatureIcon works properly', async () => {
+        autocomplete.setSkipIcons(false);
+
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        fetchMock.resetMocks();
+
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+
+        const dropdownItem = getDropDownItem(container, 0);
+        expect(dropdownItem.querySelector(".icon").innerHTML).toContain('M573.19');
+        autocomplete.setSkipIcons(true);
+
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
+        const dropdownItem2 = getDropDownItem(container, 0);
+        expect(dropdownItem2.querySelector(".icon")).toBeNull();
+    });
+    it('extendByNonVerifiedValues works properly', async () => {
+        autocomplete.setAllowNonVerifiedHouseNumber(true);
+        autocomplete.setAllowNonVerifiedStreet(true);
+
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        fetchMock.resetMocks();
+
+        const suggestionChangeSpy = jest.fn();
+        autocomplete.on('suggestions', suggestionChangeSpy);
+        await inputValueAndReturnResponse(container, mockResponseWithDataParsed);
+        selectDropdownItem(container, 0);
+
+        expect(suggestionChangeSpy).toHaveBeenCalled();
+        const calls = suggestionChangeSpy.mock.calls;
+        const properties = calls[0][0];
+        const item1 = properties[0];
+        const item2 = properties[1];
+        expect(item1.properties.housenumber).toBe("test_housenumber");
+        expect(item1.properties.nonVerifiedParts).toStrictEqual(["housenumber"]);
+        expect(item2.properties.formatted).toBe("test_housenumber Test_street, 123 Elm St");
+        expect(item2.properties.address_line1).toBe("test_housenumber Test_street");
+        expect(item2.properties.street).toBe("Test_street");
+        expect(item2.properties.nonVerifiedParts).toStrictEqual(["housenumber", "street"]);
+
+        autocomplete.setAllowNonVerifiedHouseNumber(false);
+        autocomplete.setAllowNonVerifiedStreet(false);
+    });
 });
 
 function getPrivateProperty(object: any, field: any) {
@@ -464,6 +550,15 @@ function inputText(container: HTMLDivElement, text: string) {
 
 async function wait(millis: number) {
     await new Promise(res => setTimeout(res, millis));
+}
+
+async function inputValueAndReturnResponse(container: HTMLDivElement, data: any) {
+    fetchMock.resetMocks();
+    fetchMock.mockResponseOnce(JSON.stringify(data));
+
+    inputText(container, "123");
+
+    await wait(1000);
 }
 
 async function inputValueAndExpectTheRequest(container: HTMLDivElement, request: string) {

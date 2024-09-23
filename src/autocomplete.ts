@@ -102,6 +102,18 @@ export class GeocoderAutocomplete {
         this.options.addDetails = addDetails;
     }
 
+    public setSkipIcons(skipIcons: boolean) {
+        this.options.skipIcons = skipIcons;
+    }
+
+    public setAllowNonVerifiedHouseNumber(allowNonVerifiedHouseNumber: boolean) {
+        this.options.allowNonVerifiedHouseNumber = allowNonVerifiedHouseNumber;
+    }
+
+    public setAllowNonVerifiedStreet(allowNonVerifiedStreet: boolean) {
+        this.options.allowNonVerifiedStreet = allowNonVerifiedStreet;
+    }
+
     public setCountryCodes(codes: CountyCode[]) {
         console.warn("WARNING! Obsolete function called. Function setCountryCodes() has been deprecated, please use the new addFilterByCountry() function instead!");
         this.options.countryCodes = codes;
