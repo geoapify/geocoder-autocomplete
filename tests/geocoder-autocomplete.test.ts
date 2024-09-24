@@ -284,11 +284,11 @@ describe('GeocoderAutocomplete', () => {
         selectDropdownItem(container, 0);
         expect(openSpy).toHaveBeenCalledTimes(2);
     });
-
     it('addFilterByCountry should work properly', async () => {
         autocomplete.clearFilters();
         autocomplete.addFilterByCountry(['ae']);
         await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&filter=countrycode:ae&bias=proximity:10,20");
+        autocomplete.addFilterByCountry([]);
     });
     it('addFilterByCircle should work properly', async () => {
         autocomplete.clearFilters();
@@ -576,6 +576,37 @@ describe('GeocoderAutocomplete', () => {
         expect(selectSpy).toHaveBeenNthCalledWith(3, mockResponseWithData.features[0]);
 
         expectDropdownIsClosed(container);
+    });
+    it('setCountryCodes should log warning', async () => {
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+        autocomplete.setCountryCodes(['ae']);
+
+        expect(warnSpy).toHaveBeenCalledWith('WARNING! Obsolete function called. Function setCountryCodes() has been deprecated, please use the new addFilterByCountry() function instead!');
+    });
+    it('setPosition should log warning', async () => {
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+        autocomplete.setPosition({
+            lat: 0,
+            lon: 0
+        });
+
+        expect(warnSpy).toHaveBeenCalledWith('WARNING! Obsolete function called. Function setPosition() has been deprecated, please use the new addBiasByProximity() function instead!');
+    });
+    it('setType should work properly', async () => {
+        autocomplete.clearFilters();
+        autocomplete.clearBias();
+        autocomplete.setType('postcode');
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&type=postcode&limit=5");
+        autocomplete.setType(null);
+    });
+    it('setLang should work properly', async () => {
+        autocomplete.clearFilters();
+        autocomplete.clearBias();
+        autocomplete.setLang('ab');
+        await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5&lang=ab");
+        autocomplete.setLang(null);
     });
 });
 
