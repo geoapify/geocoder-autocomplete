@@ -75,8 +75,19 @@ const mockResponseWithDataParsed = {
     query: {
         parsed: {
             housenumber: 'test_housenumber',
-            street: 'test_street',
+            street: 'test_street'
+        }
+    }
+};
 
+const mockResponseWithDataParsedWithoutHouseNumber = {
+    features: [
+        { properties: { result_type: 'street', country_code: 'ad', formatted: '123 Main St', rank: {match_type: 'match_by_street'}, address_line1: 'address line 1'}, text: '123 Main St' },
+        { properties: { result_type: 'street', country_code: 'ad', formatted: '123 Elm St' , rank: {match_type: 'match_by_city_or_disrict'}, address_line1: 'address lin 1'}, text: '123 Elm St' }
+    ],
+    query: {
+        parsed: {
+            street: 'test_street'
         }
     }
 };
@@ -110,7 +121,7 @@ describe('GeocoderAutocomplete', () => {
         );
 
         // expect the dropdown to be null
-        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+        expectDropdownIsClosed(container);
     });
     it('should open dropdown when user inputs 3 digits', async () => {
         await inputValueAndPopulateDropdown(container);
@@ -137,14 +148,14 @@ describe('GeocoderAutocomplete', () => {
             throw new Error('Clear button not found');
         }
         await wait(1000);
-        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+        expectDropdownIsClosed(container);
         expect(autocomplete.getValue()).toBe('')
     });
     it('should hide the dropdown if we click outside', async () => {
         await inputValueAndPopulateDropdown(container);
         clickOutside();
         await wait(1000);
-        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+        expectDropdownIsClosed(container);
         expect(autocomplete.getValue()).toBe('123')
     });
     it('changeCallbacks is triggered properly', async () => {
@@ -344,14 +355,14 @@ describe('GeocoderAutocomplete', () => {
         await inputValueAndExpectTheRequest(container, "https://api.geoapify.com/v1/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5");
         autocomplete.close();
         await wait(1000);
-        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+        expectDropdownIsClosed(container);
         expect(autocomplete.getValue()).toBe('123')
 
         autocomplete.open();
         expect(container.querySelector('.geoapify-autocomplete-items')).toBeDefined();
 
         autocomplete.close();
-        expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
+        expectDropdownIsClosed(container);
     });
     it('setSuggestionsFilter works properly', async () => {
         autocomplete.clearBias();
@@ -503,6 +514,69 @@ describe('GeocoderAutocomplete', () => {
         autocomplete.setAllowNonVerifiedHouseNumber(false);
         autocomplete.setAllowNonVerifiedStreet(false);
     });
+    it('extendByNonVerifiedValues works properly without housenumber', async () => {
+        autocomplete.setAllowNonVerifiedHouseNumber(true);
+        autocomplete.setAllowNonVerifiedStreet(true);
+
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        fetchMock.resetMocks();
+
+        const suggestionChangeSpy = jest.fn();
+        autocomplete.on('suggestions', suggestionChangeSpy);
+        await inputValueAndReturnResponse(container, mockResponseWithDataParsedWithoutHouseNumber);
+        selectDropdownItem(container, 0);
+
+        expect(suggestionChangeSpy).toHaveBeenCalled();
+        const calls = suggestionChangeSpy.mock.calls;
+        const properties = calls[0][0];
+        const item2 = properties[1];
+        expect(item2.properties.formatted).toBe("Test_street, 123 Elm St");
+        expect(item2.properties.address_line1).toBe("Test_street");
+        expect(item2.properties.street).toBe("Test_street");
+        expect(item2.properties.nonVerifiedParts).toStrictEqual(["street"]);
+
+        autocomplete.setAllowNonVerifiedHouseNumber(false);
+        autocomplete.setAllowNonVerifiedStreet(false);
+    });
+    it('onUserKeyPress works properly', async () => {
+        autocomplete.setAllowNonVerifiedHouseNumber(true);
+        autocomplete.setAllowNonVerifiedStreet(true);
+
+        autocomplete.clearBias();
+        autocomplete.clearFilters();
+        fetchMock.resetMocks();
+
+        const suggestionChangeSpy = jest.fn();
+        autocomplete.on('suggestions', suggestionChangeSpy);
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithData));
+
+        inputTextWithEvent(container, "123", "ArrowDown");
+        await wait(1000);
+        expect(getDropDownItemValue(container, 0)).toBe("<strong>123</strong> Main St");
+
+        inputTextWithEvent(container, "123", "Escape");
+        expectDropdownIsClosed(container);
+
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithData));
+        inputTextWithEvent(container, "123", "ArrowDown");
+        await wait(1000);
+        expect(getDropDownItemValue(container, 0)).toBe("<strong>123</strong> Main St");
+
+        const selectSpy = jest.fn();
+        autocomplete.on('select', selectSpy);
+        inputTextWithEvent(container, "123", "ArrowDown");
+        inputTextWithEvent(container, "123", "ArrowDown");
+        inputTextWithEvent(container, "123", "ArrowUp");
+        inputTextWithEvent(container, "123", "Enter");
+        await wait(1000);
+
+        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithData.features[0]);
+        expect(selectSpy).toHaveBeenNthCalledWith(2, mockResponseWithData.features[1]);
+        expect(selectSpy).toHaveBeenNthCalledWith(3, mockResponseWithData.features[0]);
+
+        expectDropdownIsClosed(container);
+    });
 });
 
 function getPrivateProperty(object: any, field: any) {
@@ -545,6 +619,20 @@ function inputText(container: HTMLDivElement, text: string) {
     inputElement.value = text;
 
     const event = new Event('input', {bubbles: true, cancelable: true});
+    inputElement.dispatchEvent(event);
+}
+
+function inputTextWithEvent(container: HTMLDivElement, text: string, eventType: string) {
+    const inputElement = container.querySelector('input') as HTMLInputElement;
+
+    inputElement.value = text;
+
+    const event = new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        code: eventType,
+        key: eventType
+    });
     inputElement.dispatchEvent(event);
 }
 
@@ -607,4 +695,8 @@ function getDropDownItemValue(container: HTMLDivElement, itemIndex: number) {
     let selectedItem = getDropDownItem(container, itemIndex);
     let spanItem = selectedItem.getElementsByClassName("main-part")[0];
     return spanItem.innerHTML;
+}
+
+function expectDropdownIsClosed(container: HTMLDivElement) {
+    expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
 }
