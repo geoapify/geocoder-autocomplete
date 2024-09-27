@@ -132,3 +132,15 @@ export function getDropDownItemValue(container: HTMLDivElement, itemIndex: numbe
 export function expectDropdownIsClosed(container: HTMLDivElement) {
     expect(container.querySelector('.geoapify-autocomplete-items')).toBeNull();
 }
+
+export function addSelectSpy(autocomplete: GeocoderAutocomplete) {
+    const selectSpy = jest.fn();
+    autocomplete.on('select', selectSpy);
+    return selectSpy;
+}
+
+export function addSuggestionsSpy(autocomplete: GeocoderAutocomplete) {
+    const suggestionChangeSpy = jest.fn();
+    autocomplete.on('suggestions', suggestionChangeSpy);
+    return suggestionChangeSpy;
+}

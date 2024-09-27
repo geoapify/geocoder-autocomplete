@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { GeocoderAutocomplete, GeocoderAutocompleteOptions } from "../src";
 import fetchMock from 'jest-fetch-mock';
 import {
+    addSelectSpy, addSuggestionsSpy,
     APP_URL,
     checkIfClearButtonInitialized,
     checkIfInputInitialized,
@@ -100,8 +101,7 @@ describe('GeocoderAutocomplete', () => {
     });
     it('changeCallbacks is triggered properly', async () => {
         // testing on('select', x)
-        const selectSpy = jest.fn();
-        autocomplete.on('select', selectSpy);
+        const selectSpy = addSelectSpy(autocomplete);
         await inputValueAndPopulateDropdown(container);
         selectDropdownItem(container, 0);
         expect(autocomplete.getValue()).toBe(mockResponseWithData.features[0].text);
@@ -127,8 +127,7 @@ describe('GeocoderAutocomplete', () => {
     });
     it('suggestionsChangeCallbacks is triggered properly', async () => {
         // testing on('suggestions', x)
-        const suggestionChangeSpy = jest.fn();
-        autocomplete.on('suggestions', suggestionChangeSpy);
+        const suggestionChangeSpy = addSuggestionsSpy(autocomplete);
         await inputValueAndPopulateDropdown(container);
         selectDropdownItem(container, 0);
         expect(autocomplete.getValue()).toBe(mockResponseWithData.features[0].text);
@@ -293,8 +292,7 @@ describe('GeocoderAutocomplete', () => {
         expectDropdownIsClosed(container);
     });
     it('setSuggestionsFilter works properly', async () => {
-        const suggestionChangeSpy = jest.fn();
-        autocomplete.on('suggestions', suggestionChangeSpy);
+        const suggestionChangeSpy = addSuggestionsSpy(autocomplete);
 
         autocomplete.setSuggestionsFilter((items) => items.filter(item => item.properties.formatted.includes("Main")));
         await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5`);
@@ -341,8 +339,7 @@ describe('GeocoderAutocomplete', () => {
     });
     it('setSendPlaceDetailsRequestFunc works properly', async () => {
         autocomplete.setAddDetails(true);
-        const selectSpy = jest.fn();
-        autocomplete.on('select', selectSpy);
+        const selectSpy = addSelectSpy(autocomplete);
 
         autocomplete.setSendPlaceDetailsRequestFunc((value: string, geocoderAutocomplete: GeocoderAutocomplete) => {
             return new Promise((resolve) => {
@@ -366,8 +363,7 @@ describe('GeocoderAutocomplete', () => {
         autocomplete.setAddDetails(true);
         fetchMock.resetMocks();
 
-        const selectSpy = jest.fn();
-        autocomplete.on('select', selectSpy);
+        const selectSpy = addSelectSpy(autocomplete);
         fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
         fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
 
@@ -402,8 +398,7 @@ describe('GeocoderAutocomplete', () => {
 
         fetchMock.resetMocks();
 
-        const suggestionChangeSpy = jest.fn();
-        autocomplete.on('suggestions', suggestionChangeSpy);
+        const suggestionChangeSpy = addSuggestionsSpy(autocomplete);
         await inputValueAndReturnResponse(container, mockResponseWithDataParsed);
         selectDropdownItem(container, 0);
 
@@ -428,8 +423,7 @@ describe('GeocoderAutocomplete', () => {
 
         fetchMock.resetMocks();
 
-        const suggestionChangeSpy = jest.fn();
-        autocomplete.on('suggestions', suggestionChangeSpy);
+        const suggestionChangeSpy = addSuggestionsSpy(autocomplete);
         await inputValueAndReturnResponse(container, mockResponseWithDataParsedWithoutHouseNumber);
         selectDropdownItem(container, 0);
 
@@ -451,8 +445,6 @@ describe('GeocoderAutocomplete', () => {
 
         fetchMock.resetMocks();
 
-        const suggestionChangeSpy = jest.fn();
-        autocomplete.on('suggestions', suggestionChangeSpy);
         fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithData));
 
         inputTextWithEvent(container, "123", "ArrowDown");
@@ -467,8 +459,7 @@ describe('GeocoderAutocomplete', () => {
         await wait(WAIT_TIME);
         expect(getDropDownItemValue(container, 0)).toBe("<strong>123</strong> Main St");
 
-        const selectSpy = jest.fn();
-        autocomplete.on('select', selectSpy);
+        const selectSpy = addSelectSpy(autocomplete);
         inputTextWithEvent(container, "123", "ArrowDown");
         inputTextWithEvent(container, "123", "ArrowDown");
         inputTextWithEvent(container, "123", "ArrowUp");
@@ -507,5 +498,30 @@ describe('GeocoderAutocomplete', () => {
         autocomplete.setLang('ab');
         await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5&lang=ab`);
         autocomplete.setLang(null);
+    });
+    it('setGeocoderUrl works as expected', async () => {
+        autocomplete.setGeocoderUrl("https://api.geoapify.com/v2/geocode/autocomplete")
+        await inputValueAndExpectTheRequest(container, `https://api.geoapify.com/v2/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5`);
+        autocomplete.setGeocoderUrl(APP_URL)
+        await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5`);
+    });
+    it('setPlaceDetailsUrl works as expected', async () => {
+        autocomplete.setPlaceDetailsUrl("https://api.geoapify.com/v3/place-details")
+        autocomplete.setAddDetails(true);
+        fetchMock.resetMocks();
+
+        const selectSpy = addSelectSpy(autocomplete);
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
+        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
+
+        autocomplete.setSendPlaceDetailsRequestFunc(null);
+        inputText(container, "123");
+        await wait(WAIT_TIME);
+
+        selectDropdownItem(container, 0);
+        await wait(WAIT_TIME);
+        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithDataOSM.features[0]);
+        expect(fetchMock).toHaveBeenCalledWith("https://api.geoapify.com/v3/place-details?id=placeId&apiKey=XXXXX");
+        autocomplete.setAddDetails(false);
     });
 });

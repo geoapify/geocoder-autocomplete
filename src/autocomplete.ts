@@ -5,9 +5,7 @@ import {
     BY_COUNTRYCODE,
     BY_PLACE,
     BY_PROXIMITY,
-    BY_RECT,
-    GEOCODER_URL,
-    PLACE_DETAILS_URL
+    BY_RECT
 } from "./helpers/constants";
 import { Callbacks } from "./helpers/callbacks";
 
@@ -41,6 +39,9 @@ export class GeocoderAutocomplete {
     private sendGeocoderRequestAlt?: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>;
     private sendPlaceDetailsRequestAlt?: (feature: any, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>;
 
+    private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
+    private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
+
     private options: GeocoderAutocompleteOptions = {
         limit: 5,
         debounceDelay: 100
@@ -56,7 +57,15 @@ export class GeocoderAutocomplete {
 
         this.addEventListeners();
     }
-    
+
+    public setGeocoderUrl(geocoderUrl: string) {
+        this.geocoderUrl = geocoderUrl;
+    }
+
+    public setPlaceDetailsUrl(placeDetailsUrl: string) {
+        this.placeDetailsUrl = placeDetailsUrl;
+    }
+
     public setType(type: 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity') {
         this.options.type = type;
     }
@@ -216,7 +225,7 @@ export class GeocoderAutocomplete {
         return new Promise((resolve, reject) => {
             this.currentPromiseReject = reject;
 
-            let url = CalculationHelper.generateUrl(value, GEOCODER_URL, this.apiKey, this.options);
+            let url = CalculationHelper.generateUrl(value, this.geocoderUrl, this.apiKey, this.options);
 
             fetch(url)
                 .then((response) => {
@@ -239,7 +248,7 @@ export class GeocoderAutocomplete {
             }
             
             this.currentPlaceDetailsPromiseReject = reject;
-            let url = CalculationHelper.generatePlacesUrl(PLACE_DETAILS_URL, feature.properties.place_id, this.apiKey, this.options);
+            let url = CalculationHelper.generatePlacesUrl(this.placeDetailsUrl, feature.properties.place_id, this.apiKey, this.options);
 
             fetch(url)
                 .then((response) => {
