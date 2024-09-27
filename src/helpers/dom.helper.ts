@@ -116,4 +116,34 @@ export class DomHelper {
 
         return `<span class="main-part">${mainPart}</span><span class="secondary-part">${secondaryPart}</span>`
     }
+
+    public static addDropdownIcon(feature: any, itemElement: HTMLDivElement) {
+        const iconElement = document.createElement("span");
+        iconElement.classList.add('icon');
+
+        DomHelper.addFeatureIcon(iconElement, feature.properties.result_type, feature.properties.country_code);
+
+        itemElement.appendChild(iconElement);
+    }
+
+    public static addActiveClassToDropdownItem(items: HTMLCollectionOf<HTMLDivElement>, index: number) {
+        for (var i = 0; i < items.length; i++) {
+            items[i].classList.remove("active");
+        }
+
+        /* Add class "autocomplete-active" to the active element*/
+        items[index].classList.add("active");
+    }
+
+    public static createDropdownItemText() {
+        const textElement = document.createElement("span");
+        textElement.classList.add('address');
+        return textElement;
+    }
+
+    public static createDropdownItem() {
+        const itemElement = document.createElement("div");
+        itemElement.classList.add('geoapify-autocomplete-item');
+        return itemElement;
+    }
 }

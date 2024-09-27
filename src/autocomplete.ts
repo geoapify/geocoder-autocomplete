@@ -9,7 +9,7 @@ import {
     GEOCODER_URL,
     PLACE_DETAILS_URL
 } from "./helpers/constants";
-import { Callbacks } from "./helpers/callbacks.class";
+import { Callbacks } from "./helpers/callbacks";
 
 export class GeocoderAutocomplete {
 
@@ -263,7 +263,7 @@ export class GeocoderAutocomplete {
         let currentValue = this.inputElement.value;
         let userEnteredValue = this.inputElement.value;
 
-        this.notifyInputChange(currentValue);
+        this.callbacks.notifyInputChange(currentValue);
 
         /* Close any already open dropdown list */
         this.closeDropDownList();
@@ -281,7 +281,6 @@ export class GeocoderAutocomplete {
 
         this.showClearButton();
 
-
         this.currentTimeout = window.setTimeout(() => {
             /* Create a new promise and send geocoding request */
             if (CalculationHelper.returnIfFunction(this.preprocessHook)) {
@@ -291,28 +290,7 @@ export class GeocoderAutocomplete {
             let promise = this.sendGeocoderRequestOrAlt(currentValue);
 
             promise.then((data: any) => {
-
-                if (CalculationHelper.needToCalculateExtendByNonVerifiedValues(data, this.options)) {
-                    CalculationHelper.extendByNonVerifiedValues(this.options, data.features, data?.query?.parsed);
-                }
-
-                this.currentItems = data.features;
-
-                if (CalculationHelper.needToFilterDataBySuggestionsFilter(this.currentItems, this.suggestionsFilter)) {
-                    this.currentItems = this.suggestionsFilter(this.currentItems);
-                }
-
-                this.notifySuggestions(this.currentItems);
-
-                if (!this.currentItems.length) {
-                    return;
-                }
-
-                this.createDropdown();
-
-                this.currentItems.forEach((feature: any, index: number) => {
-                    this.populateDropdownItem(feature, userEnteredValue, event, index);
-                });
+                this.onDropdownDataLoad(data, userEnteredValue, event);
             }, (err) => {
                 if (!err.canceled) {
                     console.log(err);
@@ -321,18 +299,39 @@ export class GeocoderAutocomplete {
         }, this.options.debounceDelay);
     }
 
-    private populateDropdownItem(feature: any, userEnteredValue: string, event: Event, index: number) {
-        /* Create a DIV element for each element: */
-        const itemElement = document.createElement("div");
-        itemElement.classList.add('geoapify-autocomplete-item');
-
-
-        if (!this.options.skipIcons) {
-            this.addDropdownIcon(feature, itemElement);
+    private onDropdownDataLoad(data: any, userEnteredValue: string, event: Event) {
+        if (CalculationHelper.needToCalculateExtendByNonVerifiedValues(data, this.options)) {
+            CalculationHelper.extendByNonVerifiedValues(this.options, data.features, data?.query?.parsed);
         }
 
-        const textElement = document.createElement("span");
-        textElement.classList.add('address');
+        this.currentItems = data.features;
+
+        if (CalculationHelper.needToFilterDataBySuggestionsFilter(this.currentItems, this.suggestionsFilter)) {
+            this.currentItems = this.suggestionsFilter(this.currentItems);
+        }
+
+        this.callbacks.notifySuggestions(this.currentItems);
+
+        if (!this.currentItems.length) {
+            return;
+        }
+
+        this.createDropdown();
+
+        this.currentItems.forEach((feature: any, index: number) => {
+            this.populateDropdownItem(feature, userEnteredValue, event, index);
+        });
+    }
+
+    private populateDropdownItem(feature: any, userEnteredValue: string, event: Event, index: number) {
+        /* Create a DIV element for each element: */
+        const itemElement = DomHelper.createDropdownItem();
+
+        if (!this.options.skipIcons) {
+            DomHelper.addDropdownIcon(feature, itemElement);
+        }
+
+        const textElement = DomHelper.createDropdownItemText();
 
         if (CalculationHelper.returnIfFunction(this.postprocessHook)) {
             const value = this.postprocessHook(feature);
@@ -353,28 +352,15 @@ export class GeocoderAutocomplete {
         });
     }
 
-    private addDropdownIcon(feature: any, itemElement: HTMLDivElement) {
-        const iconElement = document.createElement("span");
-        iconElement.classList.add('icon');
-
-        DomHelper.addFeatureIcon(iconElement, feature.properties.result_type, feature.properties.country_code);
-
-        itemElement.appendChild(iconElement);
-    }
-
     private createDropdown() {
         /*create a DIV element that will contain the items (values):*/
         this.autocompleteItemsElement = document.createElement("div");
         this.autocompleteItemsElement.setAttribute("class", "geoapify-autocomplete-items");
 
-        this.notifyOpened();
+        this.callbacks.notifyOpened();
 
         /* Append the DIV element as a child of the autocomplete container:*/
         this.container.appendChild(this.autocompleteItemsElement);
-    }
-
-    private notifyInputChange(currentValue: string) {
-        this.callbacks.inputCallbacks.forEach(callback => callback(currentValue));
     }
 
     private cancelPreviousTimeout() {
@@ -417,35 +403,13 @@ export class GeocoderAutocomplete {
 
     private onUserKeyPress(event: KeyboardEvent) {
         if (this.autocompleteItemsElement) {
-
             const itemElements: HTMLCollectionOf<HTMLDivElement> = this.autocompleteItemsElement.getElementsByTagName("div");
             if (event.code === 'ArrowDown') {
-                event.preventDefault();
-
-                /*If the arrow DOWN key is pressed, increase the focusedItemIndex variable:*/
-                this.focusedItemIndex++;
-                if (this.focusedItemIndex >= itemElements.length) this.focusedItemIndex = 0;
-                /*and and make the current item more visible:*/
-                this.setActive(itemElements, this.focusedItemIndex);
+                this.handleArrowDownEvent(event, itemElements);
             } else if (event.code === 'ArrowUp') {
-                event.preventDefault();
-
-                /*If the arrow UP key is pressed, decrease the focusedItemIndex variable:*/
-                this.focusedItemIndex--;
-                if (this.focusedItemIndex < 0) this.focusedItemIndex = (itemElements.length - 1);
-                /*and and make the current item more visible:*/
-                this.setActive(itemElements, this.focusedItemIndex);
+                this.handleArrowUpEvent(event, itemElements);
             } else if (event.code === "Enter") {
-                /* If the ENTER key is pressed and value as selected, close the list*/
-                event.preventDefault();
-                if (this.focusedItemIndex > -1) {
-                    if (this.options.skipSelectionOnArrowKey) {
-                        // select the location if it wasn't selected by navigation
-                        this.setValueAndNotify(this.currentItems[this.focusedItemIndex]);
-                    } else {
-                        this.closeDropDownList();
-                    }
-                }
+                this.handleEnterEvent(event);
             } else if (event.code === "Escape") {
                 /* If the ESC key is presses, close the list */
                 this.closeDropDownList();
@@ -458,15 +422,42 @@ export class GeocoderAutocomplete {
         }
     }
 
+    private handleEnterEvent(event: KeyboardEvent) {
+        /* If the ENTER key is pressed and value as selected, close the list*/
+        event.preventDefault();
+        if (this.focusedItemIndex > -1) {
+            if (this.options.skipSelectionOnArrowKey) {
+                // select the location if it wasn't selected by navigation
+                this.setValueAndNotify(this.currentItems[this.focusedItemIndex]);
+            } else {
+                this.closeDropDownList();
+            }
+        }
+    }
+
+    private handleArrowUpEvent(event: KeyboardEvent, itemElements: HTMLCollectionOf<HTMLDivElement>) {
+        event.preventDefault();
+
+        /*If the arrow UP key is pressed, decrease the focusedItemIndex variable:*/
+        this.focusedItemIndex--;
+        if (this.focusedItemIndex < 0) this.focusedItemIndex = (itemElements.length - 1);
+        /*and and make the current item more visible:*/
+        this.setActive(itemElements, this.focusedItemIndex);
+    }
+
+    private handleArrowDownEvent(event: KeyboardEvent, itemElements: HTMLCollectionOf<HTMLDivElement>) {
+        event.preventDefault();
+
+        /*If the arrow DOWN key is pressed, increase the focusedItemIndex variable:*/
+        this.focusedItemIndex++;
+        if (this.focusedItemIndex >= itemElements.length) this.focusedItemIndex = 0;
+        /*and and make the current item more visible:*/
+        this.setActive(itemElements, this.focusedItemIndex);
+    }
+
     private setActive(items: HTMLCollectionOf<HTMLDivElement>, index: number) {
         if (!items || !items.length) return false;
-
-        for (var i = 0; i < items.length; i++) {
-            items[i].classList.remove("active");
-        }
-
-        /* Add class "autocomplete-active" to the active element*/
-        items[index].classList.add("active");
+        DomHelper.addActiveClassToDropdownItem(items, index);
 
         if (!this.options.skipSelectionOnArrowKey) {
             // Change input value and notify
@@ -479,14 +470,12 @@ export class GeocoderAutocomplete {
         }
     }
 
-
     private setValueAndNotify(feature: any) {
         if (CalculationHelper.returnIfFunction(this.postprocessHook)) {
             this.inputElement.value = this.postprocessHook(feature);
         } else {
             this.inputElement.value = feature.properties.formatted;
         }
-
 
         this.notifyValueSelected(feature);
 
@@ -497,21 +486,11 @@ export class GeocoderAutocomplete {
     private clearFieldAndNotify(event: MouseEvent) {
         event.stopPropagation();
         this.inputElement.value = '';
-        this.inputClearButton.classList.remove("visible");
+        this.removeClearButton();
 
-        // Cancel previous request
-        if (this.currentPromiseReject) {
-            this.currentPromiseReject({
-                canceled: true
-            });
-            this.currentPromiseReject = null;
-        }
+        this.cancelPreviousRequest();
 
-        // Cancel previous timeout
-        if (this.currentTimeout) {
-            window.clearTimeout(this.currentTimeout);
-            this.currentTimeout = null;
-        }
+        this.cancelPreviousTimeout();
 
         this.closeDropDownList();
 
@@ -523,55 +502,50 @@ export class GeocoderAutocomplete {
         if (this.autocompleteItemsElement) {
             this.container.removeChild(this.autocompleteItemsElement);
             this.autocompleteItemsElement = null;
-            this.notifyClosed();
+            this.callbacks.notifyClosed();
         }
     }
 
     private notifyValueSelected(feature: any) {
+        this.cancelPreviousPlaceDetailsRequest();
 
-        // Cancel previous place details request
-        if (this.currentPlaceDetailsPromiseReject) {
-            this.currentPlaceDetailsPromiseReject({
-                canceled: true
-            });
-            this.currentPlaceDetailsPromiseReject = null;
-        }
-
-        if (!this.options.addDetails || !feature || feature.properties.nonVerifiedParts?.length) {
-            this.callbacks.changeCallbacks.forEach(callback => callback(feature));
+        if (this.noNeedToRequestPlaceDetails(feature)) {
+            this.callbacks.notifyChange(feature);
         } else {
-
-            let promise;
-
-            if (this.sendPlaceDetailsRequestAlt) {
-                promise = this.sendPlaceDetailsRequestAlt(feature, this)
-            } else {
-                promise = this.sendPlaceDetailsRequest(feature); 
-            }
+            let promise = this.sendPlaceDetailsRequestOrAlt(feature);
 
             promise.then((detailesFeature: any) => {
-                this.callbacks.changeCallbacks.forEach(callback => callback(detailesFeature));
+                this.callbacks.notifyChange(detailesFeature);
                 this.currentPlaceDetailsPromiseReject = null;
             }, (err) => {
                 if (!err.canceled) {
                     console.log(err);
-                    this.callbacks.changeCallbacks.forEach(callback => callback(feature));
+                    this.callbacks.notifyChange(feature);
                     this.currentPlaceDetailsPromiseReject = null;
                 }
             });
         }
     }
 
-    private notifySuggestions(features: any) {
-        this.callbacks.suggestionsChangeCallbacks.forEach(callback => callback(features));
+    private sendPlaceDetailsRequestOrAlt(feature: any) {
+        if (this.sendPlaceDetailsRequestAlt) {
+            return this.sendPlaceDetailsRequestAlt(feature, this)
+        } else {
+            return this.sendPlaceDetailsRequest(feature);
+        }
     }
 
-    private notifyOpened() {
-        this.callbacks.openCallbacks.forEach(callback => callback(true));
+    private noNeedToRequestPlaceDetails(feature: any) {
+        return !this.options.addDetails || !feature || feature.properties.nonVerifiedParts?.length;
     }
 
-    private notifyClosed() {
-        this.callbacks.closeCallbacks.forEach(callback => callback(false));
+    private cancelPreviousPlaceDetailsRequest() {
+        if (this.currentPlaceDetailsPromiseReject) {
+            this.currentPlaceDetailsPromiseReject({
+                canceled: true
+            });
+            this.currentPlaceDetailsPromiseReject = null;
+        }
     }
 
     private openDropdownAgain() {

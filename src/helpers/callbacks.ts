@@ -26,6 +26,26 @@ export class Callbacks {
         }
     }
 
+    notifyInputChange(currentValue: string) {
+        this.inputCallbacks.forEach(callback => callback(currentValue));
+    }
+
+    notifyChange(feature: any){
+        this.changeCallbacks.forEach(callback => callback(feature));
+    }
+
+    notifySuggestions(features: any) {
+        this.suggestionsChangeCallbacks.forEach(callback => callback(features));
+    }
+
+    notifyOpened() {
+        this.openCallbacks.forEach(callback => callback(true));
+    }
+
+    notifyClosed() {
+        this.closeCallbacks.forEach(callback => callback(false));
+    }
+
     private getCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open") {
         let currentCallbacks = null;
         switch (operation) {
