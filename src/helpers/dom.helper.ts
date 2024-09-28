@@ -28,7 +28,7 @@ export class DomHelper {
         const countryData = countiesData.find(county => countryCode && county.code.toLowerCase() === countryCode.toLowerCase());
 
         if ((type === 'country') && countryData) {
-            element.classList.add("emoji");;
+            element.classList.add("emoji");
             const emojiElement = document.createElement('span');
             emojiElement.innerText = countryData.emoji;
             element.appendChild(emojiElement);
