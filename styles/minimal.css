@@ -57,7 +57,7 @@
 
 .geoapify-close-button {
     position: absolute;
-    right: 5px;
+    inset-inline-end: 5px;
     top: 0;
 
     height: 100%;
@@ -66,7 +66,7 @@
 }
 
 .geoapify-close-button.visible {
-    display: flex;
+    display: inline-flex;
 }
 
 .geoapify-close-button {
