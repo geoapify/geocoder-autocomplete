@@ -240,9 +240,9 @@ Here's a description of the API methods:
 | *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
 | *setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. |
 | *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. |
-| *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, and dropdown open/close. |
-| *off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback?: (param: any) => void): void* | Detaches previously attached event listeners. |
-| *once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open', callback: (param: any) => void): void* | Attaches a one-time event listener that triggers only once for the specified operation. |
+| *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, dropdown open/close, and request lifecycle events. |
+| *off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end', callback?: (param: any) => void): void* | Detaches previously attached event listeners. |
+| *once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end', callback: (param: any) => void): void* | Attaches a one-time event listener that triggers only once for the specified operation. |
 
 #### Example. Setting Geocoder options
 The library offers a flexible API that enables the dynamic configuration of Geoapify Geocoder options at runtime:
@@ -404,13 +404,15 @@ autocomplete.setSendPlaceDetailsRequestFunc((feature: any, geocoderAutocomplete:
 
 `@geoapify/geocoder-autocomplete` provides a set of event handling functions—on, off, and once. These functions allow you to attach, detach, and manage event listeners for various user interactions and changes within the library. 
 
-| Event Name    | Description                                                                                                            |
-|---------------|------------------------------------------------------------------------------------------------------------------------|
-| `select`      | Triggered when a suggestion is selected from the dropdown. Useful for capturing and responding to user selections.    |
-| `suggestions` | Fired when suggestions are provided, allowing access to the list of suggestions for customization or interaction. |
-| `input`       | Occurs whenever the input field value changes, providing real-time feedback on user input for dynamic adjustments.   |
-| `close`       | Triggered when the suggestions dropdown is closed, enabling actions to be performed when the dropdown closes.       |
-| `open`        | Fired when the suggestions dropdown is opened, offering an opportunity to respond to dropdown opening events.       |
+| Event Name      | Description                                                                                                            |
+|-----------------|------------------------------------------------------------------------------------------------------------------------|
+| `select`        | Triggered when a suggestion is selected from the dropdown. Useful for capturing and responding to user selections.    |
+| `suggestions`   | Fired when suggestions are provided, allowing access to the list of suggestions for customization or interaction. |
+| `input`         | Occurs whenever the input field value changes, providing real-time feedback on user input for dynamic adjustments.   |
+| `close`         | Triggered when the suggestions dropdown is closed, enabling actions to be performed when the dropdown closes.       |
+| `open`          | Fired when the suggestions dropdown is opened, offering an opportunity to respond to dropdown opening events.       |
+| `request_start` | Triggered when a geocoding request starts. Provides the search query as parameter. Perfect for showing loading indicators. |
+| `request_end`   | Fired when a geocoding request completes (success or failure). Provides success status, data, and error information. Ideal for hiding loading indicators and handling errors. |
 
 These events offer flexibility and customization options for creating tailored interactions and user experiences in your application.
 
@@ -445,6 +447,14 @@ autocomplete.once('open', () => {
 
 autocomplete.once('close', () => {
     // dropdown list is closed, one time callback
+});
+
+autocomplete.on('request_start', (query) => {
+    // geocoding request started
+});
+
+autocomplete.on('request_end', (success, data, error) => {
+    // geocoding request completed
 });
 ```
 The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. The feature properties contain information about address and location.
