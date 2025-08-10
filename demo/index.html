@@ -6,6 +6,16 @@
   <link rel="stylesheet" href="./index.css">
 </head>
 <body>
+<div class="theme-selector">
+  <span class="theme-label">Theme:</span>
+  <select id="theme-selector" onchange="setTheme(this.value)">
+    <option value="minimal">Light</option>
+    <option value="minimal-dark">Dark</option>
+    <option value="round-borders">Light (Round)</option>
+    <option value="round-borders-dark">Dark (Round)</option>
+  </select>
+</div>
+
 <div class="address-collection-container">
   <div class="address-row">
     <div class="address-field-with-label main-part  margin-right">
@@ -56,7 +66,7 @@
 </div>
 
 <script type="text/javascript" src="../dist/index.min.js"></script>
-<link rel="stylesheet" type="text/css" href="../styles/minimal.css">
+<link id="geocoder-theme" rel="stylesheet" type="text/css" href="../styles/minimal.css">
 
 <script>
     const myAPIKey = "MY_API_KEY";
@@ -157,6 +167,28 @@
             countryInput.setValue(state.properties.country);
         }
     });
+
+    function setTheme(themeName) {
+        const themeLink = document.getElementById('geocoder-theme');
+        themeLink.href = `../styles/${themeName}.css`;
+        
+        // Update body class for additional styling if needed
+        document.body.className = document.body.className.replace(/theme-\w+/g, '');
+        document.body.classList.add(`theme-${themeName}`);
+        
+        // Store theme preference in localStorage
+        localStorage.setItem('geocoder-theme', themeName);
+    }
+
+    // Load saved theme on page load
+    function loadSavedTheme() {
+        const savedTheme = localStorage.getItem('geocoder-theme') || 'minimal';
+        document.getElementById('theme-selector').value = savedTheme;
+        setTheme(savedTheme);
+    }
+
+    // Initialize theme when page loads
+    window.addEventListener('load', loadSavedTheme);
 
     function checkAddress() {
         const postcode = document.getElementById("postcode").value;;

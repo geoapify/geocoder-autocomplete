@@ -46,3 +46,72 @@
 .geoapify-autocomplete-input {
     width: calc(100%) !important;
 }
+
+/* Theme selector styling */
+.theme-selector {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.theme-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.theme-selector select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.theme-selector select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Dark theme styles for the demo page */
+body.theme-minimal-dark,
+body.theme-round-borders-dark {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.theme-minimal-dark .theme-label,
+body.theme-round-borders-dark .theme-label {
+    color: #bbb;
+}
+
+body.theme-minimal-dark .theme-selector select,
+body.theme-round-borders-dark .theme-selector select {
+    background-color: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.theme-minimal-dark .message-container,
+body.theme-round-borders-dark .message-container {
+    color: #bbb;
+}
+
+body.theme-minimal-dark button,
+body.theme-round-borders-dark button {
+    background-color: #444;
+    color: #e0e0e0;
+    border: 1px solid #666;
+}
+
+body.theme-minimal-dark button:hover,
+body.theme-round-borders-dark button:hover {
+    background-color: #555;
+}
