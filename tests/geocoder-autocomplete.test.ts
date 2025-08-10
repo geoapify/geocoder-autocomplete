@@ -210,7 +210,34 @@ describe('GeocoderAutocomplete', () => {
         await inputValueAndPopulateDropdown(container);
         expect(requestEndSpy).toHaveBeenCalledTimes(2);
     });
-
+    it('requestEndCallbacks is triggered properly for failed requests', async () => {
+        // Clear any previous state first
+        reset(autocomplete);
+        
+        // testing on('request_end', x) with failure
+        const requestEndSpy = addRequestEndSpy(autocomplete);
+        
+        // Mock a failed HTTP response (401 Unauthorized)
+        const errorResponse = {
+            statusCode: 401,
+            error: "Unauthorized", 
+            message: "Invalid apiKey"
+        };
+        
+        fetchMock.mockResponseOnce(
+            JSON.stringify(errorResponse),
+            { status: 401, statusText: 'Unauthorized' }
+        );
+        
+        // Trigger input that will cause a request (3+ characters)
+        inputText(container, "error");
+        
+        // Wait for debounce delay (100ms) + extra time for promise resolution
+        await wait(300);
+        
+        expect(requestEndSpy).toHaveBeenCalledWith(false, null, errorResponse);
+        expect(requestEndSpy).toHaveBeenCalledTimes(1);
+    });
     it('closeCallbacks is triggered properly', async () => {
         // testing on('close', x)
         autocomplete.setValue("");
