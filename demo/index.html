@@ -168,6 +168,52 @@
         }
     });
 
+    // Loading spinner functionality
+    function showSpinner(container) {
+        let spinner = container.querySelector('.loading-spinner');
+        if (!spinner) {
+            spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            container.appendChild(spinner);
+        }
+        spinner.style.display = 'block';
+    }
+
+    function hideSpinner(container) {
+        const spinner = container.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
+    }
+
+    // Add spinner events to all autocomplete inputs
+    function addSpinnerEvents(autocompleteInput, containerId) {
+        const container = document.getElementById(containerId);
+
+        // Show spinner when request starts
+        autocompleteInput.on('request_start', (query) => {
+            console.log('Request started for:', query);
+            showSpinner(container);
+        });
+
+        // Hide spinner when request ends (success or failure)
+        autocompleteInput.on('request_end', (success, data, error) => {
+            console.log('Request ended:', success ? 'Success' : 'Failed', success ? data : error);
+            hideSpinner(container);
+            
+            // Optional: Show error message for failed requests
+            if (!success && error && !error.canceled) {
+                console.warn('Geocoding request failed:', error);
+            }
+        });
+    }
+
+    // Apply spinner events to all autocomplete inputs
+    addSpinnerEvents(streetInput, 'street');
+    addSpinnerEvents(cityInput, 'city');
+    addSpinnerEvents(stateInput, 'state');
+    addSpinnerEvents(countryInput, 'country');
+
     function setTheme(themeName) {
         const themeLink = document.getElementById('geocoder-theme');
         themeLink.href = `../styles/${themeName}.css`;

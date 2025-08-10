@@ -144,3 +144,15 @@ export function addSuggestionsSpy(autocomplete: GeocoderAutocomplete) {
     autocomplete.on('suggestions', suggestionChangeSpy);
     return suggestionChangeSpy;
 }
+
+export function addRequestStartSpy(autocomplete: GeocoderAutocomplete) {
+    const requestStartSpy = jest.fn();
+    autocomplete.on('request_start', requestStartSpy);
+    return requestStartSpy;
+}
+
+export function addRequestEndSpy(autocomplete: GeocoderAutocomplete) {
+    const requestEndSpy = jest.fn();
+    autocomplete.on('request_end', requestEndSpy);
+    return requestEndSpy;
+}

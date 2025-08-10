@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { GeocoderAutocomplete, GeocoderAutocompleteOptions } from "../src";
 import fetchMock from 'jest-fetch-mock';
 import {
-    addSelectSpy, addSuggestionsSpy,
+    addSelectSpy, addSuggestionsSpy, addRequestStartSpy, addRequestEndSpy,
     APP_URL,
     checkIfClearButtonInitialized,
     checkIfInputInitialized,
@@ -172,6 +172,45 @@ describe('GeocoderAutocomplete', () => {
         await inputValueAndPopulateDropdown(container);
         expect(inputChangeSpy).toHaveBeenCalledTimes(2);
     });
+    it('requestStartCallbacks is triggered properly', async () => {
+        // testing on('request_start', x)
+        const requestStartSpy = addRequestStartSpy(autocomplete);
+        await inputValueAndPopulateDropdown(container);
+        expect(requestStartSpy).toHaveBeenNthCalledWith(1, "123");
+        
+        // testing off('request_start', x)
+        autocomplete.off('request_start', requestStartSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(requestStartSpy).toHaveBeenCalledTimes(1);
+
+        // testing once('request_start', x)
+        autocomplete.once('request_start', requestStartSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(requestStartSpy).toHaveBeenNthCalledWith(2, "123");
+
+        await inputValueAndPopulateDropdown(container);
+        expect(requestStartSpy).toHaveBeenCalledTimes(2);
+    });
+    it('requestEndCallbacks is triggered properly for successful requests', async () => {
+        // testing on('request_end', x) with success
+        const requestEndSpy = addRequestEndSpy(autocomplete);
+        await inputValueAndPopulateDropdown(container);
+        expect(requestEndSpy).toHaveBeenNthCalledWith(1, true, mockResponseWithData, undefined);
+        
+        // testing off('request_end', x)
+        autocomplete.off('request_end', requestEndSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(requestEndSpy).toHaveBeenCalledTimes(1);
+
+        // testing once('request_end', x)
+        autocomplete.once('request_end', requestEndSpy);
+        await inputValueAndPopulateDropdown(container);
+        expect(requestEndSpy).toHaveBeenNthCalledWith(2, true, mockResponseWithData, undefined);
+
+        await inputValueAndPopulateDropdown(container);
+        expect(requestEndSpy).toHaveBeenCalledTimes(2);
+    });
+
     it('closeCallbacks is triggered properly', async () => {
         // testing on('close', x)
         autocomplete.setValue("");

@@ -115,3 +115,32 @@ body.theme-minimal-dark button:hover,
 body.theme-round-borders-dark button:hover {
     background-color: #555;
 }
+
+/* Loading spinner styling */
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    right: 35px; /* Position to the left of the clear button */
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e3e3e3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    z-index: 1001;
+    animation: spin 0.8s linear infinite;
+    pointer-events: none;
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Dark theme spinner */
+body.theme-minimal-dark .loading-spinner,
+body.theme-round-borders-dark .loading-spinner {
+    border-color: #444;
+    border-top-color: #4dabf7;
+}
