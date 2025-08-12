@@ -46,3 +46,101 @@
 .geoapify-autocomplete-input {
     width: calc(100%) !important;
 }
+
+/* Theme selector styling */
+.theme-selector {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.theme-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.theme-selector select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.theme-selector select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Dark theme styles for the demo page */
+body.theme-minimal-dark,
+body.theme-round-borders-dark {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.theme-minimal-dark .theme-label,
+body.theme-round-borders-dark .theme-label {
+    color: #bbb;
+}
+
+body.theme-minimal-dark .theme-selector select,
+body.theme-round-borders-dark .theme-selector select {
+    background-color: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.theme-minimal-dark .message-container,
+body.theme-round-borders-dark .message-container {
+    color: #bbb;
+}
+
+body.theme-minimal-dark button,
+body.theme-round-borders-dark button {
+    background-color: #444;
+    color: #e0e0e0;
+    border: 1px solid #666;
+}
+
+body.theme-minimal-dark button:hover,
+body.theme-round-borders-dark button:hover {
+    background-color: #555;
+}
+
+/* Loading spinner styling */
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    right: 35px; /* Position to the left of the clear button */
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e3e3e3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    z-index: 1001;
+    animation: spin 0.8s linear infinite;
+    pointer-events: none;
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Dark theme spinner */
+body.theme-minimal-dark .loading-spinner,
+body.theme-round-borders-dark .loading-spinner {
+    border-color: #444;
+    border-top-color: #4dabf7;
+}

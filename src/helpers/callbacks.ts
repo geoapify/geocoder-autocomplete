@@ -4,8 +4,10 @@ export class Callbacks {
     public inputCallbacks: ((input: string) => void)[] = [];
     public openCallbacks: ((opened: boolean) => void)[] = [];
     public closeCallbacks: ((opened: boolean) => void)[] = [];
+    public requestStartCallbacks: ((query: string) => void)[] = [];
+    public requestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
 
-    addCallback(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => void) {
+    addCallback(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback: (param: any) => void) {
         let currentCallbacks = this.getCallbacksByOperation(operation);
         if(currentCallbacks) {
             if (currentCallbacks.indexOf(callback) < 0) {
@@ -14,7 +16,7 @@ export class Callbacks {
         }
     }
 
-    removeCallback(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback?: (param: any) => any) {
+    removeCallback(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback?: (param: any) => any) {
         let currentCallbacks = this.getCallbacksByOperation(operation);
         if(currentCallbacks) {
             if (currentCallbacks.indexOf(callback) >= 0) {
@@ -46,7 +48,15 @@ export class Callbacks {
         this.closeCallbacks.forEach(callback => callback(false));
     }
 
-    private getCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open") {
+    notifyRequestStart(query: string) {
+        this.requestStartCallbacks.forEach(callback => callback(query));
+    }
+
+    notifyRequestEnd(success: boolean, data?: any, error?: any) {
+        this.requestEndCallbacks.forEach(callback => callback(success, data, error));
+    }
+
+    private getCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open" | "request_start" | "request_end") {
         let currentCallbacks = null;
         switch (operation) {
             case 'select': {
@@ -69,11 +79,19 @@ export class Callbacks {
                 currentCallbacks = this.openCallbacks;
                 break;
             }
+            case 'request_start': {
+                currentCallbacks = this.requestStartCallbacks;
+                break;
+            }
+            case 'request_end': {
+                currentCallbacks = this.requestEndCallbacks;
+                break;
+            }
         }
         return currentCallbacks;
     }
 
-    private setCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open",
+    private setCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open" | "request_start" | "request_end",
                                     callbacks: ((data: any) => void)[]) {
         switch (operation) {
             case 'select': {
@@ -94,6 +112,14 @@ export class Callbacks {
             }
             case 'open': {
                 this.openCallbacks = callbacks;
+                break;
+            }
+            case 'request_start': {
+                this.requestStartCallbacks = callbacks;
+                break;
+            }
+            case 'request_end': {
+                this.requestEndCallbacks = callbacks;
                 break;
             }
         }

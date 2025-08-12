@@ -158,15 +158,15 @@ export class GeocoderAutocomplete {
         this.options.bias = {};
     }
 
-    public on(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => void) {
+    public on(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback: (param: any) => void) {
         this.callbacks.addCallback(operation, callback);
     }
 
-    public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback?: (param: any) => any) {
+    public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback?: (param: any) => any) {
         this.callbacks.removeCallback(operation, callback);
     }
 
-    public once(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open', callback: (param: any) => any) {
+    public once(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback: (param: any) => any) {
         this.on(operation, callback);
 
         const current = this;
@@ -296,11 +296,15 @@ export class GeocoderAutocomplete {
                 currentValue = this.preprocessHook(currentValue);
             }
 
+            this.callbacks.notifyRequestStart(currentValue);
+
             let promise = this.sendGeocoderRequestOrAlt(currentValue);
 
             promise.then((data: any) => {
+                this.callbacks.notifyRequestEnd(true, data);
                 this.onDropdownDataLoad(data, userEnteredValue, event);
             }, (err) => {
+                this.callbacks.notifyRequestEnd(false, null, err);
                 if (!err.canceled) {
                     console.log(err);
                 }
