@@ -1,7 +1,7 @@
 {
   "name": "@geoapify/geocoder-autocomplete",
-  "version": "2.1.0",
-  "description": "Postal address autocomplete input field",
+  "version": "2.2.0",
+  "description": "A JavaScript address autocomplete input, compatible with Leaflet, MapLibre, OpenLayers, and other map libraries for efficient location search and geocoding.",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
   "minimized": "dist/index.min.js",
@@ -32,7 +32,10 @@
     "location",
     "regions",
     "boundaries",
-    "place details"
+    "place details",
+    "postal code",
+    "address lookup",
+    "location autocomplete"
   ],
   "author": {
     "name": "Geoapify GmbH",
