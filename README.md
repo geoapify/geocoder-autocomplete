@@ -4,6 +4,19 @@ The Geoapify Geocoder Autocomplete is a JavaScript (TypeScript) library designed
 
 ![Geocoder Autocomplete](https://github.com/geoapify/geocoder-autocomplete/blob/9b46b3e458d18b45e2957298e8833f830ed6252a/img/address-autocomplete-example.png?raw=true)
 
+## Table of Contents
+1. [Overview](#geoapify-geocoder-autocomplete)
+2. [Features](#features)
+3. [Live Demos](#live-demos)
+4. [Getting Geoapify API key](#getting-geoapify-api-key)
+5. [Installation](#installation)
+6. [Usage](#using-geoapifygeocoder-autocomplete-in-your-project)
+7. [API Methods](#methods)
+8. [Styling](#styling)
+9. [Working with non-verified address components](#working-with-non-verified-address-components)
+10. [Contributions and Support](#contributions-and-support)
+
+## Features
 * **Customizable Address Input**: Easily embed address input fields within your web application by adding them to provided HTML containers (e.g., `DIV` elements), allowing for flexible integration and styling.
 * **API Integration Flexibility**: By default, the library seamlessly connects to the [Geoapify Address Autocomplete API](https://www.geoapify.com/address-autocomplete/) to retrieve address suggestions. However, developers have the freedom to integrate and combine other third-party Address Search APIs, allowing for extensive customization and the incorporation of multiple data sources.
 * **Search Customization**: Tailor your address search with precision by adding filters and bias parameters. This level of customization empowers developers to fine-tune search queries, ensuring more accurate and relevant address suggestions for users.
@@ -12,10 +25,31 @@ The Geoapify Geocoder Autocomplete is a JavaScript (TypeScript) library designed
 * **Customizable Look-and-Feel**: Tailor the appearance of the address input and autocomplete suggestions effortlessly. The library offers four distinct styles for both light and dark themes, providing design flexibility. Moreover, developers can further fine-tune the visual aspects using CSS classes to achieve a seamless integration with their application's aesthetics.
 * **Zero Dependencies**: The library is intentionally built with zero external dependencies. This means that it operates independently and does not rely on external libraries or packages. 
 
-## [Playground](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
-## [JSFiddle demo: Address Field + Map](https://jsfiddle.net/Geoapify/jsgw53z8/)
-## [JSFiddle demo: Address Form 1](https://jsfiddle.net/Geoapify/t0eg541k/)
-## [JSFiddle demo: Address Form 2](https://jsfiddle.net/Geoapify/stgek5wf/)
+## Live Demos
+
+Try the address autocomplete in the Playground. Experiment with different options, such as geocoding, biasing results, and more, to see how the autocomplete behavior adapts:
+* [Playground](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
+
+A live example of the address autocomplete field integrated with map libraries:
+* [JSFiddle demo: Address Field + Leaflet Map](https://jsfiddle.net/Geoapify/jsgw53z8/)
+* [JSFiddle demo: Address Field + MapLibreGL map](https://jsfiddle.net/Geoapify/sf3hp2a6/)
+
+A simple address form demos showcasing how to implement address search and autocomplete for user input:
+* [JSFiddle demo: Address Form 1](https://jsfiddle.net/Geoapify/t0eg541k/)
+* [JSFiddle demo: Address Form 2](https://jsfiddle.net/Geoapify/stgek5wf/)
+
+This example demonstrates obtaining precise address details for shipping and delivery:
+* [JSFiddle demo: Getting precise location for Shipping](https://jsfiddle.net/Geoapify/g9xhcye0/)
+
+> **⚠️ Warning**: While address autocomplete can help users quickly select locations, it is important to note that no autocomplete service provides 100% coverage or guaranteed precision. For critical use cases like shipping or delivery, it is essential to verify and confirm the location.
+>
+> **Here’s how you can ensure accuracy**:
+> 1. After selecting an address, display a map or marker to show the user's selected location.
+> 2. Prompt the user to confirm the address details, including street, city, and postal code.
+> 3. Optionally, use reverse geocoding to verify the location after selecting the address. You can also use [Geoapify Reverse Geocoding API](https://www.geoapify.com/reverse-geocoding-api/) to confirm the precise location.
+
+This code demonstrates how to set up a custom geocoding function. It customizes the autocomplete input to return countries, states, cities, and counties based on user input, using Geoapify’s Address Autocomplete API:
+* [JSFiddle demo: Custom Geocoding Function](https://jsfiddle.net/Geoapify/916oxfja/)
 
 ## Getting Geoapify API key
 In case you decide to use Geoapify API to search addresses, you'll need to obtain an API key. 
@@ -48,9 +82,9 @@ Refer to the Geocoder Autocomplete library as a UMD module (for CMS websites, in
 
 You can use [UNPKG](https://unpkg.com/) to refer or download the library:
 
-```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/dist/index.min.js```
+```https://unpkg.com/@geoapify/geocoder-autocomplete@latest/dist/index.min.js```
 
-```https://unpkg.com/@geoapify/geocoder-autocomplete@^1/styles/minimal.css```
+```https://unpkg.com/@geoapify/geocoder-autocomplete@latest/styles/minimal.css```
 
 ## Using `@geoapify/geocoder-autocomplete` in your project
 Follow the steps below to seamlessly integrate `@geoapify/geocoder-autocomplete` into your project.
@@ -113,7 +147,17 @@ You can import the appropriate css-file to your styles:
 ```
 or as a link in a HTML-file:
 ```html
-<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@^1/styles/minimal.css">
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@latest/styles/minimal.css">
+
+<!--
+or
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@latest/styles/minimal-dark.css">
+or 
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@latest/styles/round-borders.css">
+or 
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/@geoapify/geocoder-autocomplete@latest/styles/round-borders-dark.css">
+
+-->
 ```
 
 ## Transitioning from 1.x: Replacing `skipDetails` with `addDetails`
@@ -474,10 +518,10 @@ Learn more about Geocoder result properties on [Geoapify Documentation page](htt
 
 We offer a variety of built-in themes within the library, catering to different webpage styles:
 
-1. **Minimal Theme**: Designed for webpages with a light background color.
-2. **Round Borders Theme**: Tailored for webpages with a light background color, featuring rounded borders. 
-3. **Minimal Dark Theme**: Ideal for webpages with a dark background color.
-4. **Round Borders Dark Theme**: Specifically crafted for webpages with a dark background color, incorporating rounded borders.
+1. **Minimal Theme** (`minimal.css`): Designed for webpages with a light background color.
+2. **Round Borders Theme** (`round-borders.css`): Tailored for webpages with a light background color, featuring rounded borders. 
+3. **Minimal Dark Theme** (`minimal-dark.css`): Ideal for webpages with a dark background color.
+4. **Round Borders Dark Theme** (`round-borders-dark.css`): Specifically crafted for webpages with a dark background color, incorporating rounded borders.
 
 These themes offer versatile styling options to seamlessly integrate the address autocomplete component into various webpage designs.
 
@@ -496,11 +540,14 @@ Moreover, if you prefer to have complete control over the styling, you have the 
 
 ## Working with non-verified address components
 
-When utilizing the Geocoder Autocomplete library to gather postal addresses, it's often advantageous to adopt a more permissive approach, allowing for the inclusion of non-verified address components such as house numbers and streets.
+In some cases, Geoapify may return address components that are non-verified, such as newly constructed streets or buildings that are not yet available in databases. These non-verified components are highlighted in the address suggestions.
 
-In real-world scenarios, it's possible that newly constructed streets or houses may not yet be included in existing databases. Restricting users from entering such addresses may not align with your objectives.
+You can choose to:
+1. Display these components with a warning to the user (e.g., in red).
+2. Allow users to manually correct or confirm these non-verified details before finalizing the address.
+3. Use the **`allowNonVerifiedHouseNumber`** and **`allowNonVerifiedStreet`** options to handle such cases.
 
-To accommodate users and enable the inclusion of non-verified address parts, you can leverage the `allowNonVerifiedHouseNumber` and `allowNonVerifiedStreet` parameters. These settings empower users to contribute address details that may not yet be officially validated, fostering flexibility and completeness in your address data collection process.
+For example, when a house number or street is not verified, the result will include a `nonVerifiedParts` array in the address object, which you can use to highlight or notify users about the provisional status.
 
 ### How it works
 
@@ -534,4 +581,10 @@ This extended result object provides transparency by clearly indicating which ad
 This library is open-source and released under the MIT License.
 
 ## Contributions and Support
-We welcome contributions from the developer community. If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request on [GitHub](https://github.com/geoapify/geocoder-autocomplete).
+
+We welcome contributions! Here's how you can help:
+1. **Open Issues**: If you encounter any bugs or have feature requests, please open an issue on [GitHub Issues](https://github.com/geoapify/geocoder-autocomplete/issues).
+2. **Submit a Pull Request**: Fork the repository, make your changes, and submit a pull request for review.
+3. **Documentation Updates**: Help us improve the documentation by submitting improvements or clarifications.
+
+If you need assistance or have any questions, feel free to reach out to our support team at [info@geoapify.com](mailto:info@geoapify.com).
