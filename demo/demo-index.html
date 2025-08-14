@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geoapify Geocoder Autocomplete - Demo Collection</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+    
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .demo-card {
+      border: 1px solid #e1e8ed;
+      border-radius: 8px;
+      padding: 25px;
+      background: white;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .demo-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .demo-card h3 {
+      color: #3498db;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.4em;
+    }
+    
+    .demo-card p {
+      color: #7f8c8d;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .demo-card .features {
+      margin-bottom: 20px;
+    }
+    
+    .demo-card .features strong {
+      color: #2c3e50;
+    }
+    
+    .demo-card .tech-stack {
+      background: #ecf0f1;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 0.9em;
+      color: #34495e;
+    }
+    
+    .demo-card .tech-stack strong {
+      color: #2c3e50;
+    }
+    
+    .demo-card .cta {
+      display: inline-block;
+      background: #3498db;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    .demo-card .cta:hover {
+      background: #2980b9;
+    }
+    
+    .description {
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 1.1em;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .setup-note {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 5px;
+      padding: 20px;
+      margin: 30px 0;
+      color: #856404;
+    }
+    
+    .setup-note strong {
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Geoapify Geocoder Autocomplete</h1>
+    <p class="description">
+      A comprehensive collection of demos showcasing the integration of our address autocomplete library 
+      with popular mapping libraries. Each demo demonstrates different use cases and integration patterns.
+    </p>
+    
+    <div class="setup-note">
+      <strong>Setup Required:</strong> Before running any demo, you'll need to:
+      <ol>
+        <li>Get your free API key from <a href="https://myprojects.geoapify.com" target="_blank">https://myprojects.geoapify.com</a></li>
+        <li>Replace <code>"MY_API_KEY"</code> with your actual API key in the demo files</li>
+        <li>Build the library by running <code>npm run build-all</code> from the project root</li>
+      </ol>
+    </div>
+
+    <div class="demo-grid">
+      <a href="./basic/index.html" class="demo-card">
+        <h3>📝 Basic Address Form</h3>
+        <p>A comprehensive address input form with street, city, state, and country autocomplete fields. Perfect for e-commerce, registration forms, and any application requiring address collection.</p>
+        <div class="features">
+          <strong>Features:</strong> Multi-field address input, automatic field population, address validation, theme switching, loading indicators
+        </div>
+        <div class="tech-stack">
+          <strong>Tech:</strong> Vanilla JavaScript, CSS themes, Geoapify Geocoding API
+        </div>
+        <span class="cta">View Demo →</span>
+      </a>
+      
+      <a href="./leaflet/index.html" class="demo-card">
+        <h3>🍃 Leaflet Integration</h3>
+        <p>Interactive map with address autocomplete integration. Users can search for addresses and see them marked on the map with automatic panning and custom markers.</p>
+        <div class="features">
+          <strong>Features:</strong> Interactive map, address search, marker placement, map panning, custom icons, theme switching
+        </div>
+        <div class="tech-stack">
+          <strong>Tech:</strong> Leaflet.js, Geoapify Maps API, Custom marker icons, CSS themes
+        </div>
+        <span class="cta">View Demo →</span>
+      </a>
+      
+      <a href="./maplibre/index.html" class="demo-card">
+        <h3>🗺️ MapLibre GL Integration</h3>
+        <p>Advanced vector map with address autocomplete and reverse geocoding. Click anywhere on the map to get the address, or search for addresses to place markers.</p>
+        <div class="features">
+          <strong>Features:</strong> Vector tiles, address search, reverse geocoding, smooth animations, navigation controls, theme switching
+        </div>
+        <div class="tech-stack">
+          <strong>Tech:</strong> MapLibre GL, Vector tiles, Reverse geocoding, Smooth animations, CSS themes
+        </div>
+        <span class="cta">View Demo →</span>
+      </a>
+    </div>
+    
+    <div style="margin-top: 40px; text-align: center; color: #7f8c8d;">
+      <p>
+        <strong>Need help?</strong> Check out our 
+        <a href="https://www.npmjs.com/package/@geoapify/geocoder-autocomplete" target="_blank">NPM package</a> and 
+        <a href="https://github.com/geoapify/geocoder-autocomplete" target="_blank">GitHub repository</a> for more information.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

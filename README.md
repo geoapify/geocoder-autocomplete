@@ -34,6 +34,12 @@ A live example of the address autocomplete field integrated with map libraries:
 * [JSFiddle demo: Address Field + Leaflet Map](https://jsfiddle.net/Geoapify/jsgw53z8/)
 * [JSFiddle demo: Address Field + MapLibreGL map](https://jsfiddle.net/Geoapify/sf3hp2a6/)
 
+**Local Demo Collection**: This repository includes a comprehensive collection of working demos that you can run locally:
+* [Demo Collection Overview](demo/demo-index.html) - Navigate to all available demos
+* [Basic Address Form](demo/basic/index.html) - Multi-field address input with validation
+* [Leaflet Integration](demo/leaflet/index.html) - Interactive map with address search and markers
+* [MapLibre GL Integration](demo/maplibre/index.html) - Vector map with reverse geocoding on click
+
 A simple address form demos showcasing how to implement address search and autocomplete for user input:
 * [JSFiddle demo: Address Form 1](https://jsfiddle.net/Geoapify/t0eg541k/)
 * [JSFiddle demo: Address Form 2](https://jsfiddle.net/Geoapify/stgek5wf/)
