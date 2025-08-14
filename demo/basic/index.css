@@ -10,41 +10,45 @@
 .address-row {
     display: flex;
     flex-direction: row;
-
     margin-bottom: 10px;
+    gap: 10px;
 }
 
-.address-row  .main-part {
-    flex: 1
+.address-row .main-part {
+    flex: 1;
 }
 
 .small-input {
     width: 90px;
+    flex-shrink: 0;
 }
 
 .margin-right {
-    margin-right: 10px
+    margin-right: 10px;
 }
 
 .message-container {
     margin-top: 10px;
+    color: grey;
 }
 
 .button-container {
     margin-top: 20px;
-    text-align: right
+    text-align: right;
 }
 
 .warning-input {
     border-color: #ffb610;
 }
 
-.message-container {
-    color: grey;
+.geoapify-autocomplete-input {
+    width: 100% !important;
+    box-sizing: border-box;
 }
 
-.geoapify-autocomplete-input {
-    width: calc(100%) !important;
+/* Ensure proper spacing for autocomplete containers */
+.address-field {
+    min-height: 36px;
 }
 
 /* Theme selector styling */
@@ -52,32 +56,45 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 1000;
+    z-index: 1001;
     display: flex;
     align-items: center;
-    gap: 6px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .theme-label {
     font-size: 12px;
     color: #666;
     font-weight: 500;
+    padding: 4px 8px 4px 12px;
+    border-right: 1px solid #eee;
+    background: #f8f9fa;
+    border-radius: 4px 0 0 4px;
+    white-space: nowrap;
 }
 
 .theme-selector select {
     padding: 4px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
+    border: none;
+    background: transparent;
     color: #333;
     font-size: 12px;
     cursor: pointer;
     min-width: 100px;
+    border-radius: 0 4px 4px 0;
 }
 
 .theme-selector select:focus {
     outline: none;
+}
+
+.theme-selector:hover {
     border-color: #007bff;
+    box-shadow: 0 2px 12px rgba(0, 123, 255, 0.15);
 }
 
 /* Dark theme styles for the demo page */
@@ -87,16 +104,29 @@ body.theme-round-borders-dark {
     color: #e0e0e0;
 }
 
+body.theme-minimal-dark .theme-selector,
+body.theme-round-borders-dark .theme-selector {
+    background: #333;
+    border-color: #555;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 body.theme-minimal-dark .theme-label,
 body.theme-round-borders-dark .theme-label {
     color: #bbb;
+    background: #444;
+    border-right-color: #555;
 }
 
 body.theme-minimal-dark .theme-selector select,
 body.theme-round-borders-dark .theme-selector select {
-    background-color: #333;
-    border-color: #555;
     color: #e0e0e0;
+}
+
+body.theme-minimal-dark .theme-selector:hover,
+body.theme-round-borders-dark .theme-selector:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 12px rgba(0, 123, 255, 0.2);
 }
 
 body.theme-minimal-dark .message-container,
@@ -120,7 +150,7 @@ body.theme-round-borders-dark button:hover {
 .loading-spinner {
     position: absolute;
     top: 50%;
-    right: 35px; /* Position to the left of the clear button */
+    right: 35px;
     transform: translateY(-50%);
     width: 16px;
     height: 16px;
