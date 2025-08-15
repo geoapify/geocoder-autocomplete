@@ -1,6 +1,8 @@
-// The API Key provided is restricted to JSFiddle website
-// Get your own API Key on https://myprojects.geoapify.com
-const myAPIKey = "MY_API_KEY";
+/* WARNING: This API key is provided for DEMO purposes only.
+   Please sign up at https://www.geoapify.com and generate your own API key.
+   The demo key may be rotated or blocked at any moment without notice.
+*/
+const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
 
 // Map style configurations for different themes
 const mapStyles = {

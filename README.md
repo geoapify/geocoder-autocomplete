@@ -30,15 +30,11 @@ The Geoapify Geocoder Autocomplete is a JavaScript (TypeScript) library designed
 Try the address autocomplete in the Playground. Experiment with different options, such as geocoding, biasing results, and more, to see how the autocomplete behavior adapts:
 * [Playground](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
 
+### JSFiddle demos
+
 A live example of the address autocomplete field integrated with map libraries:
 * [JSFiddle demo: Address Field + Leaflet Map](https://jsfiddle.net/Geoapify/jsgw53z8/)
 * [JSFiddle demo: Address Field + MapLibreGL map](https://jsfiddle.net/Geoapify/sf3hp2a6/)
-
-**Local Demo Collection**: This repository includes a comprehensive collection of working demos that you can run locally:
-* [Demo Collection Overview](demo/demo-index.html) - Navigate to all available demos
-* [Basic Address Form](demo/basic/index.html) - Multi-field address input with validation
-* [Leaflet Integration](demo/leaflet/index.html) - Interactive map with address search and markers
-* [MapLibre GL Integration](demo/maplibre/index.html) - Vector map with reverse geocoding on click
 
 A simple address form demos showcasing how to implement address search and autocomplete for user input:
 * [JSFiddle demo: Address Form 1](https://jsfiddle.net/Geoapify/t0eg541k/)
@@ -56,6 +52,15 @@ This example demonstrates obtaining precise address details for shipping and del
 
 This code demonstrates how to set up a custom geocoding function. It customizes the autocomplete input to return countries, states, cities, and counties based on user input, using Geoapify’s Address Autocomplete API:
 * [JSFiddle demo: Custom Geocoding Function](https://jsfiddle.net/Geoapify/916oxfja/)
+
+
+### Local Demos Collection
+
+This repository includes a comprehensive collection of working demos that you can run locally:
+* [Demo Collection Overview](demo/demo-index.html) - Navigate to all available demos
+* [Basic Address Form](demo/basic/index.html) - Multi-field address input with validation
+* [Leaflet Integration](demo/leaflet/index.html) - Interactive map with address search and markers
+* [MapLibre GL Integration](demo/maplibre/index.html) - Vector map with reverse geocoding on click
 
 ## Getting Geoapify API key
 In case you decide to use Geoapify API to search addresses, you'll need to obtain an API key. 
