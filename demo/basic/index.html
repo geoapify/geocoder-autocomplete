@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -65,8 +66,8 @@
   <div class="button-container"><button onclick="checkAddress()">Check address</button></div>
 </div>
 
-<script type="text/javascript" src="../dist/index.min.js"></script>
-<link id="geocoder-theme" rel="stylesheet" type="text/css" href="../styles/minimal.css">
+<script type="text/javascript" src="../../dist/index.min.js"></script>
+<link id="geocoder-theme" rel="stylesheet" type="text/css" href="../../styles/minimal.css">
 
 <script>
     const myAPIKey = "MY_API_KEY";
@@ -217,7 +218,7 @@
 
     function setTheme(themeName) {
         const themeLink = document.getElementById('geocoder-theme');
-        themeLink.href = `../styles/${themeName}.css`;
+        themeLink.href = `../../styles/${themeName}.css`;
         
         // Update body class for additional styling if needed
         document.body.className = document.body.className.replace(/theme-\w+/g, '');
@@ -238,7 +239,7 @@
     window.addEventListener('load', loadSavedTheme);
 
     function checkAddress() {
-        const postcode = document.getElementById("postcode").value;;
+        const postcode = document.getElementById("postcode").value;
         const city = cityInput.getValue();
         const street = streetInput.getValue();
         const state = stateInput.getValue();

@@ -13,7 +13,7 @@
     "build-all": "npm run build && npm run build-minimized",
     "build-minimized": "rollup -c rollup-config.mjs",
     "build-css-minimized": "postcss -o styles/minimal.min.css styles/minimal.css",
-    "start:demo": "npm install && npm run build-all && open demo/index.html"
+    "start:demos": "npm install && npm run build-all && open demo/demo-index.html"
   },
   "repository": {
     "type": "git",
