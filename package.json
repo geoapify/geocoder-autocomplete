@@ -1,6 +1,6 @@
 {
   "name": "@geoapify/geocoder-autocomplete",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A JavaScript address autocomplete input, compatible with Leaflet, MapLibre, OpenLayers, and other map libraries for efficient location search and geocoding.",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
