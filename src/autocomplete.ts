@@ -8,6 +8,9 @@ import {
     BY_RECT
 } from "./helpers/constants";
 import { Callbacks } from "./helpers/callbacks";
+import { CategoryManager } from "./helpers/category.helper";
+import { PlacesApiHelper } from "./helpers/places-api.helper";
+import { Category, GeocoderEventType } from "./types/external";
 
 export class GeocoderAutocomplete {
 
@@ -42,6 +45,11 @@ export class GeocoderAutocomplete {
     private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
 
+    private readonly categoryManager: CategoryManager;
+    private sendPlacesRequestAlt?: (category: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>;
+    private currentPlacesPromiseReject?: any;
+    private lastEscKeyTime?: number;
+
     private options: GeocoderAutocompleteOptions = {
         limit: 5,
         debounceDelay: 100
@@ -56,6 +64,8 @@ export class GeocoderAutocomplete {
         this.addClearButton();
 
         this.addEventListeners();
+
+        this.categoryManager = new CategoryManager();
     }
 
     public setGeocoderUrl(geocoderUrl: string) {
@@ -158,15 +168,15 @@ export class GeocoderAutocomplete {
         this.options.bias = {};
     }
 
-    public on(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback: (param: any) => void) {
+    public on(operation: GeocoderEventType, callback: (param: any) => void) {
         this.callbacks.addCallback(operation, callback);
     }
 
-    public off(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback?: (param: any) => any) {
+    public off(operation: GeocoderEventType, callback?: (param: any) => any) {
         this.callbacks.removeCallback(operation, callback);
     }
 
-    public once(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback: (param: any) => any) {
+    public once(operation: GeocoderEventType, callback: (param: any) => any) {
         this.on(operation, callback);
 
         const current = this;
@@ -267,6 +277,47 @@ export class GeocoderAutocomplete {
         });
     }
 
+    public setCategory(category: Category | string | null): void {
+        this.categoryManager.setCategory(category);
+
+        if (category) {
+            this.onCategorySelect(category);
+        } else {
+            this.clearCategory();
+        }
+    }
+
+    public getCategory(): Category | null {
+        if (!this.isCategoryModeEnabled()) {
+            return null;
+        }
+
+        return this.categoryManager.getCategory();
+    }
+
+    public async sendPlacesRequest(
+        category: string,
+        bias?: string,
+        filter?: string
+    ): Promise<any> {
+        if (!this.isCategoryModeEnabled()) {
+            return Promise.reject(new Error('Category search is disabled'));
+        }
+
+        return this.sendPlacesRequestOrAlt(category, bias, filter);
+    }
+
+    public setSendPlacesRequestFunc(
+        sendPlacesRequestFunc?: (category: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>
+    ): void {
+        if (!this.isCategoryModeEnabled()) {
+            console.warn('Category search is disabled. Enable with addCategorySearch: true');
+            return;
+        }
+
+        this.sendPlacesRequestAlt = CalculationHelper.returnIfFunction(sendPlacesRequestFunc);
+    }
+
     /* Execute a function when someone writes in the text field: */
     onUserInput(event: Event) {
         let currentValue = this.inputElement.value;
@@ -325,15 +376,47 @@ export class GeocoderAutocomplete {
 
         this.callbacks.notifySuggestions(this.currentItems);
 
-        if (!this.currentItems.length) {
+        let categories: Category[] = [];
+        if (this.isCategoryModeEnabled() && data.query?.categories) {
+            categories = this.categoryManager.extractCategoriesFromResponse(data);
+        }
+
+        if (!this.currentItems.length && !categories.length) {
             return;
         }
 
         this.createDropdown();
 
-        this.currentItems.forEach((feature: any, index: number) => {
-            this.populateDropdownItem(feature, userEnteredValue, event, index);
+        categories.forEach((category: Category, index: number) => {
+            this.populateCategoryDropdownItem(category, userEnteredValue, event, index);
         });
+
+        this.currentItems.forEach((feature: any, index: number) => {
+            this.populateDropdownItem(feature, userEnteredValue, event, index + categories.length);
+        });
+    }
+
+    private populateCategoryDropdownItem(category: Category, userEnteredValue: string, event: Event, index: number) {
+        const itemElement = DomHelper.createDropdownItem();
+        itemElement.classList.add('geoapify-category-item');
+
+        if (!this.options.skipIcons && category.icon) {
+            const iconElement = document.createElement("span");
+            iconElement.classList.add('icon');
+            iconElement.textContent = category.icon; // Simple icon support for now
+            itemElement.appendChild(iconElement);
+        }
+
+        const textElement = DomHelper.createDropdownItemText();
+        textElement.innerHTML = `<span class="main-part">${category.label}</span><span class="secondary-part">Category</span>`;
+        itemElement.appendChild(textElement);
+
+        itemElement.addEventListener("click", (e) => {
+            event.stopPropagation();
+            this.setCategory(category);
+        });
+
+        this.autocompleteItemsElement?.appendChild(itemElement);
     }
 
     private populateDropdownItem(feature: any, userEnteredValue: string, event: Event, index: number) {
@@ -361,7 +444,16 @@ export class GeocoderAutocomplete {
     private addEventListenerOnDropdownClick(itemElement: HTMLDivElement, event: Event, index: number) {
         itemElement.addEventListener("click", (e) => {
             event.stopPropagation();
-            this.setValueAndNotify(this.currentItems[index])
+            
+            let featureIndex = index;
+            if (this.isCategoryModeEnabled()) {
+                const categoryCount = this.autocompleteItemsElement?.querySelectorAll('.geoapify-category-item').length || 0;
+                featureIndex = index - categoryCount;
+            }
+            
+            if (this.currentItems?.[featureIndex]) {
+                this.setValueAndNotify(this.currentItems[featureIndex]);
+            }
         });
     }
 
@@ -424,14 +516,40 @@ export class GeocoderAutocomplete {
             } else if (event.code === "Enter") {
                 this.handleEnterEvent(event);
             } else if (event.code === "Escape") {
-                /* If the ESC key is presses, close the list */
-                this.closeDropDownList();
+                /* If the ESC key is pressed, close the list */
+                this.handleEscapeKey();
             }
         } else {
             if (event.code == 'ArrowDown') {
                 /* Open dropdown list again */
                 this.openDropdownAgain();
+            } else if (event.code === "Escape") {
+                /* Handle Esc when dropdown is closed (for double-Esc category clearing) */
+                this.handleEscapeKey();
             }
+        }
+    }
+
+    private handleEscapeKey(): void {
+        const now = Date.now();
+        const DOUBLE_ESC_THRESHOLD = 500; // 500ms window for double-Esc
+
+        if (this.autocompleteItemsElement) {
+            // First Esc: Close dropdown
+            this.closeDropDownList();
+            this.lastEscKeyTime = now;
+        } else if (
+            this.isCategoryModeEnabled() &&
+            this.categoryManager.isCategoryModeActive() &&
+            this.lastEscKeyTime &&
+            (now - this.lastEscKeyTime) < DOUBLE_ESC_THRESHOLD
+        ) {
+            // Second Esc within threshold: Clear category
+            this.setCategory(null);
+            this.lastEscKeyTime = undefined;
+        } else {
+            // Single Esc when dropdown is already closed
+            this.lastEscKeyTime = now;
         }
     }
 
@@ -504,8 +622,12 @@ export class GeocoderAutocomplete {
         this.cancelPreviousRequest();
 
         this.cancelPreviousTimeout();
-
+        this.cancelCurrentPlacesRequest();
         this.closeDropDownList();
+
+        const isCategory = this.isCategoryModeEnabled() && this.categoryManager.isCategoryModeActive();
+        this.clearCategory();
+        this.callbacks.notifyClear(isCategory ? 'category' : 'place');
 
         // notify here
         this.notifyValueSelected(null);
@@ -561,6 +683,13 @@ export class GeocoderAutocomplete {
         }
     }
 
+    private cancelCurrentPlacesRequest() {
+        if (this.currentPlacesPromiseReject) {
+            this.currentPlacesPromiseReject({ canceled: true });
+            this.currentPlacesPromiseReject = null;
+        }
+    }
+
     private openDropdownAgain() {
         const event = document.createEvent('Event');
         event.initEvent('input', true, true);
@@ -587,6 +716,60 @@ export class GeocoderAutocomplete {
         DomHelper.addIcon(this.inputClearButton, 'close');
         this.inputClearButton.addEventListener("click", this.clearFieldAndNotify.bind(this), false);
         this.container.appendChild(this.inputClearButton);
+    }
+
+    private async onCategorySelect(category: Category | string): Promise<void> {
+        const categoryObj = typeof category === 'string' ? { category, label: category } : category;
+        
+        this.inputElement.value = categoryObj.label;
+        this.showClearButton();
+
+        this.callbacks.notifyPlacesRequestStart(categoryObj.category);
+
+        try {
+            const data = await this.sendPlacesRequestOrAlt(categoryObj.category);
+            this.callbacks.notifyPlacesRequestEnd(true, data);
+            this.callbacks.notifyPlaces(data.features || []);
+        } catch (error) {
+            this.callbacks.notifyPlacesRequestEnd(false, null, error);
+            console.error('Places API request failed:', error);
+        }
+    }
+
+    private isCategoryModeEnabled(): boolean {
+        return !!this.options.addCategorySearch;
+    }
+
+    private clearCategory(): void {
+        if (!this.isCategoryModeEnabled()) return;
+        
+        this.categoryManager.clearCategory();
+        this.callbacks.notifyClear('category');
+    }
+
+    /**
+     * Send Places request or use alternative function
+     */
+    private async sendPlacesRequestOrAlt(
+        category: string,
+        bias?: string,
+        filter?: string
+    ): Promise<any> {
+        if (this.sendPlacesRequestAlt) {
+            return this.sendPlacesRequestAlt(category, this);
+        }
+
+        const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options);
+        let url = PlacesApiHelper.generatePlacesUrl(category, this.apiKey, this.options, location);
+
+        if (bias) {
+            url += `&bias=${encodeURIComponent(bias)}`;
+        }
+        if (filter) {
+            url += `&filter=${encodeURIComponent(filter)}`;
+        }
+
+        return PlacesApiHelper.sendPlacesRequest(url);
     }
 }
 
@@ -618,6 +801,10 @@ export interface GeocoderAutocompleteOptions {
     // extend results with non verified values if needed
     allowNonVerifiedHouseNumber?: boolean;
     allowNonVerifiedStreet?: boolean;
+
+    addCategorySearch?: boolean;
+    showPlacesList?: boolean;
+    placesApiUrl?: string;
 }
 
 export interface GeoPosition {

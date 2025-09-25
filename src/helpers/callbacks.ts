@@ -1,3 +1,5 @@
+import { GeocoderEventType, ItemType } from "../types/external";
+
 export class Callbacks {
     public changeCallbacks: ((selectedOption: any) => void)[] = [];
     public suggestionsChangeCallbacks: ((options: any[]) => void)[] = [];
@@ -6,8 +8,16 @@ export class Callbacks {
     public closeCallbacks: ((opened: boolean) => void)[] = [];
     public requestStartCallbacks: ((query: string) => void)[] = [];
     public requestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
+    
+    public placesCallbacks: ((places: any[]) => void)[] = [];
+    public placesRequestStartCallbacks: ((category: string) => void)[] = [];
+    public placesRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
+    public placeDetailsRequestStartCallbacks: ((place: any) => void)[] = [];
+    public placeDetailsRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
 
-    addCallback(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback: (param: any) => void) {
+    public clearCallbacks: ((itemType: ItemType) => void)[] = [];
+
+    addCallback(operation: GeocoderEventType, callback: (param: any) => void) {
         let currentCallbacks = this.getCallbacksByOperation(operation);
         if(currentCallbacks) {
             if (currentCallbacks.indexOf(callback) < 0) {
@@ -16,7 +26,7 @@ export class Callbacks {
         }
     }
 
-    removeCallback(operation: 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end', callback?: (param: any) => any) {
+    removeCallback(operation: GeocoderEventType, callback?: (param: any) => any) {
         let currentCallbacks = this.getCallbacksByOperation(operation);
         if(currentCallbacks) {
             if (currentCallbacks.indexOf(callback) >= 0) {
@@ -56,7 +66,31 @@ export class Callbacks {
         this.requestEndCallbacks.forEach(callback => callback(success, data, error));
     }
 
-    private getCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open" | "request_start" | "request_end") {
+    notifyPlaces(places: any[]) {
+        this.placesCallbacks.forEach(callback => callback(places));
+    }
+
+    notifyPlacesRequestStart(category: string) {
+        this.placesRequestStartCallbacks.forEach(callback => callback(category));
+    }
+
+    notifyPlacesRequestEnd(success: boolean, data?: any, error?: any) {
+        this.placesRequestEndCallbacks.forEach(callback => callback(success, data, error));
+    }
+
+    notifyPlaceDetailsRequestStart(place: any) {
+        this.placeDetailsRequestStartCallbacks.forEach(callback => callback(place));
+    }
+
+    notifyPlaceDetailsRequestEnd(success: boolean, data?: any, error?: any) {
+        this.placeDetailsRequestEndCallbacks.forEach(callback => callback(success, data, error));
+    }
+
+    notifyClear(itemType: ItemType) {
+        this.clearCallbacks.forEach(callback => callback(itemType));
+    }
+
+    private getCallbacksByOperation(operation: GeocoderEventType) {
         let currentCallbacks = null;
         switch (operation) {
             case 'select': {
@@ -87,12 +121,35 @@ export class Callbacks {
                 currentCallbacks = this.requestEndCallbacks;
                 break;
             }
+            case 'places': {
+                currentCallbacks = this.placesCallbacks;
+                break;
+            }
+            case 'places_request_start': {
+                currentCallbacks = this.placesRequestStartCallbacks;
+                break;
+            }
+            case 'places_request_end': {
+                currentCallbacks = this.placesRequestEndCallbacks;
+                break;
+            }
+            case 'place_details_request_start': {
+                currentCallbacks = this.placeDetailsRequestStartCallbacks;
+                break;
+            }
+            case 'place_details_request_end': {
+                currentCallbacks = this.placeDetailsRequestEndCallbacks;
+                break;
+            }
+            case 'clear': {
+                currentCallbacks = this.clearCallbacks;
+                break;
+            }
         }
         return currentCallbacks;
     }
 
-    private setCallbacksByOperation(operation: "select" | "suggestions" | "input" | "close" | "open" | "request_start" | "request_end",
-                                    callbacks: ((data: any) => void)[]) {
+    private setCallbacksByOperation(operation: GeocoderEventType, callbacks: ((data: any) => void)[]) {
         switch (operation) {
             case 'select': {
                 this.changeCallbacks = callbacks;
@@ -120,6 +177,30 @@ export class Callbacks {
             }
             case 'request_end': {
                 this.requestEndCallbacks = callbacks;
+                break;
+            }
+            case 'places': {
+                this.placesCallbacks = callbacks;
+                break;
+            }
+            case 'places_request_start': {
+                this.placesRequestStartCallbacks = callbacks;
+                break;
+            }
+            case 'places_request_end': {
+                this.placesRequestEndCallbacks = callbacks;
+                break;
+            }
+            case 'place_details_request_start': {
+                this.placeDetailsRequestStartCallbacks = callbacks;
+                break;
+            }
+            case 'place_details_request_end': {
+                this.placeDetailsRequestEndCallbacks = callbacks;
+                break;
+            }
+            case 'clear': {
+                this.clearCallbacks = callbacks;
                 break;
             }
         }

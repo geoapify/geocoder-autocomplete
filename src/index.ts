@@ -8,3 +8,5 @@ export type {ByCountryCodeOptions} from './autocomplete';
 export type {ByCircleOptions} from './autocomplete';
 export type {ByProximityOptions} from './autocomplete';
 export type {ByRectOptions} from './autocomplete';
+
+export type {Category, GeocoderEventType} from './types/external';

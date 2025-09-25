@@ -1,0 +1,281 @@
+.autocomplete-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 400px;
+  z-index: 1002;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+}
+
+
+.category-info {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+
+.places-count {
+  color: #666;
+  font-style: italic;
+}
+
+/* Places list styling (Google Maps style) */
+.places-list-container {
+  margin-top: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+}
+
+.places-list-container.active {
+  display: block;
+}
+
+.place-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.place-item:last-child {
+  border-bottom: none;
+}
+
+.place-item:hover {
+  background-color: #f8f9fa;
+}
+
+.place-item.selected {
+  background-color: #e3f2fd;
+}
+
+.place-name {
+  font-weight: 600;
+  color: #1a73e8;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.place-address {
+  color: #5f6368;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.place-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #5f6368;
+}
+
+.place-rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.place-rating .stars {
+  color: #fbbc04;
+}
+
+.place-status {
+  font-weight: 500;
+}
+
+.place-status.open {
+  color: #137333;
+}
+
+.place-status.closed {
+  color: #d93025;
+}
+
+/* Category-specific styling */
+.geoapify-category-item {
+  background-color: #e8f4fd !important;
+  border-left: 3px solid #007acc !important;
+}
+
+.geoapify-category-item:hover {
+  background-color: #d0e8f7 !important;
+}
+
+.geoapify-category-label {
+  background-color: #007acc;
+  color: white;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 4px 4px 0 0;
+}
+
+.autocomplete-container {
+  position: relative;
+}
+
+/* Theme selector styling */
+.theme-selector {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  padding: 4px 8px 4px 12px;
+  border-right: 1px solid #eee;
+  background: #f8f9fa;
+  border-radius: 4px 0 0 4px;
+  white-space: nowrap;
+}
+
+.theme-selector select {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 100px;
+  border-radius: 0 4px 4px 0;
+}
+
+.theme-selector select:focus {
+  outline: none;
+}
+
+.theme-selector:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 12px rgba(0, 123, 255, 0.15);
+}
+
+/* Dark theme styles for the demo page */
+body.theme-minimal-dark,
+body.theme-round-borders-dark {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.theme-minimal-dark .theme-selector,
+body.theme-round-borders-dark .theme-selector {
+  background: #333;
+  border-color: #555;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-minimal-dark .theme-label,
+body.theme-round-borders-dark .theme-label {
+  color: #bbb;
+  background: #444;
+  border-right-color: #555;
+}
+
+body.theme-minimal-dark .theme-selector select,
+body.theme-round-borders-dark .theme-selector select {
+  color: #e0e0e0;
+}
+
+body.theme-minimal-dark .theme-selector:hover,
+body.theme-round-borders-dark .theme-selector:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 12px rgba(0, 123, 255, 0.2);
+}
+
+/* Dark theme adjustments for category panel */
+body.theme-minimal-dark .autocomplete-panel,
+body.theme-round-borders-dark .autocomplete-panel {
+  background: rgba(40, 40, 40, 0.95);
+}
+
+
+body.theme-minimal-dark .places-count,
+body.theme-round-borders-dark .places-count {
+  color: #aaa;
+}
+
+
+/* Dark theme category items */
+body.theme-minimal-dark .geoapify-category-item,
+body.theme-round-borders-dark .geoapify-category-item {
+  background-color: #2a3f4f !important;
+  border-left: 3px solid #4a9eff !important;
+  color: #e0e0e0 !important;
+}
+
+body.theme-minimal-dark .geoapify-category-item:hover,
+body.theme-round-borders-dark .geoapify-category-item:hover {
+  background-color: #34495e !important;
+}
+
+body.theme-minimal-dark .geoapify-category-label,
+body.theme-round-borders-dark .geoapify-category-label {
+  background-color: #4a9eff;
+  color: white;
+}
+
+/* Dark theme places list */
+body.theme-minimal-dark .places-list-container,
+body.theme-round-borders-dark .places-list-container {
+  background: #2d3748;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+body.theme-minimal-dark .place-item,
+body.theme-round-borders-dark .place-item {
+  border-bottom-color: #4a5568;
+}
+
+body.theme-minimal-dark .place-item:hover,
+body.theme-round-borders-dark .place-item:hover {
+  background-color: #374151;
+}
+
+body.theme-minimal-dark .place-item.selected,
+body.theme-round-borders-dark .place-item.selected {
+  background-color: #1e3a8a;
+}
+
+body.theme-minimal-dark .place-name,
+body.theme-round-borders-dark .place-name {
+  color: #60a5fa;
+}
+
+body.theme-minimal-dark .place-address,
+body.theme-round-borders-dark .place-address {
+  color: #d1d5db;
+}
+
+body.theme-minimal-dark .place-details,
+body.theme-round-borders-dark .place-details {
+  color: #d1d5db;
+}
+
+html,
+body,
+#map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
