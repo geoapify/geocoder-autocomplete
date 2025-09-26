@@ -27,7 +27,7 @@
   <div id="map"></div>
   <div class="autocomplete-panel">
     <div id="autocomplete" class="autocomplete-container"></div>
-    <div class="category-info">
+    <div id="places-header" class="places-header">
       <div id="places-count" class="places-count"></div>
     </div>
     <div id="places-list" class="places-list-container"></div>
@@ -50,32 +50,8 @@
         document.body.className = document.body.className.replace(/theme-\w+/g, '');
         document.body.classList.add(`theme-${themeName}`);
         
-        // Debug: log the current theme and body classes
-        console.log('Theme changed to:', themeName);
-        console.log('Body classes:', document.body.className);
-        console.log('Theme class added:', `theme-${themeName}`);
-        
-        // Wait for CSS to load, then apply styles
-        themeLink.onload = function() {
-            if (themeName === 'round-borders-dark') {
-                setTimeout(applyRoundDarkStyles, 100); // Small delay to ensure CSS is applied
-            }
-        };
-        
         // Store theme preference in localStorage
         localStorage.setItem('geocoder-theme', themeName);
-    }
-
-    function applyRoundDarkStyles() {
-        // Find all autocomplete inputs and apply styles directly
-        const inputs = document.querySelectorAll('.geoapify-autocomplete-input');
-        inputs.forEach(input => {
-            input.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-            input.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-            console.log('Applied styles to input:', input);
-        });
-        
-        console.log('Applied round-dark styles to', inputs.length, 'inputs');
     }
 
     // Load saved theme on page load

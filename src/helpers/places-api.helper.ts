@@ -15,10 +15,6 @@ export class PlacesApiHelper {
         const placesUrl = options.placesApiUrl || this.DEFAULT_PLACES_API_URL;
         let url = `${placesUrl}?categories=${encodeURIComponent(category)}&apiKey=${apiKey}`;
 
-        if (options.limit) {
-            url += `&limit=${options.limit}`;
-        }
-
         if (options.lang) {
             url += `&lang=${options.lang}`;
         }

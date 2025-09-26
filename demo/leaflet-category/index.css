@@ -1,37 +1,58 @@
+/* Basic layout */
+html, body, #map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
 .autocomplete-panel {
   position: absolute;
   top: 10px;
   left: 10px;
   width: 400px;
   z-index: 1002;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 15px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  backdrop-filter: blur(10px);
 }
 
-
-.category-info {
+/* Places header - fixed above scrollable list */
+.places-header {
   margin-top: 10px;
-  font-size: 12px;
+  background: white;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: none; /* Hidden by default */
 }
 
+.places-header.active {
+  display: block;
+}
 
 .places-count {
   color: #666;
   font-style: italic;
+  font-size: 12px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  font-weight: 500;
+  border-radius: 8px 8px 0 0;
 }
 
 /* Places list styling (Google Maps style) */
 .places-list-container {
-  margin-top: 10px;
+  margin-top: 0; /* No margin when header is present */
   background: white;
-  border-radius: 8px;
+  border-radius: 0 0 8px 8px; /* Only bottom corners rounded when header is present */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   max-height: 300px;
   overflow-y: auto;
   display: none;
+}
+
+/* When no header is present (standalone list) */
+.places-list-container.standalone {
+  margin-top: 10px;
+  border-radius: 8px; /* All corners rounded when standalone */
 }
 
 .places-list-container.active {
@@ -40,9 +61,10 @@
 
 .place-item {
   padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #e8eaed;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .place-item:last-child {
@@ -51,53 +73,188 @@
 
 .place-item:hover {
   background-color: #f8f9fa;
+  box-shadow: 0 1px 6px rgba(32,33,36,.28);
 }
 
 .place-item.selected {
-  background-color: #e3f2fd;
+  background-color: #f8f9fa;
+  border-left: 4px solid #9aa0a6;
 }
 
-.place-name {
+.place-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 80px;
+}
+
+.place-header {
+  width: 100%;
+}
+
+.place-bottom {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.place-title {
   font-weight: 600;
-  color: #1a73e8;
+  color: #202124;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.place-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
   font-size: 14px;
-  margin-bottom: 4px;
+  line-height: 16px;
+}
+
+.rating-stars {
+  color: #fbbc04;
+  font-size: 14px;
+  line-height: 1;
+  margin-right: 4px;
+  text-shadow: 0 0 1px rgba(0,0,0,0.1);
+}
+
+.rating-number {
+  font-weight: 500;
+  color: #202124;
+  margin-right: 2px;
+  font-size: 14px;
+}
+
+.review-count {
+  color: #70757a;
+  margin-right: 2px;
+  font-size: 14px;
+}
+
+.separator {
+  color: #5f6368;
+  margin: 0 4px;
+  font-weight: 400;
+}
+
+.price-range {
+  color: #5f6368;
+  font-weight: 400;
+}
+
+.place-tags-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  line-height: 1.2;
+}
+
+.tag-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  min-height: 16px;
+}
+
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: #f1f3f4;
+  color: #5f6368;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 12px;
+  white-space: nowrap;
+  border: none;
+  flex-shrink: 0;
+  line-height: 1;
+  min-height: 16px;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1);
+}
+
+/* Primary tags - Main blue theme for important info */
+.tag-primary {
+  background: #e8f0fe;
+  color: #1565c0;
+  box-shadow: 0 1px 2px rgba(21, 101, 192, 0.15);
+}
+
+/* Secondary tags - Subtle gray theme for additional info */
+.tag-secondary {
+  background: #f1f3f4;
+  color: #5f6368;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1);
+}
+
+/* Facility tags - Special green theme for accessibility/important features */
+.tag-facility {
+  background: #e8f5e8;
+  color: #2e7d32;
+  box-shadow: 0 1px 2px rgba(46, 125, 50, 0.15);
 }
 
 .place-address {
-  color: #5f6368;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-
-.place-details {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  color: #5f6368;
-}
-
-.place-rating {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.place-rating .stars {
-  color: #fbbc04;
-}
-
-.place-status {
+  color: #70757a;
+  font-size: 14px;
+  line-height: 18px;
   font-weight: 500;
+  flex: 1;
 }
 
-.place-status.open {
-  color: #137333;
+.place-hours {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+  min-width: 120px;
+  flex-shrink: 0;
 }
 
-.place-status.closed {
-  color: #d93025;
+.hours-label {
+  color: #5f6368;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0px;
+}
+
+.hours-text {
+  color: #202124;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Category-specific styling */
@@ -108,17 +265,6 @@
 
 .geoapify-category-item:hover {
   background-color: #d0e8f7 !important;
-}
-
-.geoapify-category-label {
-  background-color: #007acc;
-  color: white;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-radius: 4px 4px 0 0;
 }
 
 .autocomplete-container {
@@ -178,6 +324,7 @@ body.theme-round-borders-dark {
   color: #e0e0e0;
 }
 
+/* Dark theme - theme selector */
 body.theme-minimal-dark .theme-selector,
 body.theme-round-borders-dark .theme-selector {
   background: #333;
@@ -209,12 +356,19 @@ body.theme-round-borders-dark .autocomplete-panel {
   background: rgba(40, 40, 40, 0.95);
 }
 
+/* Dark theme places header */
+body.theme-minimal-dark .places-header,
+body.theme-round-borders-dark .places-header {
+  background: #2d3748 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
 
 body.theme-minimal-dark .places-count,
 body.theme-round-borders-dark .places-count {
-  color: #aaa;
+  color: #e8eaed;
+  background: #2d3748;
+  border-bottom-color: #3c4043;
 }
-
 
 /* Dark theme category items */
 body.theme-minimal-dark .geoapify-category-item,
@@ -229,12 +383,6 @@ body.theme-round-borders-dark .geoapify-category-item:hover {
   background-color: #34495e !important;
 }
 
-body.theme-minimal-dark .geoapify-category-label,
-body.theme-round-borders-dark .geoapify-category-label {
-  background-color: #4a9eff;
-  color: white;
-}
-
 /* Dark theme places list */
 body.theme-minimal-dark .places-list-container,
 body.theme-round-borders-dark .places-list-container {
@@ -244,38 +392,97 @@ body.theme-round-borders-dark .places-list-container {
 
 body.theme-minimal-dark .place-item,
 body.theme-round-borders-dark .place-item {
-  border-bottom-color: #4a5568;
+  background-color: #2d2e30;
+  border-bottom-color: #3c4043;
 }
 
 body.theme-minimal-dark .place-item:hover,
 body.theme-round-borders-dark .place-item:hover {
-  background-color: #374151;
+  background-color: #1e293b;
+  box-shadow: 0 1px 6px rgba(0,0,0,.4);
 }
 
 body.theme-minimal-dark .place-item.selected,
 body.theme-round-borders-dark .place-item.selected {
-  background-color: #1e3a8a;
+  background-color: #2d2e30;
+  border-left-color: #9aa0a6;
 }
 
-body.theme-minimal-dark .place-name,
-body.theme-round-borders-dark .place-name {
-  color: #60a5fa;
+body.theme-minimal-dark .place-title,
+body.theme-round-borders-dark .place-title {
+  color: #e8eaed !important;
+}
+
+body.theme-minimal-dark .rating-number,
+body.theme-round-borders-dark .rating-number {
+  color: #e8eaed;
+}
+
+body.theme-minimal-dark .review-count,
+body.theme-round-borders-dark .review-count {
+  color: #9aa0a6;
+}
+
+body.theme-minimal-dark .separator,
+body.theme-round-borders-dark .separator {
+  color: #9aa0a6;
+}
+
+body.theme-minimal-dark .price-range,
+body.theme-round-borders-dark .price-range {
+  color: #9aa0a6;
+}
+
+body.theme-minimal-dark .tag-label,
+body.theme-round-borders-dark .tag-label {
+  color: #9aa0a6;
+}
+
+body.theme-minimal-dark .tag-badge,
+body.theme-round-borders-dark .tag-badge {
+  background: #3c4043;
+  color: #9aa0a6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark theme tag variants */
+body.theme-minimal-dark .tag-primary,
+body.theme-round-borders-dark .tag-primary {
+  background: #1e3a8a;
+  color: #93c5fd;
+  box-shadow: 0 1px 2px rgba(30, 58, 138, 0.3);
+}
+
+body.theme-minimal-dark .tag-secondary,
+body.theme-round-borders-dark .tag-secondary {
+  background: #3c4043;
+  color: #9aa0a6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+body.theme-minimal-dark .tag-facility,
+body.theme-round-borders-dark .tag-facility {
+  background: #14532d;
+  color: #86efac;
+  box-shadow: 0 1px 2px rgba(20, 83, 45, 0.3);
 }
 
 body.theme-minimal-dark .place-address,
 body.theme-round-borders-dark .place-address {
-  color: #d1d5db;
+  color: #9aa0a6;
 }
 
-body.theme-minimal-dark .place-details,
-body.theme-round-borders-dark .place-details {
-  color: #d1d5db;
+body.theme-minimal-dark .place-hours,
+body.theme-round-borders-dark .place-hours {
+  color: #9aa0a6;
 }
 
-html,
-body,
-#map {
-  width: 100%;
-  height: 100%;
-  margin: 0;
+body.theme-minimal-dark .hours-label,
+body.theme-round-borders-dark .hours-label {
+  color: #9aa0a6;
+}
+
+body.theme-minimal-dark .hours-text,
+body.theme-round-borders-dark .hours-text {
+  color: #e8eaed;
 }

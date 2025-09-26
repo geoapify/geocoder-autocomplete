@@ -28,8 +28,6 @@ let currentTileLayer;
 
 // Function to switch map theme
 function switchMapTheme(themeName) {
-    console.log('Switching map theme to:', themeName);
-    
     // Remove current tile layer
     if (currentTileLayer) {
         map.removeLayer(currentTileLayer);
@@ -38,8 +36,6 @@ function switchMapTheme(themeName) {
     // Determine if it's a dark theme
     const isDarkTheme = themeName.includes('dark');
     const tileConfig = isDarkTheme ? mapTiles.dark : mapTiles.light;
-    
-    console.log('Using tiles:', isDarkTheme ? 'dark' : 'light');
     
     // Add new tile layer
     currentTileLayer = L.tileLayer(isRetina ? tileConfig.retinaUrl : tileConfig.baseUrl, {
@@ -75,7 +71,6 @@ autocompleteInput.addBiasByProximity({
     lat: 48.8566
 });
 
-
 // generate an marker icon with https://apidocs.geoapify.com/playground/icon
 const markerIcon = L.icon({
   iconUrl: `https://api.geoapify.com/v1/icon/?type=awesome&color=%232ea2ff&size=large&scaleFactor=2&apiKey=${myAPIKey}`,
@@ -89,6 +84,7 @@ let placesMarkers = [];
 
 // UI elements
 const placesCount = document.getElementById('places-count');
+const placesHeader = document.getElementById('places-header');
 const placesListContainer = document.getElementById('places-list');
 
 function clearPlacesMarkers() {
@@ -99,6 +95,7 @@ function clearPlacesMarkers() {
 function clearPlacesList() {
     placesListContainer.innerHTML = '';
     placesListContainer.classList.remove('active');
+    placesHeader.classList.remove('active');
 }
 
 function createPlaceItem(place, index) {
@@ -106,30 +103,154 @@ function createPlaceItem(place, index) {
     placeElement.className = 'place-item';
     placeElement.dataset.index = index;
     
-    const name = place.properties.name || place.properties.formatted || 'Unknown Place';
-    const address = place.properties.formatted || '';
+    const props = place.properties;
+    const name = props.name || 'Unknown Place';
     
-    // Extract additional details if available
-    const rating = place.properties.rating || null;
-    const openingHours = place.properties.opening_hours || null;
-    const categories = place.properties.categories || [];
+    // Extract rating and reviews
+    const rating = props.rating || null;
+    const reviewCount = props.review_count || props.reviews_count || null;
+    
+    // Build price range (if available)
+    const priceLevel = props.price_level || null;
+    const priceRange = priceLevel ? '€'.repeat(priceLevel) : null;
+    
+    // Build full address
+    const fullAddress = props.formatted || props.address_line2 || 
+                       `${props.street || ''}${props.street && props.postcode ? ', ' : ''}${props.postcode || ''} ${props.city || ''}`.trim();
+    
+    // Separate objects for different tag types
+    const categories = [];
+    const facilities = [];
+    const cuisine = [];
+    const details = [];
+    const catering = [];
+    
+    // Utility functions
+    function cleanText(text) {
+        const lastPart = text.split('.').pop();
+        return lastPart
+            .replace(/[_]/g, ' ')
+            .replace(/\b\w/g, l => l.toUpperCase())
+            .trim();
+    }
+    
+    function shouldExcludeTag(text) {
+        const lastPart = text.split('.').pop().toLowerCase();
+        return lastPart === 'yes';
+    }
+    
+    // Extract categories (only leaf categories, not parents)
+    if (props.categories && Array.isArray(props.categories)) {
+        const leafCategories = props.categories.filter(category => {
+            if (typeof category !== 'string' || !category.trim()) return false;
+            
+            const isParent = props.categories.some(otherCategory => 
+                otherCategory !== category && 
+                otherCategory.startsWith(category + '.')
+            );
+            
+            return !isParent;
+        });
+        
+        leafCategories.forEach(category => {
+            if (!shouldExcludeTag(category)) {
+                categories.push(cleanText(category));
+            }
+        });
+    }
+    
+    // Extract facilities (boolean true values only)
+    if (props.facilities && typeof props.facilities === 'object') {
+        for (const [key, value] of Object.entries(props.facilities)) {
+            if (value === true && !shouldExcludeTag(key)) {
+                facilities.push(cleanText(key));
+            }
+        }
+    }
+    
+    // Extract catering info (with special handling for cuisine)
+    if (props.catering && typeof props.catering === 'object') {
+        for (const [key, value] of Object.entries(props.catering)) {
+            if (key === 'cuisine' || key.includes('cuisine')) {
+                // Cuisine goes to cuisine array
+                if (typeof value === 'string' && value.trim()) {
+                    const values = value.split(';').map(v => v.trim()).filter(v => v);
+                    values.forEach(val => {
+                        if (!shouldExcludeTag(val)) {
+                            cuisine.push(cleanText(val));
+                        }
+                    });
+                }
+            } else {
+                // Other catering info goes to catering array
+                if (value === true && !shouldExcludeTag(key)) {
+                    catering.push(cleanText(key));
+                } else if (typeof value === 'string' && value.trim()) {
+                    const values = value.split(';').map(v => v.trim()).filter(v => v);
+                    values.forEach(val => {
+                        if (!shouldExcludeTag(val)) {
+                            catering.push(cleanText(val));
+                        }
+                    });
+                }
+            }
+        }
+    }
+    
+    // Opening hours
+    const openingHours = props.opening_hours || null;
     
     placeElement.innerHTML = `
-        <div class="place-name">${name}</div>
-        <div class="place-address">${address}</div>
-        <div class="place-details">
-            ${rating ? `
-                <div class="place-rating">
-                    <span class="stars">★</span>
-                    <span>${rating}</span>
+        <div class="place-content">
+            <div class="place-header">
+                <div class="place-title">${name}</div>
+                <div class="place-meta-line">
+                    ${rating ? `
+                        <span class="rating-stars">${'★'.repeat(Math.floor(rating))}${'☆'.repeat(5 - Math.floor(rating))}</span>
+                        <span class="rating-number">${rating}</span>
+                        ${reviewCount ? `<span class="review-count">(${reviewCount})</span>` : ''}
+                    ` : ''}
+                    ${(rating && priceRange) ? `<span class="separator">•</span>` : ''}
+                    ${priceRange ? `<span class="price-range">${priceRange}</span>` : ''}
+                </div>
+            </div>
+            ${(categories.length > 0 || cuisine.length > 0 || facilities.length > 0 || catering.length > 0) ? `
+                <div class="place-tags-container">
+                    ${categories.length > 0 ? `
+                        <div class="tag-group">
+                            <span class="tag-label">Categories:</span>
+                            ${categories.map(tag => `<span class="tag-badge tag-primary">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    ${cuisine.length > 0 ? `
+                        <div class="tag-group">
+                            <span class="tag-label">Cuisine:</span>
+                            ${cuisine.map(tag => `<span class="tag-badge tag-secondary">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    ${facilities.length > 0 ? `
+                        <div class="tag-group">
+                            <span class="tag-label">Facilities:</span>
+                            ${facilities.map(tag => `<span class="tag-badge tag-facility">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    ${catering.length > 0 ? `
+                        <div class="tag-group">
+                            <span class="tag-label">Catering:</span>
+                            ${catering.map(tag => `<span class="tag-badge tag-secondary">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
                 </div>
             ` : ''}
-            ${categories.length > 0 ? `<span>${categories[0]}</span>` : ''}
-            ${openingHours ? `
-                <span class="place-status ${openingHours.includes('Open') ? 'open' : 'closed'}">
-                    ${openingHours.includes('Open') ? 'Open' : 'Closed'}
-                </span>
-            ` : ''}
+            <div class="place-bottom">
+                <div class="place-address">${fullAddress}</div>
+                ${openingHours ? `
+                    <div class="place-hours">
+                        <div class="hours-label">Opening hours:</div>
+                        <div class="hours-text">${openingHours}</div>
+                    </div>
+                ` : ''}
+            </div>
         </div>
     `;
     
@@ -169,20 +290,20 @@ function showPlacesList(places) {
         placesListContainer.appendChild(placeElement);
     });
     
+    placesHeader.classList.add('active');
     placesListContainer.classList.add('active');
-}
-
-function updateCategoryDisplay(category) {
-    if (!category) {
-        placesCount.textContent = '';
-    }
+    
+    // Scroll to top of the places list
+    placesListContainer.scrollTop = 0;
 }
 
 function updatePlacesCount(count, isPlaces = false) {
     if (isPlaces && count > 0) {
         placesCount.textContent = `${count} places found`;
+        placesHeader.classList.add('active');
     } else {
         placesCount.textContent = '';
+        placesHeader.classList.remove('active');
     }
 }
 
@@ -209,8 +330,6 @@ autocompleteInput.on('select', (location) => {
 autocompleteInput.on('places', (places) => {
     clearPlacesMarkers();
     
-    const currentCategory = autocompleteInput.getCategory();
-    updateCategoryDisplay(currentCategory);
     updatePlacesCount(places.length, true);
     
     // Show places in the Google Maps-style list
@@ -223,17 +342,9 @@ autocompleteInput.on('places', (places) => {
                 icon: markerIcon
             }).addTo(map);
             
-            // Add popup with place information
+            // Add popup with place information - just the name
             const name = place.properties.name || place.properties.formatted;
-            const popupContent = `
-                <div>
-                    <strong>${name}</strong><br>
-                    <small>${place.properties.formatted}</small>
-                    ${place.properties.categories ? `<br><em>${place.properties.categories.join(', ')}</em>` : ''}
-                    ${place.properties.rating ? `<br>Rating: ${place.properties.rating} ★` : ''}
-                </div>
-            `;
-            placeMarker.bindPopup(popupContent);
+            placeMarker.bindPopup(name);
             
             placesMarkers.push(placeMarker);
         }
@@ -257,7 +368,6 @@ autocompleteInput.on('suggestions', (suggestions) => {
 // Handle category clearing
 autocompleteInput.on('clear', (context) => {
     if (context === 'category') {
-        updateCategoryDisplay(null);
         clearPlacesMarkers();
         clearPlacesList();
         if (marker) {
@@ -285,7 +395,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const originalSetTheme = window.setTheme;
     if (originalSetTheme) {
         window.setTheme = function(themeName) {
-            console.log('Theme changed to:', themeName);
             // Call the original setTheme function
             originalSetTheme(themeName);
             
