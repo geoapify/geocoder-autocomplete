@@ -85,6 +85,10 @@
     color:  #ff4848;
 }
 
+.geoapify-places-list {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 .geoapify-autocomplete-items .secondary-part {
     margin-left: 10px;
     font-size: small;

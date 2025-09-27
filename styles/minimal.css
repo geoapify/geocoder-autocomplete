@@ -87,3 +87,7 @@
     font-size: small;
     color: rgba(0, 0, 0, 0.6);
 }
+
+.geoapify-places-list {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}

@@ -17,6 +17,9 @@ export class GeocoderAutocomplete {
     private inputElement: HTMLInputElement;
     private inputClearButton: HTMLElement;
     private autocompleteItemsElement: HTMLElement = null;
+    
+    /* Places list elements for showPlacesList functionality */
+    private placesListElement: HTMLElement = null;
 
     /* Focused item in the autocomplete list. This variable is used to navigate with buttons */
     private focusedItemIndex: number;
@@ -729,7 +732,14 @@ export class GeocoderAutocomplete {
         try {
             const data = await this.sendPlacesRequestOrAlt(categoryObj.category);
             this.callbacks.notifyPlacesRequestEnd(true, data);
-            this.callbacks.notifyPlaces(data.features || []);
+            
+            const places = data.features || [];
+            this.callbacks.notifyPlaces(places);
+            
+            // Show places list if enabled
+            if (this.options.showPlacesList && places.length > 0) {
+                this.showPlacesList(places);
+            }
         } catch (error) {
             this.callbacks.notifyPlacesRequestEnd(false, null, error);
             console.error('Places API request failed:', error);
@@ -744,6 +754,7 @@ export class GeocoderAutocomplete {
         if (!this.isCategoryModeEnabled()) return;
         
         this.categoryManager.clearCategory();
+        this.clearPlacesList();
         this.callbacks.notifyClear('category');
     }
 
@@ -770,6 +781,117 @@ export class GeocoderAutocomplete {
         }
 
         return PlacesApiHelper.sendPlacesRequest(url);
+    }
+
+    /**
+     * Places list management methods for showPlacesList functionality
+     */
+    private createPlacesElements(): void {
+        if (!this.options.showPlacesList) return;
+
+        // Create places list container - reuse autocomplete items styling
+        this.placesListElement = document.createElement('div');
+        this.placesListElement.className = 'geoapify-autocomplete-items geoapify-places-list';
+        this.placesListElement.style.position = 'absolute';
+        this.placesListElement.style.top = 'calc(100% + 10px)';
+        this.placesListElement.style.left = '0';
+        this.placesListElement.style.right = '0';
+        this.placesListElement.style.maxHeight = '300px';
+        this.placesListElement.style.overflowY = 'auto';
+        this.placesListElement.style.display = 'none';
+
+        // Append to container
+        this.container.appendChild(this.placesListElement);
+    }
+
+    private showPlacesList(places: any[]): void {
+        if (!this.options.showPlacesList || !places?.length) return;
+
+        // Create elements if they don't exist
+        if (!this.placesListElement) {
+            this.createPlacesElements();
+        }
+
+        // Clear existing places
+        this.clearPlacesList();
+
+        // Add a simple header with count
+        const headerElement = document.createElement('div');
+        headerElement.className = 'geoapify-autocomplete-item';
+        headerElement.style.fontWeight = 'bold';
+        headerElement.style.fontSize = '12px';
+        headerElement.style.color = '#666';
+        headerElement.style.cursor = 'default';
+        headerElement.innerHTML = `<div class="address">${places.length} places found</div>`;
+        this.placesListElement.appendChild(headerElement);
+
+        // Create place items
+        places.forEach((place, index) => {
+            const placeElement = this.createPlaceItem(place, index);
+            this.placesListElement.appendChild(placeElement);
+        });
+
+        // Show list
+        this.placesListElement.style.display = 'block';
+
+        // Scroll to top
+        this.placesListElement.scrollTop = 0;
+    }
+
+    private clearPlacesList(): void {
+        if (!this.options.showPlacesList) return;
+
+        if (this.placesListElement) {
+            this.placesListElement.innerHTML = '';
+            this.placesListElement.style.display = 'none';
+        }
+    }
+
+    private createPlaceItem(place: any, index: number): HTMLElement {
+        const placeElement = document.createElement('div');
+        placeElement.className = 'geoapify-autocomplete-item'; // Reuse existing class
+        placeElement.dataset.index = index.toString();
+        
+        const props = place.properties;
+        const name = props.name || 'Unknown Place';
+        const address = props.formatted || props.address_line2 || '';
+        
+        // Simple rating display
+        const rating = props.rating ? Math.round(props.rating * 10) / 10 : null;
+        
+        
+        placeElement.innerHTML = `
+            <div class="address">
+                <span class="main-part">${name}</span>
+                <span class="secondary-part">
+                    ${rating ? `★ ${rating} • ` : ''}${address}
+                </span>
+            </div>
+        `;
+        
+        // Add click handler
+        placeElement.addEventListener('click', () => {
+            this.selectPlaceFromList(place, index);
+        });
+        
+        return placeElement;
+    }
+
+    private selectPlaceFromList(place: any, index: number): void {
+        if (!this.options.showPlacesList) return;
+
+        // Remove previous selection
+        const placeItems = this.placesListElement?.querySelectorAll('.geoapify-autocomplete-item');
+        placeItems?.forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Add selection to clicked item
+        const clickedItem = this.placesListElement?.querySelector(`[data-index="${index}"]`);
+        clickedItem?.classList.add('active');
+        
+        // Notify selection (similar to regular autocomplete selection)
+        // this.callbacks.notifyChange(place);
     }
 }
 

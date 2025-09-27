@@ -92,3 +92,7 @@
 .geoapify-autocomplete-items .main-part .non-verified {
     color: #ff8080;
 }
+
+.geoapify-places-list {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}

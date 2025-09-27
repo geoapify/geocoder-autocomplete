@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaflet Map with Category Search - Geoapify</title>
+  <title>Leaflet Map with Built-in Places UI - Geoapify</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -27,10 +27,7 @@
   <div id="map"></div>
   <div class="autocomplete-panel">
     <div id="autocomplete" class="autocomplete-container"></div>
-    <div id="places-header" class="places-header">
-      <div id="places-count" class="places-count"></div>
-    </div>
-    <div id="places-list" class="places-list-container"></div>
+    <!-- No need for custom places list - using built-in showPlacesList -->
   </div>
 
   <!-- Leaflet JS -->
