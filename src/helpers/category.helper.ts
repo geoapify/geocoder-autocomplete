@@ -39,8 +39,7 @@ export class CategoryManager {
 
         return data.query.categories.map((cat: any) => ({
             category: cat.category,
-            label: cat.label,
-            icon: cat.icon
+            label: cat.label
         }));
     }
 

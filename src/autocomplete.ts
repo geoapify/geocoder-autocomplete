@@ -400,10 +400,10 @@ export class GeocoderAutocomplete {
         const itemElement = DomHelper.createDropdownItem();
         itemElement.classList.add('geoapify-category-item');
 
-        if (!this.options.skipIcons && category.icon) {
+        if (!this.options.skipIcons) {
             const iconElement = document.createElement("span");
             iconElement.classList.add('icon');
-            iconElement.textContent = category.icon; // Simple icon support for now
+            DomHelper.addCategoryIcon(iconElement, category.category);
             itemElement.appendChild(iconElement);
         }
 
