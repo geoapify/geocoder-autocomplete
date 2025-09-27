@@ -387,8 +387,8 @@ export class GeocoderAutocomplete {
 
         this.createDropdown();
 
-        categories.forEach((category: Category, index: number) => {
-            this.populateCategoryDropdownItem(category, userEnteredValue, event, index);
+        categories.forEach((category: Category) => {
+            this.populateCategoryDropdownItem(category, event);
         });
 
         this.currentItems.forEach((feature: any, index: number) => {
@@ -396,7 +396,7 @@ export class GeocoderAutocomplete {
         });
     }
 
-    private populateCategoryDropdownItem(category: Category, userEnteredValue: string, event: Event, index: number) {
+    private populateCategoryDropdownItem(category: Category, event: Event) {
         const itemElement = DomHelper.createDropdownItem();
         itemElement.classList.add('geoapify-category-item');
 
