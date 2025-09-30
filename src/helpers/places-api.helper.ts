@@ -10,13 +10,23 @@ export class PlacesApiHelper {
         category: string,
         apiKey: string,
         options: GeocoderAutocompleteOptions,
-        location?: GeoPosition | null
+        location?: GeoPosition | null,
+        offset?: number,
+        limit?: number
     ): string {
         const placesUrl = options.placesApiUrl || this.DEFAULT_PLACES_API_URL;
         let url = `${placesUrl}?categories=${encodeURIComponent(category)}&apiKey=${apiKey}`;
 
         if (options.lang) {
             url += `&lang=${options.lang}`;
+        }
+
+        if (limit !== undefined && limit > 0) {
+            url += `&limit=${limit}`;
+        }
+
+        if (offset !== undefined && offset > 0) {
+            url += `&offset=${offset}`;
         }
 
         const filters = this.generateFilterString(options.filter || {});
@@ -61,7 +71,8 @@ export class PlacesApiHelper {
         }
 
         try {
-            const ipUrl = `${this.IP_GEOLOCATION_URL}?apiKey=${apiKey}`;
+            const ipGeolocationUrl = options.ipGeolocationUrl || this.IP_GEOLOCATION_URL;
+            const ipUrl = `${ipGeolocationUrl}?apiKey=${apiKey}`;
             const response = await fetch(ipUrl);
             
             if (response.ok) {

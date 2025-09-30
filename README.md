@@ -21,6 +21,8 @@ The Geoapify Geocoder Autocomplete is a JavaScript (TypeScript) library designed
 * **API Integration Flexibility**: By default, the library seamlessly connects to the [Geoapify Address Autocomplete API](https://www.geoapify.com/address-autocomplete/) to retrieve address suggestions. However, developers have the freedom to integrate and combine other third-party Address Search APIs, allowing for extensive customization and the incorporation of multiple data sources.
 * **Search Customization**: Tailor your address search with precision by adding filters and bias parameters. This level of customization empowers developers to fine-tune search queries, ensuring more accurate and relevant address suggestions for users.
 * **Structured Address Forms**: Utilize the type parameter to craft address input forms that enable users to enter structured addresses, including postal codes, cities, countries, address lines, and more.
+* **Category Search**: Enable category-based search functionality that allows users to search for places by categories (e.g., restaurants, hotels, gas stations). When enabled, the autocomplete will display category suggestions alongside address results, providing a more comprehensive search experience.
+* **Places List Integration**: Optionally display a list of places within selected categories using the [Geoapify Places API](https://www.geoapify.com/places-api/). The built-in places list shows essential place information including name, address, and opening hours, with a "Load More" button to fetch additional results. For more detailed place information, you can implement custom places list handling.
 * **Place Details Integration**: Optionally, the library can call the [Geoapify Place Details API](https://www.geoapify.com/place-details-api/), providing users with detailed city and building boundaries as part of the search results. This enhances location context and visualization for a richer user experience.
 * **Customizable Look-and-Feel**: Tailor the appearance of the address input and autocomplete suggestions effortlessly. The library offers four distinct styles for both light and dark themes, providing design flexibility. Moreover, developers can further fine-tune the visual aspects using CSS classes to achieve a seamless integration with their application's aesthetics.
 * **Zero Dependencies**: The library is intentionally built with zero external dependencies. This means that it operates independently and does not rely on external libraries or packages. 
@@ -60,6 +62,8 @@ This repository includes a comprehensive collection of working demos that you ca
 * [Demo Collection Overview](demo/demo-index.html) - Navigate to all available demos
 * [Basic Address Form](demo/basic/index.html) - Multi-field address input with validation
 * [Leaflet Integration](demo/leaflet/index.html) - Interactive map with address search and markers
+* [Leaflet with Custom Places UI](demo/leaflet-places-custom/index.html) - Interactive map with category search and custom places list implementation
+* [Leaflet with Built-in Places List](demo/leaflet-places-builtin/index.html) - Interactive map with category search and built-in places list functionality
 * [MapLibre GL Integration](demo/maplibre/index.html) - Vector map with reverse geocoding on click
 
 ## Getting Geoapify API key
@@ -176,6 +180,36 @@ or
 When transitioning from the 1.x version of the library to the 2.x version, it's important to note that the `skipDetails` option has been replaced by the `addDetails` option. This change enhances the clarity of the parameter, as it now explicitly indicates whether you want to include or exclude additional details in the search results. To maintain compatibility with the updated version, make sure to adjust your code accordingly by using the `addDetails` option when needed for your address search functionality.
 
 So, if you require place details in your search results, you should set the `addDetails` option to `true`.
+
+## Category Search and Places List
+
+### Enable Category Search
+```javascript
+const autocomplete = new GeocoderAutocomplete(
+    document.getElementById("autocomplete"), 
+    'YOUR_API_KEY', 
+    { 
+        addCategorySearch: true,
+        showPlacesList: true  // Optional: show built-in places list
+    });
+```
+
+### Custom Places List
+```javascript
+const autocomplete = new GeocoderAutocomplete(
+    document.getElementById("autocomplete"), 
+    'YOUR_API_KEY', 
+    { 
+        addCategorySearch: true,
+        showPlacesList: false  // Disable built-in, use custom
+    });
+
+autocomplete.on('places', (places) => {
+    // Handle places results with your custom implementation
+    // See demo/leaflet-places-custom for complete example
+});
+```
+
 ## Documentation
 
 Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, usage examples, advanced features, and more. You'll find the information you need to seamlessly integrate address autocomplete and enhance your web-based geolocation services and user experiences.
@@ -200,6 +234,10 @@ Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, u
 | bias | BiasOptions | Prefer places by country, boundary, circle, location |
 | allowNonVerifiedHouseNumber | boolean | Allow the addition of house numbers that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. | 
 | allowNonVerifiedStreet | boolean | Allow the addition of streets that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. |
+| addCategorySearch | boolean | Enable category search functionality. When enabled, the autocomplete will show category suggestions alongside address results, allowing users to search for places by category (e.g., restaurants, hotels). |
+| showPlacesList | boolean | Enable built-in places list functionality. When a category is selected, displays a list of places within that category showing name, address, and opening hours. Requires `addCategorySearch` to be enabled. |
+| placesApiUrl | string | Custom URL for the Places API. Defaults to Geoapify Places API if not specified. |
+| ipGeolocationUrl | string | Custom URL for IP geolocation service. Used for location-based bias when no explicit location is provided. |
 
 #### LanguageCode
 2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code: `ab`, `aa`, `af`, `ak`, `sq`, `am`, `ar`, `an`, `hy`, `as`, `av`, `ae`, `ay`, `az`, `bm`, `ba`, `eu`, `be`, `bn`, `bh`, `bi`, `bs`, `br`, `bg`, `my`, `ca`, `ch`, `ce`, `ny`, `zh`, `cv`, `kw`, `co`, `cr`, `hr`, `cs`, `da`, `dv`, `nl`, `en`, `eo`, `et`, `ee`, `fo`, `fj`, `fi`, `fr`, `ff`, `gl`, `ka`, `de`, `el`, `gn`, `gu`, `ht`, `ha`, `he`, `hz`, `hi`, `ho`, `hu`, `ia`, `id`, `ie`, `ga`, `ig`, `ik`, `io`, `is`, `it`, `iu`, `ja`, `jv`, `kl`, `kn`, `kr`, `ks`, `kk`, `km`, `ki`, `rw`, `ky`, `kv`, `kg`, `ko`, `ku`, `kj`, `la`, `lb`, `lg`, `li`, `ln`, `lo`, `lt`, `lu`, `lv`, `gv`, `mk`, `mg`, `ms`, `ml`, `mt`, `mi`, `mr`, `mh`, `mn`, `na`, `nv`, `nb`, `nd`, `ne`, `ng`, `nn`, `no`, `ii`, `nr`, `oc`, `oj`, `cu`, `om`, `or`, `os`, `pa`, `pi`, `fa`, `pl`, `ps`, `pt`, `qu`, `rm`, `rn`, `ro`, `ru`, `sa`, `sc`, `sd`, `se`, `sm`, `sg`, `sr`, `gd`, `sn`, `si`, `sk`, `sl`, `so`, `st`, `es`, `su`, `sw`, `ss`, `sv`, `ta`, `te`, `tg`, `th`, `ti`, `bo`, `tk`, `tl`, `tn`, `to`, `tr`, `ts`, `tt`, `tw`, `ty`, `ug`, `uk`, `ur`, `uz`, `ve`, `vi`, `vo`, `wa`, `cy`, `wo`, `fy`, `xh`, `yi`, `yo`, `za`.
@@ -295,9 +333,9 @@ Here's a description of the API methods:
 | *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
 | *setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. |
 | *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. |
-| *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, dropdown open/close, and request lifecycle events. |
-| *off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end', callback?: (param: any) => void): void* | Detaches previously attached event listeners. |
-| *once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end', callback: (param: any) => void): void* | Attaches a one-time event listener that triggers only once for the specified operation. |
+| *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, dropdown open/close, places, and request lifecycle events. |
+| *off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback?: (param: any) => void): void* | Detaches previously attached event listeners. |
+| *once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback: (param: any) => void): void* | Attaches a one-time event listener that triggers only once for the specified operation. |
 
 #### Example. Setting Geocoder options
 The library offers a flexible API that enables the dynamic configuration of Geoapify Geocoder options at runtime:
@@ -459,15 +497,22 @@ autocomplete.setSendPlaceDetailsRequestFunc((feature: any, geocoderAutocomplete:
 
 `@geoapify/geocoder-autocomplete` provides a set of event handling functions—on, off, and once. These functions allow you to attach, detach, and manage event listeners for various user interactions and changes within the library. 
 
-| Event Name      | Description                                                                                                            |
-|-----------------|------------------------------------------------------------------------------------------------------------------------|
-| `select`        | Triggered when a suggestion is selected from the dropdown. Useful for capturing and responding to user selections.    |
-| `suggestions`   | Fired when suggestions are provided, allowing access to the list of suggestions for customization or interaction. |
-| `input`         | Occurs whenever the input field value changes, providing real-time feedback on user input for dynamic adjustments.   |
-| `close`         | Triggered when the suggestions dropdown is closed, enabling actions to be performed when the dropdown closes.       |
-| `open`          | Fired when the suggestions dropdown is opened, offering an opportunity to respond to dropdown opening events.       |
-| `request_start` | Triggered when a geocoding request starts. Provides the search query as parameter. Perfect for showing loading indicators. |
-| `request_end`   | Fired when a geocoding request completes (success or failure). Provides success status, data, and error information. Ideal for hiding loading indicators and handling errors. |
+| Event Name                    | Description                                                                                                            |
+|-------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `select`                      | Triggered when a suggestion is selected from the dropdown. Useful for capturing and responding to user selections.    |
+| `suggestions`                 | Fired when suggestions are provided, allowing access to the list of suggestions for customization or interaction. |
+| `input`                       | Occurs whenever the input field value changes, providing real-time feedback on user input for dynamic adjustments.   |
+| `close`                       | Triggered when the suggestions dropdown is closed, enabling actions to be performed when the dropdown closes.       |
+| `open`                        | Fired when the suggestions dropdown is opened, offering an opportunity to respond to dropdown opening events.       |
+| `request_start`               | Triggered when a geocoding request starts. Provides the search query as parameter. Perfect for showing loading indicators. |
+| `request_end`                 | Fired when a geocoding request completes (success or failure). Provides success status, data, and error information. Ideal for hiding loading indicators and handling errors. |
+| `places`                      | Fired when places are found for a selected category. Provides an array of places. Useful for custom places list implementations. |
+| `places_request_start`        | Triggered when a places search request starts. Provides the category as parameter. Useful for showing loading indicators during places search. |
+| `places_request_end`          | Fired when a places search request completes (success or failure). Provides success status, data, and error information. |
+| `place_details_request_start` | Triggered when a place details request starts. Provides the selected feature as parameter. Useful for showing loading indicators during place details fetching. |
+| `place_details_request_end`   | Fired when a place details request completes (success or failure). Provides success status, data, and error information. Ideal for hiding loading indicators and handling place details errors. |
+| `place_select`                | Triggered when a place is selected from the places list. Provides the selected place and its index. |
+| `clear`                       | Fired when the autocomplete is cleared. Provides the item type that was cleared (e.g., categories, places). |
 
 These events offer flexibility and customization options for creating tailored interactions and user experiences in your application.
 
@@ -510,6 +555,34 @@ autocomplete.on('request_start', (query) => {
 
 autocomplete.on('request_end', (success, data, error) => {
     // geocoding request completed
+});
+
+autocomplete.on('places', (places) => {
+    // places found for selected category
+});
+
+autocomplete.on('places_request_start', (category) => {
+    // places search request started
+});
+
+autocomplete.on('places_request_end', (success, data, error) => {
+    // places search request completed
+});
+
+autocomplete.on('place_details_request_start', (feature) => {
+    // place details request started
+});
+
+autocomplete.on('place_details_request_end', (success, data, error) => {
+    // place details request completed
+});
+
+autocomplete.on('place_select', (place, index) => {
+    // place selected from places list
+});
+
+autocomplete.on('clear', (itemType) => {
+    // autocomplete cleared
 });
 ```
 The location have [GeoJSON.Feature](https://geojson.org/) type, suggestions have GeoJSON.Feature[] type. The feature properties contain information about address and location.

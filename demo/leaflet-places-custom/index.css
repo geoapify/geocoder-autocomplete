@@ -14,45 +14,20 @@ html, body, #map {
   border-radius: 8px;
 }
 
-/* Places header - fixed above scrollable list */
-.places-header {
-  margin-top: 10px;
-  background: white;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  display: none; /* Hidden by default */
-}
-
-.places-header.active {
-  display: block;
-}
-
-.places-count {
-  color: #666;
-  font-style: italic;
-  font-size: 12px;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
-  font-weight: 500;
-  border-radius: 8px 8px 0 0;
-}
 
 /* Places list styling (Google Maps style) */
 .places-list-container {
-  margin-top: 0; /* No margin when header is present */
   background: white;
-  border-radius: 0 0 8px 8px; /* Only bottom corners rounded when header is present */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
   display: none;
 }
 
-/* When no header is present (standalone list) */
+/* Standalone list styling (no header) */
 .places-list-container.standalone {
   margin-top: 10px;
-  border-radius: 8px; /* All corners rounded when standalone */
+  border-radius: 8px;
 }
 
 .places-list-container.active {
@@ -356,19 +331,6 @@ body.theme-round-borders-dark .autocomplete-panel {
   background: rgba(40, 40, 40, 0.95);
 }
 
-/* Dark theme places header */
-body.theme-minimal-dark .places-header,
-body.theme-round-borders-dark .places-header {
-  background: #2d3748 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-body.theme-minimal-dark .places-count,
-body.theme-round-borders-dark .places-count {
-  color: #e8eaed;
-  background: #2d3748;
-  border-bottom-color: #3c4043;
-}
 
 /* Dark theme category items */
 body.theme-minimal-dark .geoapify-category-item,

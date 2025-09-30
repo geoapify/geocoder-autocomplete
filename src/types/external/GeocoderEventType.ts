@@ -11,4 +11,5 @@ export type GeocoderEventType =
     | 'places_request_end' 
     | 'place_details_request_start' 
     | 'place_details_request_end' 
+    | 'place_select'
     | 'clear';

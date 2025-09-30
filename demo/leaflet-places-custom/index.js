@@ -61,7 +61,7 @@ const autocompleteInput = new autocomplete.GeocoderAutocomplete(
                         { 
                             placeholder: "Search for places or categories...",
                             addCategorySearch: true,
-                            showPlacesList: true,
+                            showPlacesList: false,
                             limit: 8
                         });
 
@@ -83,8 +83,6 @@ let marker;
 let placesMarkers = [];
 
 // UI elements
-const placesCount = document.getElementById('places-count');
-const placesHeader = document.getElementById('places-header');
 const placesListContainer = document.getElementById('places-list');
 
 function clearPlacesMarkers() {
@@ -94,8 +92,7 @@ function clearPlacesMarkers() {
 
 function clearPlacesList() {
     placesListContainer.innerHTML = '';
-    placesListContainer.classList.remove('active');
-    placesHeader.classList.remove('active');
+    placesListContainer.classList.remove('active', 'standalone');
 }
 
 function createPlaceItem(place, index) {
@@ -290,22 +287,12 @@ function showPlacesList(places) {
         placesListContainer.appendChild(placeElement);
     });
     
-    placesHeader.classList.add('active');
-    placesListContainer.classList.add('active');
+    placesListContainer.classList.add('active', 'standalone');
     
     // Scroll to top of the places list
     placesListContainer.scrollTop = 0;
 }
 
-function updatePlacesCount(count, isPlaces = false) {
-    if (isPlaces && count > 0) {
-        placesCount.textContent = `${count} places found`;
-        placesHeader.classList.add('active');
-    } else {
-        placesCount.textContent = '';
-        placesHeader.classList.remove('active');
-    }
-}
 
 // Handle regular address selection
 autocompleteInput.on('select', (location) => {
@@ -329,8 +316,6 @@ autocompleteInput.on('select', (location) => {
 // Handle places results (when category is selected)
 autocompleteInput.on('places', (places) => {
     clearPlacesMarkers();
-    
-    updatePlacesCount(places.length, true);
     
     // Show places in the Google Maps-style list
     showPlacesList(places);
@@ -360,9 +345,7 @@ autocompleteInput.on('places', (places) => {
 // Handle suggestions (for address results)
 autocompleteInput.on('suggestions', (suggestions) => {
     const currentCategory = autocompleteInput.getCategory();
-    if (!currentCategory) {
-        updatePlacesCount(suggestions.length, false);
-    }
+    // No longer need to update places count
 });
 
 // Handle category clearing
@@ -379,12 +362,11 @@ autocompleteInput.on('clear', (context) => {
 
 // Handle places request events for loading feedback
 autocompleteInput.on('places_request_start', (category) => {
-    placesCount.textContent = 'Loading places...';
+    // Could add loading indicator here if needed
 });
 
 autocompleteInput.on('places_request_end', (success, data, error) => {
     if (!success) {
-        placesCount.textContent = 'Error loading places';
         console.error('Places request failed:', error);
     }
 });

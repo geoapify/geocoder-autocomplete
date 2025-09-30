@@ -10,6 +10,7 @@ import {
 import { Callbacks } from "./helpers/callbacks";
 import { CategoryManager } from "./helpers/category.helper";
 import { PlacesApiHelper } from "./helpers/places-api.helper";
+import { PlacesListManager, PlacesListCallbacks } from "./helpers/places-list.helper";
 import { Category, GeocoderEventType } from "./types/external";
 
 export class GeocoderAutocomplete {
@@ -18,8 +19,8 @@ export class GeocoderAutocomplete {
     private inputClearButton: HTMLElement;
     private autocompleteItemsElement: HTMLElement = null;
     
-    /* Places list elements for showPlacesList functionality */
-    private placesListElement: HTMLElement = null;
+    /* Places list manager for showPlacesList functionality */
+    private placesListManager: PlacesListManager;
 
     /* Focused item in the autocomplete list. This variable is used to navigate with buttons */
     private focusedItemIndex: number;
@@ -49,9 +50,10 @@ export class GeocoderAutocomplete {
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
 
     private readonly categoryManager: CategoryManager;
-    private sendPlacesRequestAlt?: (category: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>;
+    private sendPlacesRequestAlt?: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>;
     private currentPlacesPromiseReject?: any;
     private lastEscKeyTime?: number;
+    private readonly DOUBLE_ESC_THRESHOLD = 500; // 500ms window for double-Esc
 
     private options: GeocoderAutocompleteOptions = {
         limit: 5,
@@ -69,6 +71,20 @@ export class GeocoderAutocomplete {
         this.addEventListeners();
 
         this.categoryManager = new CategoryManager();
+        
+        // Initialize places list manager with callbacks
+        const placesCallbacks: PlacesListCallbacks = {
+            onLoadMore: (category: string, offset: number, limit?: number) => {
+                return this.sendPlacesRequestOrAlt(category, undefined, undefined, offset, limit);
+            },
+            onPlacesUpdate: (allPlaces: any[]) => {
+                this.callbacks.notifyPlaces(allPlaces);
+            },
+            onPlaceSelect: (place: any, index: number) => {
+                this.callbacks.notifyPlaceSelect(place, index);
+            }
+        };
+        this.placesListManager = new PlacesListManager(this.container, this.options, placesCallbacks);
     }
 
     public setGeocoderUrl(geocoderUrl: string) {
@@ -301,17 +317,19 @@ export class GeocoderAutocomplete {
     public async sendPlacesRequest(
         category: string,
         bias?: string,
-        filter?: string
+        filter?: string,
+        offset?: number,
+        limit?: number
     ): Promise<any> {
         if (!this.isCategoryModeEnabled()) {
             return Promise.reject(new Error('Category search is disabled'));
         }
 
-        return this.sendPlacesRequestOrAlt(category, bias, filter);
+        return this.sendPlacesRequestOrAlt(category, bias, filter, offset, limit);
     }
 
     public setSendPlacesRequestFunc(
-        sendPlacesRequestFunc?: (category: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<any>
+        sendPlacesRequestFunc?: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>
     ): void {
         if (!this.isCategoryModeEnabled()) {
             console.warn('Category search is disabled. Enable with addCategorySearch: true');
@@ -403,15 +421,9 @@ export class GeocoderAutocomplete {
         const itemElement = DomHelper.createDropdownItem();
         itemElement.classList.add('geoapify-category-item');
 
-        if (!this.options.skipIcons) {
-            const iconElement = document.createElement("span");
-            iconElement.classList.add('icon');
-            DomHelper.addCategoryIcon(iconElement, category.category);
-            itemElement.appendChild(iconElement);
-        }
 
         const textElement = DomHelper.createDropdownItemText();
-        textElement.innerHTML = `<span class="main-part">${category.label}</span><span class="secondary-part">Category</span>`;
+        textElement.innerHTML = `<span class="main-part">${category.label}</span>`;
         itemElement.appendChild(textElement);
 
         itemElement.addEventListener("click", (e) => {
@@ -535,25 +547,28 @@ export class GeocoderAutocomplete {
 
     private handleEscapeKey(): void {
         const now = Date.now();
-        const DOUBLE_ESC_THRESHOLD = 500; // 500ms window for double-Esc
 
         if (this.autocompleteItemsElement) {
             // First Esc: Close dropdown
             this.closeDropDownList();
             this.lastEscKeyTime = now;
-        } else if (
-            this.isCategoryModeEnabled() &&
-            this.categoryManager.isCategoryModeActive() &&
-            this.lastEscKeyTime &&
-            (now - this.lastEscKeyTime) < DOUBLE_ESC_THRESHOLD
-        ) {
-            // Second Esc within threshold: Clear category
+        } else if (this.shouldClearCategoryOnDoubleEscape(now)) {
+            // Second Esc within threshold: Clear category and reset input
+            this.inputElement.value = '';
+            this.removeClearButton();
             this.setCategory(null);
             this.lastEscKeyTime = undefined;
         } else {
             // Single Esc when dropdown is already closed
             this.lastEscKeyTime = now;
         }
+    }
+
+    private shouldClearCategoryOnDoubleEscape(currentTime: number): boolean {
+        return this.isCategoryModeEnabled() &&
+               this.categoryManager.isCategoryModeActive() &&
+               this.lastEscKeyTime !== undefined &&
+               (currentTime - this.lastEscKeyTime) < this.DOUBLE_ESC_THRESHOLD;
     }
 
     private handleEnterEvent(event: KeyboardEvent) {
@@ -611,6 +626,11 @@ export class GeocoderAutocomplete {
             this.inputElement.value = feature.properties.formatted;
         }
 
+        // Clear category when selecting a regular place from main dropdown
+        if (this.isCategoryModeEnabled() && this.categoryManager.isCategoryModeActive()) {
+            this.clearCategory();
+        }
+
         this.notifyValueSelected(feature);
 
         /* Close the list of autocompleted values: */
@@ -632,7 +652,6 @@ export class GeocoderAutocomplete {
         this.clearCategory();
         this.callbacks.notifyClear(isCategory ? 'category' : 'place');
 
-        // notify here
         this.notifyValueSelected(null);
     }
 
@@ -650,14 +669,18 @@ export class GeocoderAutocomplete {
         if (this.noNeedToRequestPlaceDetails(feature)) {
             this.callbacks.notifyChange(feature);
         } else {
+            this.callbacks.notifyPlaceDetailsRequestStart(feature);
+            
             let promise = this.sendPlaceDetailsRequestOrAlt(feature);
 
             promise.then((detailesFeature: any) => {
+                this.callbacks.notifyPlaceDetailsRequestEnd(true, detailesFeature);
                 this.callbacks.notifyChange(detailesFeature);
                 this.currentPlaceDetailsPromiseReject = null;
             }, (err) => {
                 if (!err.canceled) {
                     console.log(err);
+                    this.callbacks.notifyPlaceDetailsRequestEnd(false, null, err);
                     this.callbacks.notifyChange(feature);
                     this.currentPlaceDetailsPromiseReject = null;
                 }
@@ -730,15 +753,15 @@ export class GeocoderAutocomplete {
         this.callbacks.notifyPlacesRequestStart(categoryObj.category);
 
         try {
-            const data = await this.sendPlacesRequestOrAlt(categoryObj.category);
+            const data = await this.sendPlacesRequestOrAlt(categoryObj.category, undefined, undefined, 0, this.options.limit);
             this.callbacks.notifyPlacesRequestEnd(true, data);
             
             const places = data.features || [];
-            this.callbacks.notifyPlaces(places);
             
-            // Show places list if enabled
             if (this.options.showPlacesList && places.length > 0) {
-                this.showPlacesList(places);
+                this.placesListManager.showPlacesList(places, categoryObj.category);
+            } else {
+                this.callbacks.notifyPlaces(places);
             }
         } catch (error) {
             this.callbacks.notifyPlacesRequestEnd(false, null, error);
@@ -754,7 +777,7 @@ export class GeocoderAutocomplete {
         if (!this.isCategoryModeEnabled()) return;
         
         this.categoryManager.clearCategory();
-        this.clearPlacesList();
+        this.placesListManager.resetCategory();
         this.callbacks.notifyClear('category');
     }
 
@@ -764,14 +787,16 @@ export class GeocoderAutocomplete {
     private async sendPlacesRequestOrAlt(
         category: string,
         bias?: string,
-        filter?: string
+        filter?: string,
+        offset?: number,
+        limit?: number
     ): Promise<any> {
         if (this.sendPlacesRequestAlt) {
-            return this.sendPlacesRequestAlt(category, this);
+            return this.sendPlacesRequestAlt(category, this, offset, limit);
         }
 
         const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options);
-        let url = PlacesApiHelper.generatePlacesUrl(category, this.apiKey, this.options, location);
+        let url = PlacesApiHelper.generatePlacesUrl(category, this.apiKey, this.options, location, offset, limit);
 
         if (bias) {
             url += `&bias=${encodeURIComponent(bias)}`;
@@ -783,116 +808,6 @@ export class GeocoderAutocomplete {
         return PlacesApiHelper.sendPlacesRequest(url);
     }
 
-    /**
-     * Places list management methods for showPlacesList functionality
-     */
-    private createPlacesElements(): void {
-        if (!this.options.showPlacesList) return;
-
-        // Create places list container - reuse autocomplete items styling
-        this.placesListElement = document.createElement('div');
-        this.placesListElement.className = 'geoapify-autocomplete-items geoapify-places-list';
-        this.placesListElement.style.position = 'absolute';
-        this.placesListElement.style.top = 'calc(100% + 10px)';
-        this.placesListElement.style.left = '0';
-        this.placesListElement.style.right = '0';
-        this.placesListElement.style.maxHeight = '300px';
-        this.placesListElement.style.overflowY = 'auto';
-        this.placesListElement.style.display = 'none';
-
-        // Append to container
-        this.container.appendChild(this.placesListElement);
-    }
-
-    private showPlacesList(places: any[]): void {
-        if (!this.options.showPlacesList || !places?.length) return;
-
-        // Create elements if they don't exist
-        if (!this.placesListElement) {
-            this.createPlacesElements();
-        }
-
-        // Clear existing places
-        this.clearPlacesList();
-
-        // Add a simple header with count
-        const headerElement = document.createElement('div');
-        headerElement.className = 'geoapify-autocomplete-item';
-        headerElement.style.fontWeight = 'bold';
-        headerElement.style.fontSize = '12px';
-        headerElement.style.color = '#666';
-        headerElement.style.cursor = 'default';
-        headerElement.innerHTML = `<div class="address">${places.length} places found</div>`;
-        this.placesListElement.appendChild(headerElement);
-
-        // Create place items
-        places.forEach((place, index) => {
-            const placeElement = this.createPlaceItem(place, index);
-            this.placesListElement.appendChild(placeElement);
-        });
-
-        // Show list
-        this.placesListElement.style.display = 'block';
-
-        // Scroll to top
-        this.placesListElement.scrollTop = 0;
-    }
-
-    private clearPlacesList(): void {
-        if (!this.options.showPlacesList) return;
-
-        if (this.placesListElement) {
-            this.placesListElement.innerHTML = '';
-            this.placesListElement.style.display = 'none';
-        }
-    }
-
-    private createPlaceItem(place: any, index: number): HTMLElement {
-        const placeElement = document.createElement('div');
-        placeElement.className = 'geoapify-autocomplete-item'; // Reuse existing class
-        placeElement.dataset.index = index.toString();
-        
-        const props = place.properties;
-        const name = props.name || 'Unknown Place';
-        const address = props.formatted || props.address_line2 || '';
-        
-        // Simple rating display
-        const rating = props.rating ? Math.round(props.rating * 10) / 10 : null;
-        
-        
-        placeElement.innerHTML = `
-            <div class="address">
-                <span class="main-part">${name}</span>
-                <span class="secondary-part">
-                    ${rating ? `★ ${rating} • ` : ''}${address}
-                </span>
-            </div>
-        `;
-        
-        // Add click handler
-        placeElement.addEventListener('click', () => {
-            this.selectPlaceFromList(place, index);
-        });
-        
-        return placeElement;
-    }
-
-    private selectPlaceFromList(place: any, index: number): void {
-        if (!this.options.showPlacesList) return;
-
-        // Remove previous selection
-        const placeItems = this.placesListElement?.querySelectorAll('.geoapify-autocomplete-item');
-        placeItems?.forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // Add selection to clicked item
-        const clickedItem = this.placesListElement?.querySelector(`[data-index="${index}"]`);
-        clickedItem?.classList.add('active');
-        
-        // Notify selection (similar to regular autocomplete selection)
-        // this.callbacks.notifyChange(place);
-    }
 }
 
 export interface GeocoderAutocompleteOptions {
@@ -927,6 +842,7 @@ export interface GeocoderAutocompleteOptions {
     addCategorySearch?: boolean;
     showPlacesList?: boolean;
     placesApiUrl?: string;
+    ipGeolocationUrl?: string;
 }
 
 export interface GeoPosition {

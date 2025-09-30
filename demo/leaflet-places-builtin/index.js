@@ -144,6 +144,19 @@ autocompleteInput.on('clear', (context) => {
     }
 });
 
+autocompleteInput.on('place_select', (place, index) => {
+    console.log('Place selected:', place.properties.name, 'at index:', index);
+    
+    if (placesMarkers[index]) {
+        map.panTo([place.properties.lat, place.properties.lon]);
+        placesMarkers[index].openPopup();
+        
+        if (map.getZoom() < 16) {
+            map.setZoom(16);
+        }
+    }
+});
+
 // Handle places request events for loading feedback
 autocompleteInput.on('places_request_start', (category) => {
     console.log('Loading places for category:', category);

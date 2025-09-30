@@ -97,10 +97,108 @@
     color: rgba(255, 255, 255, 0.6);
 }
 
+.geoapify-places-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-left: 0;
+    padding-right: 8px;
+}
+
+.geoapify-places-details.secondary-part {
+    margin-left: 0;
+}
+
 .geoapify-autocomplete-items .main-part .non-verified {
     color:  #ff8080;
 }
 
 .geoapify-places-list {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+}
+
+.geoapify-places-load-more-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-top: 1px solid #4a4a4a;
+    background: #2d2d2d;
+    color: #b3b3b3;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    gap: 8px;
+}
+
+.geoapify-places-load-more-button:hover {
+    background: #404040;
+}
+
+.geoapify-places-load-more-button.loading {
+    cursor: wait;
+    background: #353535;
+}
+
+.geoapify-places-clock-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 4px;
+    color: rgba(255, 255, 255, 0.6);
+    vertical-align: middle;
+}
+
+.geoapify-places-clock-icon svg {
+    height: 12px;
+    width: 12px;
+}
+
+.geoapify-places-address-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+}
+
+.geoapify-places-address-element {
+    flex: 1;
+    min-width: 0;
+}
+
+.geoapify-places-hours-container {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    padding-right: 8px;
+    flex-shrink: 0;
+}
+
+.geoapify-places-hours-text {
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.geoapify-places-load-more-icon {
+    display: flex;
+    align-items: center;
+}
+
+.geoapify-places-spinner-icon {
+    height: 16px;
+    width: 16px;
+    animation: geoapify-spin 1s linear infinite;
+}
+
+@keyframes geoapify-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }

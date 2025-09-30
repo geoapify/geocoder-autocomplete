@@ -14,6 +14,7 @@ export class Callbacks {
     public placesRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
     public placeDetailsRequestStartCallbacks: ((place: any) => void)[] = [];
     public placeDetailsRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
+    public placeSelectCallbacks: ((place: any, index: number) => void)[] = [];
 
     public clearCallbacks: ((itemType: ItemType) => void)[] = [];
 
@@ -86,6 +87,10 @@ export class Callbacks {
         this.placeDetailsRequestEndCallbacks.forEach(callback => callback(success, data, error));
     }
 
+    notifyPlaceSelect(place: any, index: number) {
+        this.placeSelectCallbacks.forEach(callback => callback(place, index));
+    }
+
     notifyClear(itemType: ItemType) {
         this.clearCallbacks.forEach(callback => callback(itemType));
     }
@@ -139,6 +144,10 @@ export class Callbacks {
             }
             case 'place_details_request_end': {
                 currentCallbacks = this.placeDetailsRequestEndCallbacks;
+                break;
+            }
+            case 'place_select': {
+                currentCallbacks = this.placeSelectCallbacks as any;
                 break;
             }
             case 'clear': {
@@ -197,6 +206,10 @@ export class Callbacks {
             }
             case 'place_details_request_end': {
                 this.placeDetailsRequestEndCallbacks = callbacks;
+                break;
+            }
+            case 'place_select': {
+                this.placeSelectCallbacks = callbacks as any;
                 break;
             }
             case 'clear': {
