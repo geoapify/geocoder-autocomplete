@@ -82,6 +82,11 @@ export class GeocoderAutocomplete {
             },
             onPlaceSelect: (place: any, index: number) => {
                 this.callbacks.notifyPlaceSelect(place, index);
+                
+                // Auto-hide places list if option is enabled
+                if (this.options.hidePlacesListAfterSelect) {
+                    this.placesListManager.clearPlacesList();
+                }
             }
         };
         this.placesListManager = new PlacesListManager(this.container, this.options, placesCallbacks);
@@ -241,6 +246,10 @@ export class GeocoderAutocomplete {
         }
     }
 
+    public clearPlacesList() {
+        this.placesListManager.clearPlacesList();
+    }
+
     private sendGeocoderRequestOrAlt(currentValue: string): Promise<any> {
         if (this.sendGeocoderRequestAlt) {
             return this.sendGeocoderRequestAlt(currentValue, this);
@@ -345,6 +354,10 @@ export class GeocoderAutocomplete {
         let userEnteredValue = this.inputElement.value;
 
         this.callbacks.notifyInputChange(currentValue);
+
+        /* Reset category mode and clear places list when user types */
+        this.categoryManager.clearCategory();
+        this.placesListManager.resetCategory();
 
         /* Close any already open dropdown list */
         this.closeDropDownList();
@@ -841,6 +854,7 @@ export interface GeocoderAutocompleteOptions {
 
     addCategorySearch?: boolean;
     showPlacesList?: boolean;
+    hidePlacesListAfterSelect?: boolean;
     placesApiUrl?: string;
     ipGeolocationUrl?: string;
 }

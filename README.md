@@ -236,6 +236,7 @@ Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, u
 | allowNonVerifiedStreet | boolean | Allow the addition of streets that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. |
 | addCategorySearch | boolean | Enable category search functionality. When enabled, the autocomplete will show category suggestions alongside address results, allowing users to search for places by category (e.g., restaurants, hotels). |
 | showPlacesList | boolean | Enable built-in places list functionality. When a category is selected, displays a list of places within that category showing name, address, and opening hours. Requires `addCategorySearch` to be enabled. |
+| hidePlacesListAfterSelect | boolean | Automatically hide the places list after a place is selected. Defaults to `false`. |
 | placesApiUrl | string | Custom URL for the Places API. Defaults to Geoapify Places API if not specified. |
 | ipGeolocationUrl | string | Custom URL for IP geolocation service. Used for location-based bias when no explicit location is provided. |
 

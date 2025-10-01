@@ -98,7 +98,7 @@ export class PlacesListManager {
         if (!this.options.showPlacesList) return;
 
         this.placesListElement = document.createElement('div');
-        this.placesListElement.className = 'geoapify-autocomplete-items geoapify-places-list';
+        this.placesListElement.className = 'geoapify-places-list';
 
         this.container.appendChild(this.placesListElement);
     }
@@ -142,7 +142,7 @@ export class PlacesListManager {
 
     private createPlaceItem(place: any, index: number): HTMLElement {
         const placeElement = document.createElement('div');
-        placeElement.className = 'geoapify-autocomplete-item';
+        placeElement.className = 'geoapify-places-item';
         placeElement.dataset.index = index.toString();
         
         const placeData = this.extractPlaceData(place);
@@ -172,21 +172,20 @@ export class PlacesListManager {
 
     private createAddressContainer(): HTMLElement {
         const container = document.createElement('span');
-        container.className = 'address';
-        container.className = 'address geoapify-places-address-container';
+        container.className = 'geoapify-places-address-container';
         return container;
     }
 
     private createNameElement(name: string): HTMLElement {
         const nameElement = document.createElement('span');
-        nameElement.className = 'main-part';
+        nameElement.className = 'geoapify-places-main-part';
         nameElement.textContent = name;
         return nameElement;
     }
 
     private createDetailsElement(placeData: PlaceData): HTMLElement {
         const detailsElement = document.createElement('span');
-        detailsElement.className = 'secondary-part geoapify-places-details';
+        detailsElement.className = 'geoapify-places-details';
         
         const addressElement = this.createAddressElement(placeData.address);
         detailsElement.appendChild(addressElement);
@@ -309,7 +308,7 @@ export class PlacesListManager {
         if (!this.options.showPlacesList) return;
 
         // Remove previous selection
-        const placeItems = this.placesListElement?.querySelectorAll('.geoapify-autocomplete-item');
+        const placeItems = this.placesListElement?.querySelectorAll('.geoapify-places-item');
         placeItems?.forEach(item => {
             item.classList.remove('active');
         });

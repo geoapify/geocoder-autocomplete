@@ -86,14 +86,34 @@
 }
 
 .geoapify-places-list {
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
     position: absolute;
     top: calc(100% + 10px);
     left: 0;
     right: 0;
-    max-height: 400px;
+
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+
+    box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.1);
+    z-index: 99;
     overflow-y: auto;
     display: none;
+}
+
+.geoapify-places-list div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.geoapify-places-list div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.geoapify-places-list .active {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .geoapify-places-load-more-button {
@@ -133,10 +153,8 @@
     width: 100%;
     margin-left: 0;
     padding-right: 8px;
-}
-
-.geoapify-places-details.secondary-part {
-    margin-left: 0;
+    font-size: small;
+    color: rgba(0, 0, 0, 0.6);
 }
 
 .geoapify-places-clock-icon {
@@ -157,11 +175,15 @@
     flex-direction: column;
     width: 100%;
     padding: 0;
+    flex: 1;
+    overflow: hidden;
 }
 
 .geoapify-places-address-element {
     flex: 1;
     min-width: 0;
+    font-size: small;
+    color: rgba(0, 0, 0, 0.6);
 }
 
 .geoapify-places-hours-container {
@@ -191,4 +213,30 @@
 @keyframes geoapify-spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+.geoapify-places-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.geoapify-places-item .icon {
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+    color: #aaa;
+}
+
+.geoapify-places-item .icon.emoji {
+    color: unset;
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+.geoapify-places-main-part {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
