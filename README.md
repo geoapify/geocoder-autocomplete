@@ -61,6 +61,7 @@ This code demonstrates how to set up a custom geocoding function. It customizes 
 This repository includes a comprehensive collection of working demos that you can run locally:
 * [Demo Collection Overview](demo/demo-index.html) - Navigate to all available demos
 * [Basic Address Form](demo/basic/index.html) - Multi-field address input with validation
+* [Basic Address Form with Built-in Places List](demo/basic-places-builtin/index.html) - Address input with category search and built-in places list functionality
 * [Leaflet Integration](demo/leaflet/index.html) - Interactive map with address search and markers
 * [Leaflet with Custom Places UI](demo/leaflet-places-custom/index.html) - Interactive map with category search and custom places list implementation
 * [Leaflet with Built-in Places List](demo/leaflet-places-builtin/index.html) - Interactive map with category search and built-in places list functionality
@@ -330,8 +331,13 @@ Here's a description of the API methods:
 | *isOpen(): boolean* | Checks if the suggestions dropdown is currently open. |
 | *close(): void* | Manually closes the suggestions dropdown. |
 | *open(): void* | Manually opens the suggestions dropdown. |
+| *setCategory(category: Category or string or null): void* | Sets the selected category for places search. Pass null to clear the category. |
+| *getCategory(): Category or null* | Retrieves the currently selected category. |
+| *clearPlacesList(): void* | Manually clears the places list display. |
 | *sendGeocoderRequest(value: string): Promise<GeoJSON.FeatureCollection>* | Sends a geocoder request based on the provided value and returns a Promise with the response in [GeoJSON FeatureCollection](https://en.wikipedia.org/wiki/GeoJSON) format containing suggestions. |
 | *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
+| *sendPlacesRequest(category: string, biasLocation?: {lat: number; lon: number}, filterLocation?: {lat: number; lon: number}, offset?: number, limit?: number): Promise<GeoJSON.FeatureCollection>* | Sends a places search request for the specified category and returns a Promise with the response in GeoJSON FeatureCollection format containing places. |
+| *setSendPlacesRequestFunc(sendPlacesRequestFunc: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send places search requests. |
 | *setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. |
 | *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. |
 | *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, dropdown open/close, places, and request lifecycle events. |
@@ -622,6 +628,19 @@ Moreover, if you prefer to have complete control over the styling, you have the 
 | `.geoapify-autocomplete-item.text`             | Styles the text within the dropdown list items.                |
 | `.geoapify-close-button`                       | Styles the clear button.                                       |
 | `.geoapify-autocomplete-items .main-part .non-verified` | Styles a portion of the street address that could not be verified by the Geocoder. |
+| `.geoapify-places-list`                        | Styles the places list container.                              |
+| `.geoapify-places-item`                        | Styles individual place items in the list.                     |
+| `.geoapify-places-item .icon`                  | Styles the place category icon.                                |
+| `.geoapify-places-main-part`                   | Styles the main content area of a place item.                  |
+| `.geoapify-places-details`                     | Styles the place details section.                              |
+| `.geoapify-places-address-container`           | Styles the address container within place details.             |
+| `.geoapify-places-address-element`             | Styles individual address elements in place details.           |
+| `.geoapify-places-hours-container`             | Styles the opening hours container.                            |
+| `.geoapify-places-hours-text`                  | Styles the opening hours text.                                 |
+| `.geoapify-places-clock-icon`                  | Styles the clock icon for opening hours.                       |
+| `.geoapify-places-load-more-button`            | Styles the "Load More" button.                                 |
+| `.geoapify-places-load-more-icon`              | Styles the arrow icon in the "Load More" button.               |
+| `.geoapify-places-spinner-icon`                | Styles the loading spinner icon.                               |
 
 ## Working with non-verified address components
 

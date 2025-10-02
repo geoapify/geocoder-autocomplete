@@ -156,3 +156,116 @@ export function addRequestEndSpy(autocomplete: GeocoderAutocomplete) {
     autocomplete.on('request_end', requestEndSpy);
     return requestEndSpy;
 }
+
+// ========================================================================
+// CATEGORY AND PLACES HELPER FUNCTIONS
+// ========================================================================
+
+export function addPlacesSpy(autocomplete: GeocoderAutocomplete) {
+    const placesSpy = jest.fn();
+    autocomplete.on('places', placesSpy);
+    return placesSpy;
+}
+
+export function addPlacesRequestStartSpy(autocomplete: GeocoderAutocomplete) {
+    const placesRequestStartSpy = jest.fn();
+    autocomplete.on('places_request_start', placesRequestStartSpy);
+    return placesRequestStartSpy;
+}
+
+export function addPlacesRequestEndSpy(autocomplete: GeocoderAutocomplete) {
+    const placesRequestEndSpy = jest.fn();
+    autocomplete.on('places_request_end', placesRequestEndSpy);
+    return placesRequestEndSpy;
+}
+
+export function addPlaceSelectSpy(autocomplete: GeocoderAutocomplete) {
+    const placeSelectSpy = jest.fn();
+    autocomplete.on('place_select', placeSelectSpy);
+    return placeSelectSpy;
+}
+
+export function addClearSpy(autocomplete: GeocoderAutocomplete) {
+    const clearSpy = jest.fn();
+    autocomplete.on('clear', clearSpy);
+    return clearSpy;
+}
+
+export function getCategoryDropdownItem(container: HTMLDivElement, itemIndex: number) {
+    const dropdown = container.querySelector('.geoapify-autocomplete-items');
+    const items = dropdown?.querySelectorAll('.geoapify-category-item');
+    return items?.[itemIndex] as HTMLDivElement;
+}
+
+export function selectCategoryDropdownItem(container: HTMLDivElement, itemIndex: number) {
+    const categoryItem = getCategoryDropdownItem(container, itemIndex);
+    if (categoryItem) {
+        categoryItem.click();
+    } else {
+        throw new Error(`Category item at index ${itemIndex} not found`);
+    }
+}
+
+export function getPlacesListElement(container: HTMLDivElement): HTMLElement | null {
+    return container.querySelector('.geoapify-places-list');
+}
+
+export function getPlacesListItems(container: HTMLDivElement): NodeListOf<HTMLElement> | null {
+    const placesList = getPlacesListElement(container);
+    return placesList?.querySelectorAll('.geoapify-places-item') || null;
+}
+
+export function selectPlaceFromList(container: HTMLDivElement, itemIndex: number) {
+    const items = getPlacesListItems(container);
+    if (items && items[itemIndex]) {
+        items[itemIndex].click();
+    } else {
+        throw new Error(`Place item at index ${itemIndex} not found`);
+    }
+}
+
+export function getLoadMoreButton(container: HTMLDivElement): HTMLElement | null {
+    const placesList = getPlacesListElement(container);
+    return placesList?.querySelector('.geoapify-places-load-more-button') || null;
+}
+
+export function clickLoadMoreButton(container: HTMLDivElement) {
+    const loadMoreButton = getLoadMoreButton(container);
+    if (loadMoreButton) {
+        loadMoreButton.click();
+    } else {
+        throw new Error('Load more button not found');
+    }
+}
+
+export function expectPlacesListVisible(container: HTMLDivElement) {
+    const placesList = getPlacesListElement(container);
+    expect(placesList).toBeTruthy();
+    expect(placesList).toHaveClass('geoapify-places-list');
+    expect(placesList).toHaveClass('active');
+}
+
+export function expectPlacesListHidden(container: HTMLDivElement) {
+    const placesList = getPlacesListElement(container);
+    expect(placesList).toBeFalsy();
+}
+
+export async function setCategory(autocomplete: GeocoderAutocomplete, category: string, mockResponse: any) {
+    fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
+    autocomplete.setCategory(category);
+    await wait(WAIT_TIME);
+}
+
+export function expectCategoryInDropdown(container: HTMLDivElement, expectedCount: number) {
+    const dropdown = container.querySelector('.geoapify-autocomplete-items');
+    const categoryItems = dropdown?.querySelectorAll('.geoapify-category-item');
+    expect(categoryItems?.length).toBe(expectedCount);
+}
+
+export function mockIpInfo(ipInfoResponse: any) {
+    fetchMock.mockResponseOnce(JSON.stringify(ipInfoResponse));
+}
+
+export function mockPlacesApi(placesResponse: any) {
+    fetchMock.mockResponseOnce(JSON.stringify(placesResponse));
+}

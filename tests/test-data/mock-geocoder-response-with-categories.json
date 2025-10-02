@@ -1,0 +1,527 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Hauts-de-France",
+                "county": "Oise",
+                "city": "Rieux",
+                "hamlet": "Cafosse",
+                "municipality": "Clermont",
+                "postcode": "60870",
+                "iso3166_2": "FR-HDF",
+                "iso3166_2_sublevel": "FR-60",
+                "lon": 2.5123043,
+                "lat": 49.304497,
+                "state_code": "HDF",
+                "state_COG": "32",
+                "suburb": "Cafosse",
+                "result_type": "suburb",
+                "distance": 51150.79020823065,
+                "department_COG": "60",
+                "formatted": "Cafosse, Rieux, HDF, France",
+                "address_line1": "Cafosse",
+                "address_line2": "Rieux, HDF, France",
+                "category": "populated_place",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "8FX48G36+QW",
+                "plus_code_short": "36+QW, 60870 Rieux, France",
+                "rank": {
+                    "importance": 0.1333433333333333,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "5127cd30ff3219044059745df8c1f9a64840f00103f901bfeffaf301000000c00205"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.5123043,
+                    49.304497
+                ]
+            },
+            "bbox": [
+                2.4923043,
+                49.284497,
+                2.5323043,
+                49.324497
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Hauts-de-France",
+                "county": "Pas-de-Calais",
+                "city": "Caffiers",
+                "municipality": "Calais",
+                "postcode": "62132",
+                "iso3166_2": "FR-HDF",
+                "iso3166_2_sublevel": "FR-62",
+                "lon": 1.809751,
+                "lat": 50.8412015,
+                "state_code": "HDF",
+                "state_COG": "32",
+                "result_type": "postcode",
+                "distance": 224077.28219375762,
+                "department_COG": "62",
+                "formatted": "Caffiers, HDF, France",
+                "address_line1": "Caffiers",
+                "address_line2": "HDF, France",
+                "category": "administrative",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "9F23RRR5+FW",
+                "rank": {
+                    "importance": 0.6055038807118032,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "51e773ee76bdf4fc3f594eeca17dac6b4940f00101f9013f60040000000000c0020792030836323133322b6672"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    1.809751,
+                    50.8412015
+                ]
+            },
+            "bbox": [
+                1.7860976,
+                50.8323771,
+                1.8372999,
+                50.8581756
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Bourgogne – Franche-Comté",
+                "county": "Yonne",
+                "city": "Jouy",
+                "isolated_dwelling": "Les Caffiers",
+                "municipality": "Sens",
+                "postcode": "89150",
+                "iso3166_2": "FR-BFC",
+                "iso3166_2_sublevel": "FR-89",
+                "lon": 3.0047017,
+                "lat": 48.1486258,
+                "name": "Les Caffiers",
+                "result_type": "postcode",
+                "distance": 92240.41420719483,
+                "department_COG": "89",
+                "formatted": "Les Caffiers (Jouy), Bourgogne – Franche-Comté, France",
+                "address_line1": "Les Caffiers (Jouy)",
+                "address_line2": "Bourgogne – Franche-Comté, France",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "8FW542X3+FV",
+                "rank": {
+                    "importance": 0.10667666666666664,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "5184e27d0ba109084059c12b932b06134840f00103f901c1473e7701000000c0020792030838393135302b6672"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    3.0047017,
+                    48.1486258
+                ]
+            },
+            "bbox": [
+                3.0046517,
+                48.1485758,
+                3.0047517,
+                48.1486758
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Hauts-de-France",
+                "county": "Somme",
+                "city": "Liercourt",
+                "hamlet": "Le Café du Renard",
+                "municipality": "Abbeville",
+                "postcode": "80580",
+                "iso3166_2": "FR-HDF",
+                "iso3166_2_sublevel": "FR-80",
+                "lon": 1.8854693,
+                "lat": 50.0439747,
+                "state_code": "HDF",
+                "state_COG": "32",
+                "suburb": "Le Café du Renard",
+                "result_type": "suburb",
+                "distance": 136272.2095190996,
+                "department_COG": "80",
+                "formatted": "Le Café du Renard, Liercourt, HDF, France",
+                "address_line1": "Le Café du Renard",
+                "address_line2": "Liercourt, HDF, France",
+                "category": "populated_place",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "9F232VVP+H5",
+                "rank": {
+                    "importance": 0.1333433333333333,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "51ceca51dbe12afe3f59fb2c85f6a0054940f00103f901b11ced4b01000000c00205"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    1.8854693,
+                    50.0439747
+                ]
+            },
+            "bbox": [
+                1.8654693,
+                50.0239747,
+                1.9054693,
+                50.0639747
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Pays de la Loire",
+                "county": "Sarthe",
+                "city": "Montreuil-le-Chétif",
+                "isolated_dwelling": "La Cafetière",
+                "municipality": "Mamers",
+                "postcode": "72130",
+                "iso3166_2": "FR-PDL",
+                "iso3166_2_sublevel": "FR-72",
+                "lon": -0.0273754,
+                "lat": 48.2382153,
+                "state_code": "PDL",
+                "state_COG": "52",
+                "name": "La Cafetière",
+                "result_type": "postcode",
+                "distance": 188165.83481819913,
+                "department_COG": "72",
+                "formatted": "La Cafetière (Montreuil-le-Chétif), PDL, France",
+                "address_line1": "La Cafetière (Montreuil-le-Chétif)",
+                "address_line2": "PDL, France",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "8CWX6XQF+72",
+                "rank": {
+                    "importance": 0.10667666666666664,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "519213dcfe4b089cbf591374c5d67d1e4840f00103f901eb0c78f502000000c0020792030837323133302b6672"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -0.0273754,
+                    48.2382153
+                ]
+            },
+            "bbox": [
+                -0.0274254,
+                48.2381653,
+                -0.0273254,
+                48.2382653
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Bourgogne – Franche-Comté",
+                "county": "Nièvre",
+                "city": "Giry",
+                "hamlet": "Les Caffards",
+                "municipality": "Cosne-Cours-sur-Loire",
+                "postcode": "58700",
+                "iso3166_2": "FR-BFC",
+                "iso3166_2_sublevel": "FR-58",
+                "lon": 3.3259218,
+                "lat": 47.2217781,
+                "suburb": "Les Caffards",
+                "result_type": "suburb",
+                "distance": 195664.48856196343,
+                "department_COG": "58",
+                "formatted": "Les Caffards, Giry, Bourgogne – Franche-Comté, France",
+                "address_line1": "Les Caffards",
+                "address_line2": "Giry, Bourgogne – Franche-Comté, France",
+                "category": "populated_place",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "8FV568CG+P9",
+                "rank": {
+                    "importance": 0.1333433333333333,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "51796d80e37c9b0a4059093c8b39639c4740f00103f90125a05da702000000c00205"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    3.3259218,
+                    47.2217781
+                ]
+            },
+            "bbox": [
+                3.3059218,
+                47.2017781,
+                3.3459218,
+                47.2417781
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Pays de la Loire",
+                "county": "Sarthe",
+                "city": "La Fontaine-Saint-Martin",
+                "isolated_dwelling": "Caffernant",
+                "municipality": "La Flèche",
+                "postcode": "72330",
+                "iso3166_2": "FR-PDL",
+                "iso3166_2_sublevel": "FR-72",
+                "lon": 0.0438525,
+                "lat": 47.7860995,
+                "state_code": "PDL",
+                "state_COG": "52",
+                "name": "Caffernant",
+                "result_type": "postcode",
+                "distance": 208071.7551122739,
+                "department_COG": "72",
+                "formatted": "Caffernant (La Fontaine-Saint-Martin), PDL, France",
+                "address_line1": "Caffernant (La Fontaine-Saint-Martin)",
+                "address_line2": "PDL, France",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "8FV2Q2PV+CG",
+                "rank": {
+                    "importance": 0.10667666666666664,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "511618b2bad573a63f5973f38de89ee44740f00103f9017ebd36bd00000000c0020792030837323333302b6672"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    0.0438525,
+                    47.7860995
+                ]
+            },
+            "bbox": [
+                0.0438025,
+                47.7860495,
+                0.0439025,
+                47.7861495
+            ]
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright"
+                },
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Centre-Val de Loire",
+                "county": "Indre-et-Loire",
+                "city": "Reignac-sur-Indre",
+                "hamlet": "Le Café Brûlé",
+                "municipality": "Loches",
+                "postcode": "37310",
+                "iso3166_2": "FR-CVL",
+                "iso3166_2_sublevel": "FR-37",
+                "lon": 0.8983564,
+                "lat": 47.2126733,
+                "state_code": "CVL",
+                "state_COG": "24",
+                "suburb": "Le Café Brûlé",
+                "result_type": "suburb",
+                "distance": 212357.93688351184,
+                "department_COG": "37",
+                "formatted": "Le Café Brûlé, Reignac-sur-Indre, CVL, France",
+                "address_line1": "Le Café Brûlé",
+                "address_line2": "Reignac-sur-Indre, CVL, France",
+                "category": "populated_place",
+                "timezone": {
+                    "name": "Europe/Paris",
+                    "offset_STD": "+01:00",
+                    "offset_STD_seconds": 3600,
+                    "offset_DST": "+02:00",
+                    "offset_DST_seconds": 7200,
+                    "abbreviation_STD": "CET",
+                    "abbreviation_DST": "CEST"
+                },
+                "plus_code": "8FV26V7X+38",
+                "plus_code_short": "6V7X+38 Reignac-sur-Indre, Indre-et-Loire, France",
+                "rank": {
+                    "importance": 0.1333433333333333,
+                    "confidence": 1,
+                    "confidence_city_level": 1,
+                    "match_type": "full_match"
+                },
+                "place_id": "5199dfc4eb55bfec3f59bf1df2e0389b4740f00103f90157e14d2f00000000c00205"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    0.8983564,
+                    47.2126733
+                ]
+            },
+            "bbox": [
+                0.8783564,
+                47.1926733,
+                0.9183564,
+                47.2326733
+            ]
+        }
+    ],
+    "query": {
+        "text": "caf",
+        "parsed": {
+            "country": "caf",
+            "expected_type": "unknown"
+        },
+        "categories": [
+            {
+                "category": "catering",
+                "label": "Food & Dining Places"
+            },
+            {
+                "category": "catering.cafe",
+                "label": "Cafes"
+            }
+        ]
+    }
+}

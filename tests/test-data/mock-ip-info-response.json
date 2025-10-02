@@ -1,0 +1,82 @@
+{
+    "city": {
+        "names": {
+            "en": "Yerevan"
+        },
+        "name": "Yerevan"
+    },
+    "continent": {
+        "code": "AS",
+        "geoname_id": 6255147,
+        "names": {
+            "de": "Asien",
+            "en": "Asia",
+            "es": "Asia",
+            "fa": " آسیا",
+            "fr": "Asie",
+            "ja": "アジア大陸",
+            "ko": "아시아",
+            "pt-BR": "Ásia",
+            "ru": "Азия",
+            "zh-CN": "亚洲"
+        },
+        "name": "Asia"
+    },
+    "country": {
+        "geoname_id": 174982,
+        "iso_code": "AM",
+        "names": {
+            "de": "Armenien",
+            "en": "Armenia",
+            "es": "Armenia",
+            "fa": "ارمنستان",
+            "fr": "Arménie",
+            "ja": "アルメニア",
+            "ko": "아르메니아",
+            "pt-BR": "Armênia",
+            "ru": "Армения",
+            "zh-CN": "亚美尼亚"
+        },
+        "name": "Armenia",
+        "name_native": "Հայաստան",
+        "phone_code": "374",
+        "capital": "Yerevan",
+        "currency": "AMD",
+        "flag": "🇦🇲",
+        "languages": [
+            {
+                "iso_code": "hy",
+                "name": "Armenian",
+                "name_native": "Հայերեն"
+            },
+            {
+                "iso_code": "ru",
+                "name": "Russian",
+                "name_native": "Русский"
+            }
+        ]
+    },
+    "location": {
+        "latitude": 40.17765,
+        "longitude": 44.5126
+    },
+    "subdivisions": [
+        {
+            "names": {
+                "en": "Yerevan"
+            },
+            "name": "Yerevan"
+        }
+    ],
+    "state": {
+        "name": "Yerevan"
+    },
+    "datasource": [
+        {
+            "name": "IP to City Lite",
+            "attribution": "<a href='https://db-ip.com'>IP Geolocation by DB-IP</a>",
+            "license": "Creative Commons Attribution License"
+        }
+    ],
+    "ip": "109.75.38.191"
+}

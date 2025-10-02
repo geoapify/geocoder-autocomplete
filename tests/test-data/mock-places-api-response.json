@@ -1,0 +1,570 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Marlette",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Merri",
+                "street": "Rue de Rivoli",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3526636,
+                "lat": 48.8574019,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Marlette, Rue de Rivoli, 75004 Paris, France",
+                "address_line1": "Marlette",
+                "address_line2": "Rue de Rivoli, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe",
+                    "catering.cafe.coffee",
+                    "catering.cafe.coffee_shop",
+                    "wheelchair",
+                    "wheelchair.yes"
+                ],
+                "details": [
+                    "details",
+                    "details.catering",
+                    "details.facilities"
+                ],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Marlette",
+                        "level": 3,
+                        "osm_id": 8932455801,
+                        "amenity": "cafe",
+                        "cuisine": "coffee_shop",
+                        "smoking": "no",
+                        "toilets": "no",
+                        "operator": "Coutume Café",
+                        "osm_type": "n",
+                        "takeaway": "no",
+                        "kids_area": "no",
+                        "wheelchair": "yes",
+                        "opening_hours": "Mo-Su 11:30-19:30",
+                        "outdoor_seating": "no"
+                    }
+                },
+                "opening_hours": "Mo-Su 11:30-19:30",
+                "operator": "Coutume Café",
+                "facilities": {
+                    "wheelchair": true,
+                    "smoking": false,
+                    "toilets": false,
+                    "outdoor_seating": false,
+                    "takeaway": false
+                },
+                "catering": {
+                    "cuisine": "coffee_shop"
+                },
+                "distance": 95,
+                "place_id": "51c1ea234b41d2024059e96d6f58bf6d4840f00103f90179756a14020000009203084d61726c65747465"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3526636,
+                    48.857401899727684
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Le Relais de l'Hôtel de Ville",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Gervais",
+                "street": "Rue de Rivoli",
+                "housenumber": "50",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3541492,
+                "lat": 48.8570216,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Le Relais de l'Hôtel de Ville, 50 Rue de Rivoli, 75004 Paris, France",
+                "address_line1": "Le Relais de l'Hôtel de Ville",
+                "address_line2": "50 Rue de Rivoli, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe",
+                    "wheelchair",
+                    "wheelchair.limited"
+                ],
+                "details": [
+                    "details",
+                    "details.catering",
+                    "details.contact",
+                    "details.facilities"
+                ],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Le Relais de l'Hôtel de Ville",
+                        "phone": "+33 1 43 56 69 55",
+                        "osm_id": 702306852,
+                        "amenity": "cafe",
+                        "cuisine": "french;local",
+                        "name:fr": "Le Relais de l'Hôtel de Ville",
+                        "smoking": "outside",
+                        "osm_type": "n",
+                        "wheelchair": "limited",
+                        "addr:street": "Rue de Rivoli",
+                        "addr:postcode": 75004,
+                        "indoor_seating": "yes",
+                        "outdoor_seating": "yes",
+                        "addr:housenumber": 50
+                    }
+                },
+                "name_international": {
+                    "fr": "Le Relais de l'Hôtel de Ville"
+                },
+                "contact": {
+                    "phone": "+33 1 43 56 69 55"
+                },
+                "facilities": {
+                    "wheelchair": true,
+                    "wheelchair_details": {
+                        "condition": "limited"
+                    },
+                    "smoking": true,
+                    "outdoor_seating": true
+                },
+                "catering": {
+                    "cuisine": "french;local"
+                },
+                "distance": 151,
+                "place_id": "518c3cff2c4cd5024059f0653fe2b26d4840f00103f901245adc290000000092031e4c652052656c616973206465206c2748c3b474656c2064652056696c6c65"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3541492,
+                    48.85702159972777
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Le Carrefour",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Gervais",
+                "street": "Rue de la Verrerie",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3544599,
+                "lat": 48.8575154,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Le Carrefour, Rue de la Verrerie, 75004 Paris, France",
+                "address_line1": "Le Carrefour",
+                "address_line2": "Rue de la Verrerie, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "details": [
+                    "details",
+                    "details.catering",
+                    "details.facilities"
+                ],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Le Carrefour",
+                        "osm_id": 599513406,
+                        "amenity": "cafe",
+                        "name:fr": "Le Carrefour",
+                        "osm_type": "n",
+                        "addr:city": "Paris",
+                        "indoor_seating": "yes",
+                        "outdoor_seating": "yes"
+                    }
+                },
+                "name_international": {
+                    "fr": "Le Carrefour"
+                },
+                "facilities": {
+                    "outdoor_seating": true
+                },
+                "distance": 195,
+                "place_id": "518bf27112efd5024059c5d28a10c36d4840f00103f9013ed9bb230000000092030c4c65204361727265666f7572"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3544598999999997,
+                    48.85751539972765
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Starbucks",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Gervais",
+                "street": "Rue de Rivoli",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3548812,
+                "lat": 48.8568355,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Starbucks, Rue de Rivoli, 75004 Paris, France",
+                "address_line1": "Starbucks",
+                "address_line2": "Rue de Rivoli, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe",
+                    "catering.cafe.coffee",
+                    "catering.cafe.coffee_shop",
+                    "wheelchair",
+                    "wheelchair.yes"
+                ],
+                "details": [
+                    "details",
+                    "details.catering",
+                    "details.facilities"
+                ],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Starbucks",
+                        "brand": "Starbucks",
+                        "osm_id": 3306561674,
+                        "amenity": "cafe",
+                        "cuisine": "coffee_shop",
+                        "name:fr": "Starbucks",
+                        "smoking": "no",
+                        "website": "https://www.starbucks.fr/",
+                        "operator": "Starbucks",
+                        "osm_type": "n",
+                        "takeaway": "yes",
+                        "wheelchair": "yes",
+                        "official_name": "Starbucks Coffee",
+                        "brand:wikidata": "Q37158",
+                        "indoor_seating": "yes",
+                        "brand:wikipedia": "en:Starbucks",
+                        "outdoor_seating": "yes"
+                    }
+                },
+                "website": "https://www.starbucks.fr/",
+                "brand": "Starbucks",
+                "brand_details": {
+                    "wikidata": "Q37158",
+                    "wikipedia": "en:Starbucks"
+                },
+                "operator": "Starbucks",
+                "name_other": {
+                    "official_name": "Starbucks Coffee"
+                },
+                "name_international": {
+                    "fr": "Starbucks"
+                },
+                "facilities": {
+                    "wheelchair": true,
+                    "smoking": false,
+                    "outdoor_seating": true,
+                    "takeaway": true
+                },
+                "catering": {
+                    "cuisine": "coffee_shop"
+                },
+                "distance": 198,
+                "place_id": "51cdb85ff4cbd602405903b120c9ac6d4840f00103f9018a2016c500000000920309537461726275636b73"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3548812,
+                    48.85683549972784
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Les Deux Théâtres",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Merri",
+                "street": "Avenue Victoria",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.349554,
+                "lat": 48.8573922,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Les Deux Théâtres, Avenue Victoria, 75004 Paris, France",
+                "address_line1": "Les Deux Théâtres",
+                "address_line2": "Avenue Victoria, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "details": [],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Les Deux Théâtres",
+                        "osm_id": 2211556498,
+                        "amenity": "cafe",
+                        "osm_type": "n",
+                        "panoramax": "fdf2cdcf-e271-4975-b498-e21573ff02be",
+                        "survey:date": "2025-04-04"
+                    }
+                },
+                "distance": 213,
+                "place_id": "51e57cb1f7e2cb02405985d61007bf6d4840f00103f90192acd183000000009203134c65732044657578205468c3a9c3a274726573"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.349554,
+                    48.85739219972769
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Art'Lunch",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Gervais",
+                "street": "Rue des Mauvais Garçons",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3551515,
+                "lat": 48.8567626,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Art'Lunch, Rue des Mauvais Garçons, 75004 Paris, France",
+                "address_line1": "Art'Lunch",
+                "address_line2": "Rue des Mauvais Garçons, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "details": [
+                    "details.catering",
+                    "details.facilities"
+                ],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Art'Lunch",
+                        "osm_id": 3980384402,
+                        "amenity": "cafe",
+                        "osm_type": "n",
+                        "wheelchair": "no",
+                        "indoor_seating": "yes",
+                        "outdoor_seating": "no"
+                    }
+                },
+                "facilities": {
+                    "wheelchair": false,
+                    "outdoor_seating": false
+                },
+                "distance": 217,
+                "place_id": "51b4006dab59d70240592e229965aa6d4840f00103f90192d83fed00000000920309417274274c756e6368"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3551515,
+                    48.856762599727844
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Le P'tit Bistrot",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Merri",
+                "street": "Rue Saint-Martin",
+                "housenumber": "8",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3495606,
+                "lat": 48.8575081,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Le P'tit Bistrot, 8 Rue Saint-Martin, 75004 Paris, France",
+                "address_line1": "Le P'tit Bistrot",
+                "address_line2": "8 Rue Saint-Martin, 75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "details": [
+                    "details",
+                    "details.catering",
+                    "details.contact"
+                ],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "name": "Le P'tit Bistrot",
+                        "phone": "+33142785580",
+                        "osm_id": 3181710642,
+                        "amenity": "cafe",
+                        "cuisine": "french",
+                        "name:fr": "Le P'tit Bistrot",
+                        "osm_type": "n",
+                        "panoramax": "d4be6ac7-997f-46ff-85d0-de40a26378cc",
+                        "addr:street": "Rue Saint-Martin",
+                        "survey:date": "2025-04-04",
+                        "addr:postcode": 75004,
+                        "opening_hours": "Mo-Fr 07:00-23:00; Sa 09:00-23:00",
+                        "addr:housenumber": 8
+                    }
+                },
+                "opening_hours": "Mo-Fr 07:00-23:00; Sa 09:00-23:00",
+                "name_international": {
+                    "fr": "Le P'tit Bistrot"
+                },
+                "contact": {
+                    "phone": "+33142785580"
+                },
+                "catering": {
+                    "cuisine": "french"
+                },
+                "distance": 218,
+                "place_id": "51d8c2876de6cb02405956314ed3c26d4840f00103f901320da5bd000000009203104c652050277469742042697374726f74"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3495606,
+                    48.85750809972767
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75004",
+                "district": "Paris",
+                "suburb": "4th Arrondissement",
+                "city_block": "Quartier Saint-Merri",
+                "street": "Rue Saint-Martin",
+                "iso3166_2": "FR-IDF",
+                "iso3166_2_sublevel": "FR-75C",
+                "lon": 2.3496675,
+                "lat": 48.8577225,
+                "state_code": "IDF",
+                "state_COG": "11",
+                "formatted": "Rue Saint-Martin, 75004 Paris, France",
+                "address_line1": "Rue Saint-Martin",
+                "address_line2": "75004 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "details": [],
+                "datasource": {
+                    "sourcename": "openstreetmap",
+                    "attribution": "© OpenStreetMap contributors",
+                    "license": "Open Database License",
+                    "url": "https://www.openstreetmap.org/copyright",
+                    "raw": {
+                        "osm_id": 2277001786,
+                        "amenity": "cafe",
+                        "osm_type": "n",
+                        "panoramax": "56337242-16ba-4af6-ab6b-25e7a5b44282"
+                    }
+                },
+                "distance": 224,
+                "place_id": "51e9ca67791ecc024059ccafd2d9c96d4840f00103f9013a4ab88700000000"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.3496674999999994,
+                    48.8577224997276
+                ]
+            }
+        }
+    ]
+}

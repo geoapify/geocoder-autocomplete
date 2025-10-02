@@ -91,3 +91,18 @@ export const mockResponseWithDataParsedWithoutHouseNumber = {
 export const mockEmptyResponse = {
     features: [] as string[]
 };
+
+// Mock data for category and places functionality
+import mockGeocoderResponseWithCategories from './test-data/mock-geocoder-response-with-categories.json';
+import mockPlacesApiResponse from './test-data/mock-places-api-response.json';
+import mockPlacesApiEmpty from './test-data/mock-places-api-empty.json';
+import mockGeocoderResponseEmpty from './test-data/mock-geocoder-response-empty.json';
+import mockIpInfoResponse from './test-data/mock-ip-info-response.json';
+
+export { 
+    mockGeocoderResponseWithCategories,
+    mockPlacesApiResponse,
+    mockPlacesApiEmpty,
+    mockGeocoderResponseEmpty,
+    mockIpInfoResponse
+};
