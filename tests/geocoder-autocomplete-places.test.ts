@@ -280,6 +280,56 @@ describe('Category Search and Places List', () => {
             
             expect(labelElement?.textContent).toBe('Food & Dining Places');
         });
+
+        it('should navigate dropdown with arrow down key and populate input with category', async () => {
+            fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
+            
+            inputText(container, 'caf');
+            await wait(WAIT_TIME);
+            
+            // Verify dropdown is open with categories
+            const dropdown = container.querySelector('.geoapify-autocomplete-items');
+            expect(dropdown).toBeTruthy();
+            expectCategoryInDropdown(container, 2);
+            
+            // Press arrow down to select first item (first category)
+            inputTextWithEvent(container, 'caf', 'ArrowDown');
+            
+            // Check that the first category label is populated in the input
+            const inputElement = container.querySelector('input') as HTMLInputElement;
+            expect(inputElement.value).toBe('Food & Dining Places');
+        });
+
+        it('should close dropdown and trigger places request when Enter is pressed on category', async () => {
+            const placesSpy = addPlacesSpy(autocomplete);
+            
+            fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
+            inputText(container, 'caf');
+            await wait(WAIT_TIME);
+            
+            // Verify dropdown is open
+            let dropdown = container.querySelector('.geoapify-autocomplete-items');
+            expect(dropdown).toBeTruthy();
+            
+            // Press arrow down to navigate to first category
+            inputTextWithEvent(container, 'caf', 'ArrowDown');
+            
+            // Mock IP info and places API for when category is selected
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            
+            // Press Enter to select the category
+            inputTextWithEvent(container, 'Food & Dining Places', 'Enter');
+            await wait(WAIT_TIME);
+            
+            // Dropdown should be closed
+            dropdown = container.querySelector('.geoapify-autocomplete-items');
+            expect(dropdown).toBeNull();
+            
+            // Category should be set and places request should be triggered
+            expect(autocomplete.getCategory()).toBeTruthy();
+            expect(placesSpy).toHaveBeenCalledWith(mockPlacesApiResponse.features);
+        });
     });
 
     // ========================================================================
@@ -934,6 +984,103 @@ describe('Category Search and Places List', () => {
             
             const loadMoreButton = getLoadMoreButton(container);
             expect(loadMoreButton).toBeFalsy();
+        });
+    });
+
+    // ========================================================================
+    // 12. PROGRAMMATIC PLACE SELECTION (selectPlace API)
+    // ========================================================================
+
+    describe('Programmatic Place Selection', () => {
+        beforeEach(() => {
+            autocomplete = new GeocoderAutocomplete(container, "XXXXX", optionsWithPlacesList);
+        });
+
+        it('should add active class to selected place using selectPlace()', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Select the second place (index 1)
+            autocomplete.selectPlace(1);
+
+            const placeItems = getPlacesListItems(container);
+            expect(placeItems?.[1]).toHaveClass('active');
+            expect(placeItems?.[0]).not.toHaveClass('active');
+            expect(placeItems?.[2]).not.toHaveClass('active');
+        });
+
+        it('should clear active class when selectPlace(null) is called', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Select a place first
+            autocomplete.selectPlace(2);
+            let placeItems = getPlacesListItems(container);
+            expect(placeItems?.[2]).toHaveClass('active');
+
+            // Clear selection
+            autocomplete.selectPlace(null);
+            placeItems = getPlacesListItems(container);
+            placeItems?.forEach(item => {
+                expect(item).not.toHaveClass('active');
+            });
+        });
+
+        it('should clear active class when selectPlace(-1) is called', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Select a place first
+            autocomplete.selectPlace(1);
+            let placeItems = getPlacesListItems(container);
+            expect(placeItems?.[1]).toHaveClass('active');
+
+            // Clear selection with negative index
+            autocomplete.selectPlace(-1);
+            placeItems = getPlacesListItems(container);
+            placeItems?.forEach(item => {
+                expect(item).not.toHaveClass('active');
+            });
+        });
+
+        it('should move selection when selectPlace is called multiple times', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Select first place
+            autocomplete.selectPlace(0);
+            let placeItems = getPlacesListItems(container);
+            expect(placeItems?.[0]).toHaveClass('active');
+
+            // Select third place
+            autocomplete.selectPlace(2);
+            placeItems = getPlacesListItems(container);
+            expect(placeItems?.[0]).not.toHaveClass('active');
+            expect(placeItems?.[2]).toHaveClass('active');
+        });
+
+        it('should do nothing when selectPlace is called without showPlacesList', async () => {
+            const autocompleteNoList = new GeocoderAutocomplete(
+                container,
+                "XXXXX",
+                optionsWithCategorySearch // No showPlacesList
+            );
+
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocompleteNoList.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Should not throw error
+            expect(() => autocompleteNoList.selectPlace(0)).not.toThrow();
         });
     });
 });

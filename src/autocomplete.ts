@@ -16,6 +16,7 @@ import { Category, GeocoderEventType } from "./types/external";
 export class GeocoderAutocomplete {
 
     private inputElement: HTMLInputElement;
+    private inputWrapper: HTMLElement;
     private inputClearButton: HTMLElement;
     private autocompleteItemsElement: HTMLElement = null;
     
@@ -27,6 +28,9 @@ export class GeocoderAutocomplete {
 
     /* Current autocomplete items data (GeoJSON.Feature) */
     private currentItems: any;
+
+    /* Current categories displayed in dropdown */
+    private currentCategories: Category[] = [];
 
     /* Active request promise reject function. To be able to cancel the promise when a new request comes */
     private currentPromiseReject: any;
@@ -64,7 +68,7 @@ export class GeocoderAutocomplete {
         this.constructOptions(options);
 
         this.inputElement = document.createElement("input");
-        DomHelper.createInputElement(this.inputElement, this.options, this.container);
+        this.inputWrapper = DomHelper.createInputElement(this.inputElement, this.options, this.container);
 
         this.addClearButton();
 
@@ -77,10 +81,10 @@ export class GeocoderAutocomplete {
             onLoadMore: (category: string, offset: number, limit?: number) => {
                 return this.sendPlacesRequestOrAlt(category, undefined, undefined, offset, limit);
             },
-            onPlacesUpdate: (allPlaces: any[]) => {
+            onPlacesUpdate: (allPlaces: GeoJSON.Feature[]) => {
                 this.callbacks.notifyPlaces(allPlaces);
             },
-            onPlaceSelect: (place: any, index: number) => {
+            onPlaceSelect: (place: GeoJSON.Feature, index: number) => {
                 this.callbacks.notifyPlaceSelect(place, index);
                 
                 // Auto-hide places list if option is enabled
@@ -323,6 +327,22 @@ export class GeocoderAutocomplete {
         return this.categoryManager.getCategory();
     }
 
+    public selectPlace(index: number | null): void {
+        // Only works with built-in places list
+        if (!this.options.showPlacesList) {
+            return;
+        }
+
+        // If index is null or negative, clear selection
+        if (index === null || index < 0) {
+            this.placesListManager.clearSelection();
+            return;
+        }
+
+        // Select the place (no validation - let the user manage that)
+        this.placesListManager.selectPlace(index);
+    }
+
     public async sendPlacesRequest(
         category: string,
         bias?: string,
@@ -410,23 +430,23 @@ export class GeocoderAutocomplete {
 
         this.callbacks.notifySuggestions(this.currentItems);
 
-        let categories: Category[] = [];
+        this.currentCategories = [];
         if (this.isCategoryModeEnabled() && data.query?.categories) {
-            categories = this.categoryManager.extractCategoriesFromResponse(data);
+            this.currentCategories = this.categoryManager.extractCategoriesFromResponse(data);
         }
 
-        if (!this.currentItems.length && !categories.length) {
+        if (!this.currentItems.length && !this.currentCategories.length) {
             return;
         }
 
         this.createDropdown();
 
-        categories.forEach((category: Category) => {
+        this.currentCategories.forEach((category: Category) => {
             this.populateCategoryDropdownItem(category, event);
         });
 
         this.currentItems.forEach((feature: any, index: number) => {
-            this.populateDropdownItem(feature, userEnteredValue, event, index + categories.length);
+            this.populateDropdownItem(feature, userEnteredValue, event, index + this.currentCategories.length);
         });
     }
 
@@ -492,8 +512,8 @@ export class GeocoderAutocomplete {
 
         this.callbacks.notifyOpened();
 
-        /* Append the DIV element as a child of the autocomplete container:*/
-        this.container.appendChild(this.autocompleteItemsElement);
+        /* Append the DIV element as a child of the input wrapper:*/
+        this.inputWrapper.appendChild(this.autocompleteItemsElement);
     }
 
     private cancelPreviousTimeout() {
@@ -588,11 +608,22 @@ export class GeocoderAutocomplete {
         /* If the ENTER key is pressed and value as selected, close the list*/
         event.preventDefault();
         if (this.focusedItemIndex > -1) {
-            if (this.options.skipSelectionOnArrowKey) {
-                // select the location if it wasn't selected by navigation
-                this.setValueAndNotify(this.currentItems[this.focusedItemIndex]);
+            const categoryCount = this.currentCategories.length;
+            
+            // Check if the focused item is a category
+            if (this.focusedItemIndex < categoryCount) {
+                // It's a category - trigger setCategory
+                const category = this.currentCategories[this.focusedItemIndex];
+                this.setCategory(category);
             } else {
-                this.closeDropDownList();
+                // It's a regular geocoder item
+                const itemIndex = this.focusedItemIndex - categoryCount;
+                if (this.options.skipSelectionOnArrowKey) {
+                    // select the location if it wasn't selected by navigation
+                    this.setValueAndNotify(this.currentItems[itemIndex]);
+                } else {
+                    this.closeDropDownList();
+                }
             }
         }
     }
@@ -622,13 +653,23 @@ export class GeocoderAutocomplete {
         DomHelper.addActiveClassToDropdownItem(items, index);
 
         if (!this.options.skipSelectionOnArrowKey) {
-            // Change input value and notify
-            if (CalculationHelper.returnIfFunction(this.postprocessHook)) {
-                this.inputElement.value = this.postprocessHook(this.currentItems[index]);
+            const categoryCount = this.currentCategories.length;
+            
+            // Check if the focused item is a category
+            if (index < categoryCount) {
+                // It's a category item
+                const category = this.currentCategories[index];
+                this.inputElement.value = category.label;
             } else {
-                this.inputElement.value = this.currentItems[index].properties.formatted;
+                // It's a regular geocoder item
+                const itemIndex = index - categoryCount;
+                if (CalculationHelper.returnIfFunction(this.postprocessHook)) {
+                    this.inputElement.value = this.postprocessHook(this.currentItems[itemIndex]);
+                } else {
+                    this.inputElement.value = this.currentItems[itemIndex].properties.formatted;
+                }
+                this.notifyValueSelected(this.currentItems[itemIndex]);
             }
-            this.notifyValueSelected(this.currentItems[index]);
         }
     }
 
@@ -670,7 +711,7 @@ export class GeocoderAutocomplete {
 
     private closeDropDownList() {
         if (this.autocompleteItemsElement) {
-            this.container.removeChild(this.autocompleteItemsElement);
+            this.inputWrapper.removeChild(this.autocompleteItemsElement);
             this.autocompleteItemsElement = null;
             this.callbacks.notifyClosed();
         }
@@ -754,7 +795,7 @@ export class GeocoderAutocomplete {
         this.inputClearButton.classList.add("geoapify-close-button");
         DomHelper.addIcon(this.inputClearButton, 'close');
         this.inputClearButton.addEventListener("click", this.clearFieldAndNotify.bind(this), false);
-        this.container.appendChild(this.inputClearButton);
+        this.inputWrapper.appendChild(this.inputClearButton);
     }
 
     private async onCategorySelect(category: Category | string): Promise<void> {
@@ -762,6 +803,9 @@ export class GeocoderAutocomplete {
         
         this.inputElement.value = categoryObj.label;
         this.showClearButton();
+
+        // Close the dropdown when a category is selected
+        this.closeDropDownList();
 
         this.callbacks.notifyPlacesRequestStart(categoryObj.category);
 

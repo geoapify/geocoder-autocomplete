@@ -1,3 +1,7 @@
+.geoapify-input-wrapper {
+    position: relative;
+}
+
 .geoapify-autocomplete-input {
     padding: 0 31px 0 7px;
     width: calc(100% - 40px);
@@ -101,15 +105,9 @@
 
 
 .geoapify-places-list {
-    position: absolute;
     border: 1px solid rgba(0, 0, 0, 0.3);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: none;
     background-color: #fff;
-    
-    z-index: 99;
-    top: calc(100% + 10px);
-    left: 0;
-    right: 0;
     overflow-y: auto;
     display: none;
 }

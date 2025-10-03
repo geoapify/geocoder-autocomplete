@@ -9,12 +9,12 @@ export class Callbacks {
     public requestStartCallbacks: ((query: string) => void)[] = [];
     public requestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
     
-    public placesCallbacks: ((places: any[]) => void)[] = [];
+    public placesCallbacks: ((places: GeoJSON.Feature[]) => void)[] = [];
     public placesRequestStartCallbacks: ((category: string) => void)[] = [];
     public placesRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
-    public placeDetailsRequestStartCallbacks: ((place: any) => void)[] = [];
+    public placeDetailsRequestStartCallbacks: ((place: GeoJSON.Feature) => void)[] = [];
     public placeDetailsRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
-    public placeSelectCallbacks: ((place: any, index: number) => void)[] = [];
+    public placeSelectCallbacks: ((place: GeoJSON.Feature, index: number) => void)[] = [];
 
     public clearCallbacks: ((itemType: ItemType) => void)[] = [];
 
@@ -67,7 +67,7 @@ export class Callbacks {
         this.requestEndCallbacks.forEach(callback => callback(success, data, error));
     }
 
-    notifyPlaces(places: any[]) {
+    notifyPlaces(places: GeoJSON.Feature[]) {
         this.placesCallbacks.forEach(callback => callback(places));
     }
 
@@ -79,7 +79,7 @@ export class Callbacks {
         this.placesRequestEndCallbacks.forEach(callback => callback(success, data, error));
     }
 
-    notifyPlaceDetailsRequestStart(place: any) {
+    notifyPlaceDetailsRequestStart(place: GeoJSON.Feature) {
         this.placeDetailsRequestStartCallbacks.forEach(callback => callback(place));
     }
 
@@ -87,7 +87,7 @@ export class Callbacks {
         this.placeDetailsRequestEndCallbacks.forEach(callback => callback(success, data, error));
     }
 
-    notifyPlaceSelect(place: any, index: number) {
+    notifyPlaceSelect(place: GeoJSON.Feature, index: number) {
         this.placeSelectCallbacks.forEach(callback => callback(place, index));
     }
 

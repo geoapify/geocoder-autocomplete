@@ -81,6 +81,7 @@ const markerIcon = L.icon({
 
 let marker;
 let placesMarkers = [];
+let currentPlaces = [];
 
 function clearPlacesMarkers() {
     placesMarkers.forEach(m => m.remove());
@@ -108,6 +109,7 @@ autocompleteInput.on('select', (location) => {
 // Handle places results (when category is selected) - now with map integration
 autocompleteInput.on('places', (places) => {
     clearPlacesMarkers();
+    currentPlaces = places; // Store for later use
     
     console.log(`Found ${places.length} places`);
     
@@ -122,14 +124,35 @@ autocompleteInput.on('places', (places) => {
             const name = place.properties.name || place.properties.formatted;
             placeMarker.bindPopup(name);
             
+            // When marker is clicked, select the place in the built-in list
+            placeMarker.on('click', () => {
+                // Highlight in list
+                autocompleteInput.selectPlace(index);
+                // Pan and zoom (same as place_select callback)
+                map.panTo([place.properties.lat, place.properties.lon]);
+                placeMarker.openPopup();
+                if (map.getZoom() < 16) {
+                    map.setZoom(16);
+                }
+            });
+            
             placesMarkers.push(placeMarker);
         }
     });
     
-    // Fit map to show all places if there are any
+    // Only adjust map if NO places are currently visible
     if (placesMarkers.length > 0) {
-        const group = new L.featureGroup(placesMarkers);
-        map.fitBounds(group.getBounds().pad(0.1));
+        // Check if at least one place is visible on the current map bounds
+        const mapBounds = map.getBounds();
+        const hasVisiblePlace = placesMarkers.some(marker => 
+            mapBounds.contains(marker.getLatLng())
+        );
+        
+        // Only fit bounds if no places are visible on the map
+        if (!hasVisiblePlace) {
+            const group = new L.featureGroup(placesMarkers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
     }
 });
 
@@ -146,6 +169,9 @@ autocompleteInput.on('clear', (context) => {
 
 autocompleteInput.on('place_select', (place, index) => {
     console.log('Place selected:', place.properties.name, 'at index:', index);
+    
+    // Highlight the place in the list
+    autocompleteInput.selectPlace(index);
     
     if (placesMarkers[index]) {
         map.panTo([place.properties.lat, place.properties.lon]);

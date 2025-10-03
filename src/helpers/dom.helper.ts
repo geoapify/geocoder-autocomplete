@@ -4,11 +4,18 @@ import countiesData from "../countries.json";
 export class DomHelper {
     public static createInputElement(inputElement: HTMLInputElement,
                                       options: GeocoderAutocompleteOptions,
-                                      container: HTMLElement) {
+                                      container: HTMLElement): HTMLElement {
         inputElement.classList.add("geoapify-autocomplete-input");
         inputElement.setAttribute("type", "text");
         inputElement.setAttribute("placeholder", options.placeholder || "Enter an address here");
-        container.appendChild(inputElement);
+        
+        // Create wrapper for input and close button
+        const inputWrapper = document.createElement("div");
+        inputWrapper.classList.add("geoapify-input-wrapper");
+        inputWrapper.appendChild(inputElement);
+        container.appendChild(inputWrapper);
+        
+        return inputWrapper;
     }
 
     public static addFeatureIcon(element: HTMLElement, type: string, countryCode: string) {

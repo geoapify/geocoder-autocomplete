@@ -331,6 +331,11 @@ autocompleteInput.on('places', (places) => {
             const name = place.properties.name || place.properties.formatted;
             placeMarker.bindPopup(name);
             
+            // When marker is clicked, select the corresponding place in the list
+            placeMarker.on('click', () => {
+                selectPlaceFromList(place, index);
+            });
+            
             placesMarkers.push(placeMarker);
         }
     });

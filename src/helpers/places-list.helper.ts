@@ -2,9 +2,9 @@ import { DomHelper } from "./dom.helper";
 import { GeocoderAutocompleteOptions } from "../autocomplete";
 
 export interface PlacesListCallbacks {
-    onPlaceSelect?: (place: any, index: number) => void;
+    onPlaceSelect?: (place: GeoJSON.Feature, index: number) => void;
     onLoadMore?: (category: string, offset: number, limit?: number) => Promise<any>;
-    onPlacesUpdate?: (allPlaces: any[]) => void;
+    onPlacesUpdate?: (allPlaces: GeoJSON.Feature[]) => void;
 }
 
 interface PlaceData {
@@ -26,7 +26,7 @@ export class PlacesListManager {
     private currentPlacesCategory: string = null;
     private isLoadingMorePlaces: boolean = false;
     private hasMorePlaces: boolean = true;
-    private allPlaces: any[] = [];
+    private allPlaces: GeoJSON.Feature[] = [];
 
     constructor(
         container: HTMLElement, 
@@ -38,7 +38,7 @@ export class PlacesListManager {
         this.callbacks = callbacks;
     }
 
-    public showPlacesList(places: any[], category: string, isLoadMore: boolean = false): void {
+    public showPlacesList(places: GeoJSON.Feature[], category: string, isLoadMore: boolean = false): void {
         if (!this.options.showPlacesList || !places?.length) return;
 
         // Create elements if they don't exist
@@ -94,6 +94,36 @@ export class PlacesListManager {
         this.clearPlacesList();
     }
 
+    public selectPlace(index: number): void {
+        if (!this.placesListElement) return;
+
+        // Remove previous selection
+        const placeItems = this.placesListElement.querySelectorAll('.geoapify-places-item');
+        placeItems.forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Add selection to the specified item
+        const targetItem = this.placesListElement.querySelector(`[data-index="${index}"]`);
+        if (targetItem) {
+            targetItem.classList.add('active');
+            // Scroll item into view if needed (if supported)
+            if (typeof targetItem.scrollIntoView === 'function') {
+                targetItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }
+
+    public clearSelection(): void {
+        if (!this.placesListElement) return;
+
+        // Remove selection from all items
+        const placeItems = this.placesListElement.querySelectorAll('.geoapify-places-item');
+        placeItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
     private createPlacesElements(): void {
         if (!this.options.showPlacesList) return;
 
@@ -103,7 +133,7 @@ export class PlacesListManager {
         this.container.appendChild(this.placesListElement);
     }
 
-    private renderPlaces(places: any[], isLoadMore: boolean): void {
+    private renderPlaces(places: GeoJSON.Feature[], isLoadMore: boolean): void {
         const startIndex = isLoadMore ? this.placesListElement.children.length : 0;
         
         places.forEach((place, index) => {
@@ -140,7 +170,7 @@ export class PlacesListManager {
     // PLACE ITEM CREATION
     // ========================================================================
 
-    private createPlaceItem(place: any, index: number): HTMLElement {
+    private createPlaceItem(place: GeoJSON.Feature, index: number): HTMLElement {
         const placeElement = document.createElement('div');
         placeElement.className = 'geoapify-places-item';
         placeElement.dataset.index = index.toString();
@@ -161,7 +191,7 @@ export class PlacesListManager {
         return placeElement;
     }
 
-    private extractPlaceData(place: any): PlaceData {
+    private extractPlaceData(place: GeoJSON.Feature): PlaceData {
         const props = place.properties;
         return {
             name: props.name || 'Unknown Place',
@@ -304,20 +334,10 @@ export class PlacesListManager {
         }
     }
 
-    private selectPlaceFromList(place: any, index: number): void {
+    private selectPlaceFromList(place: GeoJSON.Feature, index: number): void {
         if (!this.options.showPlacesList) return;
 
-        // Remove previous selection
-        const placeItems = this.placesListElement?.querySelectorAll('.geoapify-places-item');
-        placeItems?.forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // Add selection to clicked item
-        const clickedItem = this.placesListElement?.querySelector(`[data-index="${index}"]`);
-        clickedItem?.classList.add('active');
-        
-        // Notify callback
+        // Built-in list doesn't track selection - just notify callback
         this.callbacks.onPlaceSelect?.(place, index);
     }
 }
