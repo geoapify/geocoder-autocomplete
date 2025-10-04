@@ -333,7 +333,11 @@ Here's a description of the API methods:
 | *open(): void* | Manually opens the suggestions dropdown. |
 | *setCategory(category: Category or string or null): void* | Sets the selected category for places search. Pass null to clear the category. |
 | *getCategory(): Category or null* | Retrieves the currently selected category. |
-| *clearPlacesList(): void* | Manually clears the places list display. |
+| *selectPlace(index: number or null): void* | Programmatically selects a place from the places list by index. Pass null to clear selection. |
+| *setGeocoderUrl(url: string): void* | Overrides the default Geocoder API URL. |
+| *setPlaceDetailsUrl(url: string): void* | Overrides the default Place Details API URL. |
+| *setPlacesApiUrl(url: string): void* | Overrides the default Places API URL. |
+| *setIpGeolocationUrl(url: string): void* | Overrides the default IP Geolocation API URL. |
 | *sendGeocoderRequest(value: string): Promise<GeoJSON.FeatureCollection>* | Sends a geocoder request based on the provided value and returns a Promise with the response in [GeoJSON FeatureCollection](https://en.wikipedia.org/wiki/GeoJSON) format containing suggestions. |
 | *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
 | *sendPlacesRequest(category: string, biasLocation?: {lat: number; lon: number}, filterLocation?: {lat: number; lon: number}, offset?: number, limit?: number): Promise<GeoJSON.FeatureCollection>* | Sends a places search request for the specified category and returns a Promise with the response in GeoJSON FeatureCollection format containing places. |

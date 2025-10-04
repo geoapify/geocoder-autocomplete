@@ -10,12 +10,12 @@ export class PlacesApiHelper {
         category: string,
         apiKey: string,
         options: GeocoderAutocompleteOptions,
+        placesApiUrl: string,
         location?: GeoPosition | null,
         offset?: number,
         limit?: number
     ): string {
-        const placesUrl = options.placesApiUrl || this.DEFAULT_PLACES_API_URL;
-        let url = `${placesUrl}?categories=${encodeURIComponent(category)}&apiKey=${apiKey}`;
+        let url = `${placesApiUrl}?categories=${encodeURIComponent(category)}&apiKey=${apiKey}`;
 
         if (options.lang) {
             url += `&lang=${options.lang}`;
@@ -58,7 +58,8 @@ export class PlacesApiHelper {
 
     public static async getLocationForBias(
         apiKey: string,
-        options: GeocoderAutocompleteOptions
+        options: GeocoderAutocompleteOptions,
+        ipGeolocationUrl: string
     ): Promise<GeoPosition | null> {
         const existingProximity = options.bias?.['proximity'] as any;
         if (existingProximity && 
@@ -71,7 +72,6 @@ export class PlacesApiHelper {
         }
 
         try {
-            const ipGeolocationUrl = options.ipGeolocationUrl || this.IP_GEOLOCATION_URL;
             const ipUrl = `${ipGeolocationUrl}?apiKey=${apiKey}`;
             const response = await fetch(ipUrl);
             

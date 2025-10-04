@@ -149,6 +149,23 @@
     background: #f1f3f4;
 }
 
+.geoapify-places-lazy-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    gap: 8px;
+    border-top: 1px solid #e8eaed;
+    background: #f8f9fa;
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.geoapify-places-lazy-loading-spinner {
+    display: inline-flex;
+    align-items: center;
+}
+
 .geoapify-places-clock-icon {
     display: inline-flex;
     align-items: center;

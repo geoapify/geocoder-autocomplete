@@ -393,19 +393,6 @@ describe('Category Search and Places List', () => {
             expect(hoursElement?.textContent).toBe('Mo-Su 11:30-19:30');
         });
 
-        it('should clear places list using clearPlacesList()', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
-            
-            expectPlacesListVisible(container);
-            
-            autocomplete.clearPlacesList();
-            
-            const placeItems = getPlacesListItems(container);
-            expect(placeItems?.length).toBe(0);
-        });
 
         it('should not display places list when showPlacesList is false', async () => {
             const autocompleteNoList = new GeocoderAutocomplete(
@@ -624,6 +611,54 @@ describe('Category Search and Places List', () => {
             await wait(WAIT_TIME);
             
             expect(autocomplete.getValue()).toBe('');
+        });
+
+        it('should notify "category" when user types and category was active', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+            
+            const clearSpy = addClearSpy(autocomplete);
+            
+            fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
+            inputText(container, 'new search');
+            await wait(WAIT_TIME);
+            
+            expect(clearSpy).toHaveBeenCalledWith('category');
+        });
+
+        it('should NOT send duplicate clear events when clearing category via clear button', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+            
+            const clearSpy = addClearSpy(autocomplete);
+            
+            const clearButton = container.querySelector('.geoapify-close-button') as HTMLElement;
+            clearButton.click();
+            await wait(WAIT_TIME);
+            
+            // Should only be called once with 'category'
+            expect(clearSpy).toHaveBeenCalledTimes(1);
+            expect(clearSpy).toHaveBeenCalledWith('category');
+        });
+
+        it('should notify "place" when clearing without category active', async () => {
+            fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
+            inputText(container, 'some text');
+            await wait(WAIT_TIME);
+            
+            const clearSpy = addClearSpy(autocomplete);
+            
+            const clearButton = container.querySelector('.geoapify-close-button') as HTMLElement;
+            clearButton.click();
+            await wait(WAIT_TIME);
+            
+            expect(clearSpy).toHaveBeenCalledWith('place');
         });
     });
 

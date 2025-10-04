@@ -52,6 +52,8 @@ export class GeocoderAutocomplete {
 
     private geocoderUrl = "https://api.geoapify.com/v1/geocode/autocomplete";
     private placeDetailsUrl = "https://api.geoapify.com/v2/place-details";
+    private placesApiUrl = "https://api.geoapify.com/v2/places";
+    private ipGeolocationUrl = "https://api.geoapify.com/v1/ipinfo";
 
     private readonly categoryManager: CategoryManager;
     private sendPlacesRequestAlt?: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>;
@@ -102,6 +104,14 @@ export class GeocoderAutocomplete {
 
     public setPlaceDetailsUrl(placeDetailsUrl: string) {
         this.placeDetailsUrl = placeDetailsUrl;
+    }
+
+    public setPlacesApiUrl(placesApiUrl: string) {
+        this.placesApiUrl = placesApiUrl;
+    }
+
+    public setIpGeolocationUrl(ipGeolocationUrl: string) {
+        this.ipGeolocationUrl = ipGeolocationUrl;
     }
 
     public setType(type: 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity') {
@@ -250,10 +260,6 @@ export class GeocoderAutocomplete {
         }
     }
 
-    public clearPlacesList() {
-        this.placesListManager.clearPlacesList();
-    }
-
     private sendGeocoderRequestOrAlt(currentValue: string): Promise<any> {
         if (this.sendGeocoderRequestAlt) {
             return this.sendGeocoderRequestAlt(currentValue, this);
@@ -310,12 +316,11 @@ export class GeocoderAutocomplete {
     }
 
     public setCategory(category: Category | string | null): void {
-        this.categoryManager.setCategory(category);
-
         if (category) {
+            this.categoryManager.setCategory(category);
             this.onCategorySelect(category);
         } else {
-            this.clearCategory();
+            this.clearCategoryAndNotify();
         }
     }
 
@@ -376,8 +381,7 @@ export class GeocoderAutocomplete {
         this.callbacks.notifyInputChange(currentValue);
 
         /* Reset category mode and clear places list when user types */
-        this.categoryManager.clearCategory();
-        this.placesListManager.resetCategory();
+        this.clearCategoryAndNotify();
 
         /* Close any already open dropdown list */
         this.closeDropDownList();
@@ -681,9 +685,7 @@ export class GeocoderAutocomplete {
         }
 
         // Clear category when selecting a regular place from main dropdown
-        if (this.isCategoryModeEnabled() && this.categoryManager.isCategoryModeActive()) {
-            this.clearCategory();
-        }
+        this.clearCategoryAndNotify();
 
         this.notifyValueSelected(feature);
 
@@ -702,9 +704,11 @@ export class GeocoderAutocomplete {
         this.cancelCurrentPlacesRequest();
         this.closeDropDownList();
 
-        const isCategory = this.isCategoryModeEnabled() && this.categoryManager.isCategoryModeActive();
-        this.clearCategory();
-        this.callbacks.notifyClear(isCategory ? 'category' : 'place');
+        if (this.isCategoryModeEnabled() && this.categoryManager.isCategoryModeActive()) {
+            this.clearCategoryAndNotify();
+        } else {
+            this.callbacks.notifyClear('place');
+        }
 
         this.notifyValueSelected(null);
     }
@@ -830,12 +834,16 @@ export class GeocoderAutocomplete {
         return !!this.options.addCategorySearch;
     }
 
-    private clearCategory(): void {
+    private clearCategoryAndNotify(): void {
         if (!this.isCategoryModeEnabled()) return;
         
+        const wasCategoryActive = this.categoryManager.isCategoryModeActive();
         this.categoryManager.clearCategory();
         this.placesListManager.resetCategory();
-        this.callbacks.notifyClear('category');
+        
+        if (wasCategoryActive) {
+            this.callbacks.notifyClear('category');
+        }
     }
 
     /**
@@ -852,8 +860,8 @@ export class GeocoderAutocomplete {
             return this.sendPlacesRequestAlt(category, this, offset, limit);
         }
 
-        const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options);
-        let url = PlacesApiHelper.generatePlacesUrl(category, this.apiKey, this.options, location, offset, limit);
+        const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options, this.ipGeolocationUrl);
+        let url = PlacesApiHelper.generatePlacesUrl(category, this.apiKey, this.options, this.placesApiUrl, location, offset, limit);
 
         if (bias) {
             url += `&bias=${encodeURIComponent(bias)}`;
@@ -899,8 +907,7 @@ export interface GeocoderAutocompleteOptions {
     addCategorySearch?: boolean;
     showPlacesList?: boolean;
     hidePlacesListAfterSelect?: boolean;
-    placesApiUrl?: string;
-    ipGeolocationUrl?: string;
+    enablePlacesLazyLoading?: boolean;
 }
 
 export interface GeoPosition {

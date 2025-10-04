@@ -20,6 +20,7 @@ export class PlacesListManager {
 
     private placesListElement: HTMLElement = null;
     private loadMoreButton: HTMLElement = null;
+    private lazyLoadingIndicator: HTMLElement = null;
     
     // Pagination state
     private currentPlacesOffset: number = 0;
@@ -27,6 +28,9 @@ export class PlacesListManager {
     private isLoadingMorePlaces: boolean = false;
     private hasMorePlaces: boolean = true;
     private allPlaces: GeoJSON.Feature[] = [];
+    
+    // Lazy loading
+    private scrollListener: ((event: Event) => void) | null = null;
 
     constructor(
         container: HTMLElement, 
@@ -65,9 +69,13 @@ export class PlacesListManager {
         this.currentPlacesOffset += places.length;
         this.hasMorePlaces = places.length >= (this.options.limit || 5);
 
-        // Add load more button if needed
+        // Add load more button or setup lazy loading
         if (this.hasMorePlaces) {
-            this.createLoadMoreButton();
+            if (this.options.enablePlacesLazyLoading) {
+                this.setupLazyLoading();
+            } else {
+                this.createLoadMoreButton();
+            }
         }
 
         // Show list
@@ -86,6 +94,7 @@ export class PlacesListManager {
             this.placesListElement.style.display = 'none';
         }
         
+        this.removeLazyLoadingListener();
         this.resetPaginationState();
     }
 
@@ -309,10 +318,12 @@ export class PlacesListManager {
             } else {
                 this.hasMorePlaces = false;
                 this.removeLoadMoreButton();
+                this.hideLazyLoadingIndicator();
             }
         } catch (error) {
             console.error('Failed to load more places:', error);
             this.updateLoadMoreButtonState(false);
+            this.hideLazyLoadingIndicator();
         } finally {
             this.isLoadingMorePlaces = false;
         }
@@ -339,5 +350,82 @@ export class PlacesListManager {
 
         // Built-in list doesn't track selection - just notify callback
         this.callbacks.onPlaceSelect?.(place, index);
+    }
+
+    private setupLazyLoading(): void {
+        if (!this.placesListElement || !this.options.enablePlacesLazyLoading) return;
+
+        // Remove existing listener to avoid duplicates
+        this.removeLazyLoadingListener();
+
+        // Create and attach new scroll listener
+        this.scrollListener = (event: Event) => this.onScrollHandler(event);
+        this.placesListElement.addEventListener('scroll', this.scrollListener);
+        
+        // Create loading indicator
+        this.createLazyLoadingIndicator();
+    }
+
+    private removeLazyLoadingListener(): void {
+        if (this.scrollListener && this.placesListElement) {
+            this.placesListElement.removeEventListener('scroll', this.scrollListener);
+            this.scrollListener = null;
+        }
+        this.removeLazyLoadingIndicator();
+    }
+
+    private onScrollHandler(event: Event): void {
+        if (!this.placesListElement || this.isLoadingMorePlaces || !this.hasMorePlaces) {
+            return;
+        }
+
+        const element = this.placesListElement;
+        const scrollTop = element.scrollTop;
+        const scrollHeight = element.scrollHeight;
+        const clientHeight = element.clientHeight;
+
+        // Calculate distance from bottom (threshold: 100px from bottom)
+        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+        const threshold = 100;
+
+        // Trigger load more when user is close to the bottom
+        if (distanceFromBottom < threshold) {
+            this.showLazyLoadingIndicator();
+            this.loadMorePlaces();
+         }
+    }
+
+    private createLazyLoadingIndicator(): void {
+        if (!this.placesListElement || this.lazyLoadingIndicator) return;
+
+        this.lazyLoadingIndicator = document.createElement('div');
+        this.lazyLoadingIndicator.className = 'geoapify-places-lazy-loading';
+        this.lazyLoadingIndicator.style.display = 'none';
+
+        const spinnerElement = document.createElement('span');
+        spinnerElement.className = 'geoapify-places-lazy-loading-spinner';
+        DomHelper.addSpinnerIcon(spinnerElement);
+
+        this.lazyLoadingIndicator.appendChild(spinnerElement);
+        this.placesListElement.appendChild(this.lazyLoadingIndicator);
+    }
+
+    private showLazyLoadingIndicator(): void {
+        if (this.lazyLoadingIndicator) {
+            this.lazyLoadingIndicator.style.display = 'flex';
+        }
+    }
+
+    private hideLazyLoadingIndicator(): void {
+        if (this.lazyLoadingIndicator) {
+            this.lazyLoadingIndicator.style.display = 'none';
+        }
+    }
+
+    private removeLazyLoadingIndicator(): void {
+        if (this.lazyLoadingIndicator) {
+            this.lazyLoadingIndicator.remove();
+            this.lazyLoadingIndicator = null;
+        }
     }
 }
