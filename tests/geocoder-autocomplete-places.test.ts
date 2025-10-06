@@ -13,6 +13,7 @@ import {
     getPlacesListItems,
     selectPlaceFromList,
     getLoadMoreButton,
+    scrollPlacesToBottom,
     clickLoadMoreButton,
     expectPlacesListVisible,
     expectPlacesListHidden,
@@ -375,8 +376,9 @@ describe('Category Search and Places List', () => {
             const nameElement = firstPlace?.querySelector('.geoapify-places-main-part');
             expect(nameElement?.textContent).toBe('Marlette');
             
-            const detailsElement = firstPlace?.querySelector('.geoapify-places-details');
-            expect(detailsElement).toBeTruthy();
+            // Check that hours info is displayed
+            const hoursInfo = firstPlace?.querySelector('.geoapify-places-hours-info');
+            expect(hoursInfo).toBeTruthy();
         });
 
         it('should show opening hours if available', async () => {
@@ -419,16 +421,19 @@ describe('Category Search and Places List', () => {
             autocomplete = new GeocoderAutocomplete(container, "XXXXX", optionsWithPlacesList);
         });
 
-        it('should display "Load More" button when more places are available', async () => {
+        it('should display "Load More" button when scrolled to bottom', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             
             await wait(WAIT_TIME);
             
+            // Scroll to bottom to trigger button
+            scrollPlacesToBottom(container);
+            
             const loadMoreButton = getLoadMoreButton(container);
             expect(loadMoreButton).toBeTruthy();
-            expect(loadMoreButton).toHaveClass('geoapify-places-load-more-button');
+            expect(loadMoreButton).toHaveClass('geoapify-places-status-bar-button');
         });
 
         it('should load more places when button is clicked', async () => {

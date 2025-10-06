@@ -226,10 +226,24 @@ export function selectPlaceFromList(container: HTMLDivElement, itemIndex: number
 
 export function getLoadMoreButton(container: HTMLDivElement): HTMLElement | null {
     const placesList = getPlacesListElement(container);
-    return placesList?.querySelector('.geoapify-places-load-more-button') || null;
+    return placesList?.querySelector('.geoapify-places-status-bar-button') || null;
+}
+
+export function scrollPlacesToBottom(container: HTMLDivElement) {
+    const placesList = getPlacesListElement(container);
+    const scrollContainer = placesList?.querySelector('.geoapify-places-scroll-container') as HTMLElement;
+    if (scrollContainer) {
+        // Scroll to bottom to trigger button appearance
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        // Trigger scroll event
+        scrollContainer.dispatchEvent(new Event('scroll'));
+    }
 }
 
 export function clickLoadMoreButton(container: HTMLDivElement) {
+    // First scroll to bottom to make button appear
+    scrollPlacesToBottom(container);
+    
     const loadMoreButton = getLoadMoreButton(container);
     if (loadMoreButton) {
         loadMoreButton.click();
