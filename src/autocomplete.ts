@@ -820,7 +820,7 @@ export class GeocoderAutocomplete {
             const places = data.features || [];
             
             if (this.options.showPlacesList && places.length > 0) {
-                this.placesListManager.showPlacesList(places, categoryObj.category);
+                this.placesListManager.showPlacesList(places, categoryObj.category, categoryObj.label);
             } else {
                 this.callbacks.notifyPlaces(places);
             }

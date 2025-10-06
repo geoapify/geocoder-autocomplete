@@ -99,5 +99,9 @@ body.theme-round-borders-dark .theme-selector:hover {
 
 .geoapify-places-list {
   margin-top: 15px;
-  max-height: 400px;
+  max-width: 400px;
+}
+
+.geoapify-places-scroll-container {
+  max-height: 320px;
 }

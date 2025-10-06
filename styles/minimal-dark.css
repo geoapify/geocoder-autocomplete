@@ -93,18 +93,6 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
-.geoapify-places-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-left: 0;
-    padding-right: 8px;
-    font-size: small;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-
 .geoapify-autocomplete-items .main-part .non-verified {
     color: #ff8080;
 }
@@ -114,144 +102,182 @@
     border-top: none;
     background-color: #2a2a2a;
     color: #ffffff;
-    overflow-y: auto;
     display: none;
 }
 
-.geoapify-places-list div {
-    padding: 10px;
-    cursor: pointer;
+.geoapify-places-list.active {
+    display: block;
 }
 
-.geoapify-places-list div:hover {
-    background-color: #3a3a3a;
-}
-
-.geoapify-places-list .active {
-    background-color: #3a3a3a;
-}
-
-.geoapify-places-load-more-button {
+/* Title Bar */
+.geoapify-places-title-bar {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 12px 16px;
-    cursor: pointer;
-    border-top: 1px solid #4a4a4a;
-    background: #2d2d2d;
-    color: #b3b3b3;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-    gap: 8px;
+    gap: 6px;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: #333333;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
-.geoapify-places-load-more-button:hover {
-    background: #404040;
-}
-
-.geoapify-places-load-more-button.loading {
-    cursor: wait;
-    background: #353535;
-}
-
-.geoapify-places-lazy-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    gap: 8px;
-    border-top: 1px solid #4a4a4a;
-    background: #2d2d2d;
-    color: #b3b3b3;
-    font-size: 14px;
-}
-
-.geoapify-places-lazy-loading-spinner {
+.geoapify-places-title-icon {
     display: inline-flex;
     align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.geoapify-places-title-icon svg {
+    height: 14px;
+    width: 14px;
+}
+
+.geoapify-places-title-label {
+    font-weight: 500;
+}
+
+/* Scroll Container */
+.geoapify-places-scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
+/* Custom scrollbar for webkit browsers */
+.geoapify-places-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.geoapify-places-scroll-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+}
+
+.geoapify-places-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 3px;
+}
+
+.geoapify-places-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Place Items */
+.geoapify-places-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background-color 0.15s ease;
+    min-width: 0; /* Allow flex item to shrink below content size */
+}
+
+.geoapify-places-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.geoapify-places-item.active {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.geoapify-places-item:last-child {
+    border-bottom: none;
+}
+
+.geoapify-places-main-part {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0; /* Allow text to shrink */
+}
+
+.geoapify-places-hours-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .geoapify-places-clock-icon {
     display: inline-flex;
     align-items: center;
-    margin-right: 4px;
     color: rgba(255, 255, 255, 0.6);
-    vertical-align: middle;
 }
 
 .geoapify-places-clock-icon svg {
-    height: 12px;
-    width: 12px;
-}
-
-.geoapify-places-address-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 0;
-    flex: 1;
-    overflow: hidden;
-}
-
-.geoapify-places-address-element {
-    flex: 1;
-    min-width: 0;
-    font-size: small;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.geoapify-places-hours-container {
-    display: flex;
-    align-items: center;
-    margin-left: 12px;
-    padding-right: 8px;
-    flex-shrink: 0;
+    height: 14px;
+    width: 14px;
 }
 
 .geoapify-places-hours-text {
     white-space: nowrap;
-    font-size: 12px;
+    font-size: 13px;
 }
 
-.geoapify-places-load-more-icon {
+/* Status Bar */
+.geoapify-places-status-bar {
     display: flex;
     align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    background: #2d2d2d;
 }
 
-.geoapify-places-spinner-icon {
+.geoapify-places-status-bar.end {
+    min-height: 20px;
+    background: #333333;
+}
+
+.geoapify-places-status-bar-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+}
+
+.geoapify-places-status-bar-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.geoapify-places-status-bar-button:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.geoapify-places-status-bar-button svg {
     height: 16px;
     width: 16px;
-    animation: geoapify-spin 1s linear infinite;
 }
 
-@keyframes geoapify-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.geoapify-places-item {
-    display: flex;
-    flex-direction: row;
+.geoapify-places-status-bar-loading {
+    display: inline-flex;
     align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    letter-spacing: 2px;
+    animation: geoapify-dots-pulse 1.4s ease-in-out infinite;
 }
 
-.geoapify-places-item .icon {
-    display: inline-block;
-    width: 40px;
-    height: 24px;
-    color: #aaa;
-}
-
-.geoapify-places-item .icon.emoji {
-    color: unset;
-    font-size: 20px;
-    opacity: 0.9;
-}
-
-.geoapify-places-main-part {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+@keyframes geoapify-dots-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
 }

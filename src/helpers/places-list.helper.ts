@@ -9,7 +9,6 @@ export interface PlacesListCallbacks {
 
 interface PlaceData {
     name: string;
-    address: string;
     openingHours: string | null;
 }
 
@@ -19,17 +18,19 @@ export class PlacesListManager {
     private callbacks: PlacesListCallbacks;
 
     private placesListElement: HTMLElement = null;
-    private loadMoreButton: HTMLElement = null;
-    private lazyLoadingIndicator: HTMLElement = null;
+    private titleBar: HTMLElement = null;
+    private scrollContainer: HTMLElement = null;
+    private statusBar: HTMLElement = null;
     
     // Pagination state
     private currentPlacesOffset: number = 0;
     private currentPlacesCategory: string = null;
+    private currentCategoryLabel: string = null;
     private isLoadingMorePlaces: boolean = false;
     private hasMorePlaces: boolean = true;
     private allPlaces: GeoJSON.Feature[] = [];
     
-    // Lazy loading
+    // Scroll detection
     private scrollListener: ((event: Event) => void) | null = null;
 
     constructor(
@@ -42,7 +43,7 @@ export class PlacesListManager {
         this.callbacks = callbacks;
     }
 
-    public showPlacesList(places: GeoJSON.Feature[], category: string, isLoadMore: boolean = false): void {
+    public showPlacesList(places: GeoJSON.Feature[], category: string, categoryLabel?: string, isLoadMore: boolean = false): void {
         if (!this.options.showPlacesList || !places?.length) return;
 
         // Create elements if they don't exist
@@ -53,13 +54,12 @@ export class PlacesListManager {
         // Handle initial vs load more
         if (!isLoadMore) {
             this.currentPlacesCategory = category;
+            this.currentCategoryLabel = categoryLabel || category;
             this.currentPlacesOffset = 0;
             this.allPlaces = [];
-            this.clearPlacesList();
+            this.clearPlacesItems();
+            this.updateTitleBar(this.currentCategoryLabel);
         }
-
-        // Remove existing load more button
-        this.removeLoadMoreButton();
 
         // Add new places
         this.allPlaces.push(...places);
@@ -69,13 +69,14 @@ export class PlacesListManager {
         this.currentPlacesOffset += places.length;
         this.hasMorePlaces = places.length >= (this.options.limit || 5);
 
-        // Add load more button or setup lazy loading
+        // Update status bar
+        this.updateStatusBarState('empty');
+
+        // Setup scroll detection
         if (this.hasMorePlaces) {
-            if (this.options.enablePlacesLazyLoading) {
-                this.setupLazyLoading();
-            } else {
-                this.createLoadMoreButton();
-            }
+            this.setupScrollDetection();
+        } else {
+            this.updateStatusBarState('end');
         }
 
         // Show list
@@ -88,14 +89,23 @@ export class PlacesListManager {
     public clearPlacesList(): void {
         if (!this.options.showPlacesList) return;
 
+        if (this.scrollContainer) {
+            this.scrollContainer.innerHTML = '';
+        }
+        
         if (this.placesListElement) {
-            this.placesListElement.innerHTML = '';
             this.placesListElement.classList.remove('active', 'standalone');
             this.placesListElement.style.display = 'none';
         }
         
-        this.removeLazyLoadingListener();
+        this.removeScrollListener();
         this.resetPaginationState();
+    }
+
+    private clearPlacesItems(): void {
+        if (this.scrollContainer) {
+            this.scrollContainer.innerHTML = '';
+        }
     }
 
     public resetCategory(): void {
@@ -104,16 +114,16 @@ export class PlacesListManager {
     }
 
     public selectPlace(index: number): void {
-        if (!this.placesListElement) return;
+        if (!this.scrollContainer) return;
 
         // Remove previous selection
-        const placeItems = this.placesListElement.querySelectorAll('.geoapify-places-item');
+        const placeItems = this.scrollContainer.querySelectorAll('.geoapify-places-item');
         placeItems.forEach(item => {
             item.classList.remove('active');
         });
         
         // Add selection to the specified item
-        const targetItem = this.placesListElement.querySelector(`[data-index="${index}"]`);
+        const targetItem = this.scrollContainer.querySelector(`[data-index="${index}"]`);
         if (targetItem) {
             targetItem.classList.add('active');
             // Scroll item into view if needed (if supported)
@@ -124,10 +134,10 @@ export class PlacesListManager {
     }
 
     public clearSelection(): void {
-        if (!this.placesListElement) return;
+        if (!this.scrollContainer) return;
 
         // Remove selection from all items
-        const placeItems = this.placesListElement.querySelectorAll('.geoapify-places-item');
+        const placeItems = this.scrollContainer.querySelectorAll('.geoapify-places-item');
         placeItems.forEach(item => {
             item.classList.remove('active');
         });
@@ -136,18 +146,34 @@ export class PlacesListManager {
     private createPlacesElements(): void {
         if (!this.options.showPlacesList) return;
 
+        // Main container
         this.placesListElement = document.createElement('div');
         this.placesListElement.className = 'geoapify-places-list';
+
+        // Title bar
+        this.titleBar = document.createElement('div');
+        this.titleBar.className = 'geoapify-places-title-bar';
+        this.placesListElement.appendChild(this.titleBar);
+
+        // Scroll container
+        this.scrollContainer = document.createElement('div');
+        this.scrollContainer.className = 'geoapify-places-scroll-container';
+        this.placesListElement.appendChild(this.scrollContainer);
+
+        // Status bar
+        this.statusBar = document.createElement('div');
+        this.statusBar.className = 'geoapify-places-status-bar';
+        this.placesListElement.appendChild(this.statusBar);
 
         this.container.appendChild(this.placesListElement);
     }
 
     private renderPlaces(places: GeoJSON.Feature[], isLoadMore: boolean): void {
-        const startIndex = isLoadMore ? this.placesListElement.children.length : 0;
+        const startIndex = isLoadMore ? this.scrollContainer.children.length : 0;
         
         places.forEach((place, index) => {
             const placeElement = this.createPlaceItem(place, startIndex + index);
-            this.placesListElement.appendChild(placeElement);
+            this.scrollContainer.appendChild(placeElement);
         });
     }
 
@@ -155,23 +181,62 @@ export class PlacesListManager {
         this.placesListElement.classList.add('active', 'standalone');
         this.placesListElement.style.display = 'block';
 
-        if (!isLoadMore) {
-            this.placesListElement.scrollTop = 0;
+        if (!isLoadMore && this.scrollContainer) {
+            this.scrollContainer.scrollTop = 0;
         }
     }
 
     private resetPaginationState(): void {
         this.currentPlacesOffset = 0;
+        this.currentPlacesCategory = null;
+        this.currentCategoryLabel = null;
         this.hasMorePlaces = true;
         this.isLoadingMorePlaces = false;
-        this.loadMoreButton = null;
         this.allPlaces = [];
     }
 
-    private removeLoadMoreButton(): void {
-        if (this.loadMoreButton) {
-            this.loadMoreButton.remove();
-            this.loadMoreButton = null;
+    private updateTitleBar(categoryLabel: string): void {
+        if (!this.titleBar) return;
+
+        this.titleBar.innerHTML = '';
+        
+        const searchIcon = document.createElement('span');
+        searchIcon.className = 'geoapify-places-title-icon';
+        DomHelper.addIcon(searchIcon, 'search');
+        
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'geoapify-places-title-label';
+        labelSpan.textContent = categoryLabel;
+        
+        this.titleBar.appendChild(searchIcon);
+        this.titleBar.appendChild(labelSpan);
+    }
+
+    private updateStatusBarState(state: 'empty' | 'button' | 'loading' | 'end'): void {
+        if (!this.statusBar) return;
+
+        this.statusBar.innerHTML = '';
+        this.statusBar.className = state === 'empty' 
+            ? 'geoapify-places-status-bar' 
+            : `geoapify-places-status-bar ${state}`;
+
+        if (state === 'button') {
+            const button = document.createElement('button');
+            button.className = 'geoapify-places-status-bar-button';
+            button.setAttribute('type', 'button');
+            button.setAttribute('aria-label', 'Load more places');
+            button.addEventListener('click', () => this.loadMorePlaces());
+            
+            const iconElement = document.createElement('span');
+            DomHelper.addIcon(iconElement, 'chevron-down');
+            button.appendChild(iconElement);
+            
+            this.statusBar.appendChild(button);
+        } else if (state === 'loading') {
+            const dots = document.createElement('span');
+            dots.className = 'geoapify-places-status-bar-loading';
+            dots.textContent = '•••';
+            this.statusBar.appendChild(dots);
         }
     }
 
@@ -185,13 +250,30 @@ export class PlacesListManager {
         placeElement.dataset.index = index.toString();
         
         const placeData = this.extractPlaceData(place);
-        const addressContainer = this.createAddressContainer();
-        const nameElement = this.createNameElement(placeData.name);
-        const detailsElement = this.createDetailsElement(placeData);
         
-        addressContainer.appendChild(nameElement);
-        addressContainer.appendChild(detailsElement);
-        placeElement.appendChild(addressContainer);
+        // Place name
+        const nameElement = document.createElement('span');
+        nameElement.className = 'geoapify-places-main-part';
+        nameElement.textContent = placeData.name;
+        placeElement.appendChild(nameElement);
+        
+        // Opening hours (text + icon) - only if available
+        if (placeData.openingHours) {
+            const hoursContainer = document.createElement('span');
+            hoursContainer.className = 'geoapify-places-hours-info';
+            
+            const clockIcon = document.createElement('span');
+            clockIcon.className = 'geoapify-places-clock-icon';
+            DomHelper.addIcon(clockIcon, 'clock');
+            
+            const hoursText = document.createElement('span');
+            hoursText.className = 'geoapify-places-hours-text';
+            hoursText.textContent = placeData.openingHours;
+            
+            hoursContainer.appendChild(clockIcon);
+            hoursContainer.appendChild(hoursText);
+            placeElement.appendChild(hoursContainer);
+        }
         
         placeElement.addEventListener('click', () => {
             this.selectPlaceFromList(place, index);
@@ -204,97 +286,19 @@ export class PlacesListManager {
         const props = place.properties;
         return {
             name: props.name || 'Unknown Place',
-            address: props.formatted || props.address_line2 || '',
             openingHours: props.opening_hours || null
         };
     }
 
-    private createAddressContainer(): HTMLElement {
-        const container = document.createElement('span');
-        container.className = 'geoapify-places-address-container';
-        return container;
-    }
-
-    private createNameElement(name: string): HTMLElement {
-        const nameElement = document.createElement('span');
-        nameElement.className = 'geoapify-places-main-part';
-        nameElement.textContent = name;
-        return nameElement;
-    }
-
-    private createDetailsElement(placeData: PlaceData): HTMLElement {
-        const detailsElement = document.createElement('span');
-        detailsElement.className = 'geoapify-places-details';
-        
-        const addressElement = this.createAddressElement(placeData.address);
-        detailsElement.appendChild(addressElement);
-        
-        if (placeData.openingHours) {
-            const hoursElement = this.createOpeningHoursElement(placeData.openingHours);
-            detailsElement.appendChild(hoursElement);
-        }
-        
-        return detailsElement;
-    }
-
-    private createAddressElement(address: string): HTMLElement {
-        const addressElement = document.createElement('span');
-        addressElement.className = 'geoapify-places-address-element';
-        
-        addressElement.textContent = address;
-        
-        return addressElement;
-    }
-
-    private createOpeningHoursElement(openingHours: string): HTMLElement {
-        const hoursContainer = document.createElement('span');
-        hoursContainer.className = 'geoapify-places-hours-container';
-        
-        const clockIcon = this.createClockIcon();
-        const hoursText = this.createHoursText(openingHours);
-        
-        hoursContainer.appendChild(clockIcon);
-        hoursContainer.appendChild(hoursText);
-        
-        return hoursContainer;
-    }
-
-    private createClockIcon(): HTMLElement {
-        const clockIconSpan = document.createElement('span');
-        clockIconSpan.className = 'clock-icon geoapify-places-clock-icon';
-        
-        DomHelper.addIcon(clockIconSpan, 'clock');
-        
-        return clockIconSpan;
-    }
-
-    private createHoursText(openingHours: string): HTMLElement {
-        const hoursSpan = document.createElement('span');
-        hoursSpan.textContent = openingHours;
-        hoursSpan.className = 'geoapify-places-hours-text';
-        return hoursSpan;
-    }
-
     // ========================================================================
-    // LOAD MORE FUNCTIONALITY
+    // LOAD MORE FUNCTIONALITY & SCROLL DETECTION
     // ========================================================================
 
-    private createLoadMoreButton(): void {
+    private selectPlaceFromList(place: GeoJSON.Feature, index: number): void {
         if (!this.options.showPlacesList) return;
 
-        this.loadMoreButton = document.createElement('div');
-        this.loadMoreButton.className = 'geoapify-places-load-more-button';
-
-        const iconElement = document.createElement('span');
-        iconElement.className = 'geoapify-places-load-more-icon';
-        DomHelper.addIcon(iconElement, 'chevron-down');
-        this.loadMoreButton.appendChild(iconElement);
-
-        this.loadMoreButton.addEventListener('click', () => {
-            this.loadMorePlaces();
-        });
-
-        this.placesListElement.appendChild(this.loadMoreButton);
+        // Built-in list doesn't track selection - just notify callback
+        this.callbacks.onPlaceSelect?.(place, index);
     }
 
     private async loadMorePlaces(): Promise<void> {
@@ -303,7 +307,7 @@ export class PlacesListManager {
         }
 
         this.isLoadingMorePlaces = true;
-        this.updateLoadMoreButtonState(true);
+        this.updateStatusBarState('loading');
 
         try {
             const data = await this.callbacks.onLoadMore(
@@ -314,118 +318,55 @@ export class PlacesListManager {
 
             const newPlaces = data.features || [];
             if (newPlaces.length > 0) {
-                this.showPlacesList(newPlaces, this.currentPlacesCategory, true);
+                this.showPlacesList(newPlaces, this.currentPlacesCategory, this.currentCategoryLabel, true);
             } else {
                 this.hasMorePlaces = false;
-                this.removeLoadMoreButton();
-                this.hideLazyLoadingIndicator();
+                this.updateStatusBarState('end');
             }
         } catch (error) {
             console.error('Failed to load more places:', error);
-            this.updateLoadMoreButtonState(false);
-            this.hideLazyLoadingIndicator();
+            // Revert to button state on error
+            this.updateStatusBarState('button');
         } finally {
             this.isLoadingMorePlaces = false;
         }
     }
 
-    private updateLoadMoreButtonState(loading: boolean): void {
-        if (!this.loadMoreButton) return;
-
-        const iconElement = this.loadMoreButton.querySelector('span') as HTMLElement;
-
-        if (loading) {
-            iconElement.innerHTML = '';
-            DomHelper.addSpinnerIcon(iconElement);
-            this.loadMoreButton.classList.add('loading');
-        } else {
-            iconElement.innerHTML = '';
-            DomHelper.addIcon(iconElement, 'chevron-down');
-            this.loadMoreButton.classList.remove('loading');
-        }
-    }
-
-    private selectPlaceFromList(place: GeoJSON.Feature, index: number): void {
-        if (!this.options.showPlacesList) return;
-
-        // Built-in list doesn't track selection - just notify callback
-        this.callbacks.onPlaceSelect?.(place, index);
-    }
-
-    private setupLazyLoading(): void {
-        if (!this.placesListElement || !this.options.enablePlacesLazyLoading) return;
+    private setupScrollDetection(): void {
+        if (!this.scrollContainer || !this.hasMorePlaces) return;
 
         // Remove existing listener to avoid duplicates
-        this.removeLazyLoadingListener();
+        this.removeScrollListener();
 
         // Create and attach new scroll listener
-        this.scrollListener = (event: Event) => this.onScrollHandler(event);
-        this.placesListElement.addEventListener('scroll', this.scrollListener);
-        
-        // Create loading indicator
-        this.createLazyLoadingIndicator();
+        this.scrollListener = () => this.onScrollHandler();
+        this.scrollContainer.addEventListener('scroll', this.scrollListener);
     }
 
-    private removeLazyLoadingListener(): void {
-        if (this.scrollListener && this.placesListElement) {
-            this.placesListElement.removeEventListener('scroll', this.scrollListener);
+    private removeScrollListener(): void {
+        if (this.scrollListener && this.scrollContainer) {
+            this.scrollContainer.removeEventListener('scroll', this.scrollListener);
             this.scrollListener = null;
         }
-        this.removeLazyLoadingIndicator();
     }
 
-    private onScrollHandler(event: Event): void {
-        if (!this.placesListElement || this.isLoadingMorePlaces || !this.hasMorePlaces) {
-            return;
-        }
+    private onScrollHandler(): void {
+        if (!this.scrollContainer || this.isLoadingMorePlaces || !this.hasMorePlaces) return;
 
-        const element = this.placesListElement;
-        const scrollTop = element.scrollTop;
-        const scrollHeight = element.scrollHeight;
-        const clientHeight = element.clientHeight;
-
-        // Calculate distance from bottom (threshold: 100px from bottom)
+        const { scrollTop, scrollHeight, clientHeight } = this.scrollContainer;
         const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-        const threshold = 100;
+        const isAtBottom = distanceFromBottom <= 10;
 
-        // Trigger load more when user is close to the bottom
-        if (distanceFromBottom < threshold) {
-            this.showLazyLoadingIndicator();
-            this.loadMorePlaces();
-         }
-    }
-
-    private createLazyLoadingIndicator(): void {
-        if (!this.placesListElement || this.lazyLoadingIndicator) return;
-
-        this.lazyLoadingIndicator = document.createElement('div');
-        this.lazyLoadingIndicator.className = 'geoapify-places-lazy-loading';
-        this.lazyLoadingIndicator.style.display = 'none';
-
-        const spinnerElement = document.createElement('span');
-        spinnerElement.className = 'geoapify-places-lazy-loading-spinner';
-        DomHelper.addSpinnerIcon(spinnerElement);
-
-        this.lazyLoadingIndicator.appendChild(spinnerElement);
-        this.placesListElement.appendChild(this.lazyLoadingIndicator);
-    }
-
-    private showLazyLoadingIndicator(): void {
-        if (this.lazyLoadingIndicator) {
-            this.lazyLoadingIndicator.style.display = 'flex';
-        }
-    }
-
-    private hideLazyLoadingIndicator(): void {
-        if (this.lazyLoadingIndicator) {
-            this.lazyLoadingIndicator.style.display = 'none';
-        }
-    }
-
-    private removeLazyLoadingIndicator(): void {
-        if (this.lazyLoadingIndicator) {
-            this.lazyLoadingIndicator.remove();
-            this.lazyLoadingIndicator = null;
+        if (isAtBottom) {
+            // Auto-load or show button when at bottom
+            if (this.options.enablePlacesLazyLoading) {
+                this.loadMorePlaces();
+            } else {
+                this.updateStatusBarState('button');
+            }
+        } else if (this.statusBar?.classList.contains('button')) {
+            // Hide button when scrolling away from bottom
+            this.updateStatusBarState('empty');
         }
     }
 }
