@@ -226,7 +226,7 @@ export function selectPlaceFromList(container: HTMLDivElement, itemIndex: number
 
 export function getLoadMoreButton(container: HTMLDivElement): HTMLElement | null {
     const placesList = getPlacesListElement(container);
-    return placesList?.querySelector('.geoapify-places-status-bar-button') || null;
+    return placesList?.querySelector('.geoapify-places-load-more-button') || null;
 }
 
 export function scrollPlacesToBottom(container: HTMLDivElement) {

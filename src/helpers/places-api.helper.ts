@@ -7,7 +7,7 @@ export class PlacesApiHelper {
     private static readonly IP_GEOLOCATION_URL = "https://api.geoapify.com/v1/ipinfo";
 
     public static generatePlacesUrl(
-        category: string,
+        category: string[],
         apiKey: string,
         options: GeocoderAutocompleteOptions,
         placesApiUrl: string,
@@ -15,7 +15,8 @@ export class PlacesApiHelper {
         offset?: number,
         limit?: number
     ): string {
-        let url = `${placesApiUrl}?categories=${encodeURIComponent(category)}&apiKey=${apiKey}`;
+        const categoriesParam = category.map(c => encodeURIComponent(c)).join(',');
+        let url = `${placesApiUrl}?categories=${categoriesParam}&apiKey=${apiKey}`;
 
         if (options.lang) {
             url += `&lang=${options.lang}`;

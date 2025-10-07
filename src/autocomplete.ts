@@ -56,7 +56,7 @@ export class GeocoderAutocomplete {
     private ipGeolocationUrl = "https://api.geoapify.com/v1/ipinfo";
 
     private readonly categoryManager: CategoryManager;
-    private sendPlacesRequestAlt?: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>;
+    private sendPlacesRequestAlt?: (category: string[], geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>;
     private currentPlacesPromiseReject?: any;
     private lastEscKeyTime?: number;
     private readonly DOUBLE_ESC_THRESHOLD = 500; // 500ms window for double-Esc
@@ -80,7 +80,7 @@ export class GeocoderAutocomplete {
         
         // Initialize places list manager with callbacks
         const placesCallbacks: PlacesListCallbacks = {
-            onLoadMore: (category: string, offset: number, limit?: number) => {
+            onLoadMore: (category: string[], offset: number, limit?: number) => {
                 return this.sendPlacesRequestOrAlt(category, undefined, undefined, offset, limit);
             },
             onPlacesUpdate: (allPlaces: GeoJSON.Feature[]) => {
@@ -315,10 +315,10 @@ export class GeocoderAutocomplete {
         });
     }
 
-    public setCategory(category: Category | string | null): void {
+    public setCategory(category: Category | string | string[] | null): void {
         if (category) {
             this.categoryManager.setCategory(category);
-            this.onCategorySelect(category);
+            this.onCategorySelect();
         } else {
             this.clearCategoryAndNotify();
         }
@@ -349,7 +349,7 @@ export class GeocoderAutocomplete {
     }
 
     public async sendPlacesRequest(
-        category: string,
+        category: string[],
         bias?: string,
         filter?: string,
         offset?: number,
@@ -363,7 +363,7 @@ export class GeocoderAutocomplete {
     }
 
     public setSendPlacesRequestFunc(
-        sendPlacesRequestFunc?: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>
+        sendPlacesRequestFunc?: (category: string[], geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<any>
     ): void {
         if (!this.isCategoryModeEnabled()) {
             console.warn('Category search is disabled. Enable with addCategorySearch: true');
@@ -458,6 +458,11 @@ export class GeocoderAutocomplete {
         const itemElement = DomHelper.createDropdownItem();
         itemElement.classList.add('geoapify-category-item');
 
+        // Add search icon
+        const iconElement = document.createElement("span");
+        iconElement.classList.add('icon');
+        DomHelper.addIcon(iconElement, 'search');
+        itemElement.appendChild(iconElement);
 
         const textElement = DomHelper.createDropdownItemText();
         textElement.innerHTML = `<span class="main-part">${category.label}</span>`;
@@ -802,8 +807,12 @@ export class GeocoderAutocomplete {
         this.inputWrapper.appendChild(this.inputClearButton);
     }
 
-    private async onCategorySelect(category: Category | string): Promise<void> {
-        const categoryObj = typeof category === 'string' ? { category, label: category } : category;
+    private async onCategorySelect(): Promise<void> {
+        const categoryObj = this.categoryManager.getCategory();
+        
+        if (!categoryObj) {
+            return;
+        }
         
         this.inputElement.value = categoryObj.label;
         this.showClearButton();
@@ -819,11 +828,10 @@ export class GeocoderAutocomplete {
             
             const places = data.features || [];
             
-            if (this.options.showPlacesList && places.length > 0) {
+            if (this.options.showPlacesList) {
                 this.placesListManager.showPlacesList(places, categoryObj.category, categoryObj.label);
-            } else {
-                this.callbacks.notifyPlaces(places);
             }
+            this.callbacks.notifyPlaces(places);
         } catch (error) {
             this.callbacks.notifyPlacesRequestEnd(false, null, error);
             console.error('Places API request failed:', error);
@@ -850,7 +858,7 @@ export class GeocoderAutocomplete {
      * Send Places request or use alternative function
      */
     private async sendPlacesRequestOrAlt(
-        category: string,
+        category: string[],
         bias?: string,
         filter?: string,
         offset?: number,

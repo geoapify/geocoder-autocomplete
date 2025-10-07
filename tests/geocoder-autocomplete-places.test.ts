@@ -81,7 +81,7 @@ describe('Category Search and Places List', () => {
         });
 
         it('should set category properly using setCategory()', async () => {
-            const category: Category = { category: 'catering.cafe', label: 'Cafes' };
+            const category: Category = { category: ['catering.cafe'], label: 'Cafes' };
             
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
@@ -100,7 +100,7 @@ describe('Category Search and Places List', () => {
             await wait(WAIT_TIME);
             
             const category = autocomplete.getCategory();
-            expect(category).toEqual({ category: 'catering.cafe', label: 'catering.cafe' });
+            expect(category).toEqual({ category: ['catering.cafe'], label: 'catering.cafe' });
         });
 
         it('should get category using getCategory()', async () => {
@@ -112,7 +112,34 @@ describe('Category Search and Places List', () => {
             
             const category = autocomplete.getCategory();
             expect(category).toBeTruthy();
-            expect(category?.category).toBe('catering.cafe');
+            expect(category?.category).toStrictEqual(['catering.cafe']);
+        });
+
+        it('should set category using array of strings', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            const categories = ['catering.fast_food.pizza', 'catering.restaurant.pizza'];
+            autocomplete.setCategory(categories);
+            
+            await wait(WAIT_TIME);
+            
+            const category = autocomplete.getCategory();
+            expect(category).toBeTruthy();
+            expect(category?.category).toStrictEqual(categories);
+            expect(category?.label).toBe('catering.fast_food.pizza, catering.restaurant.pizza');
+        });
+
+        it('should send multiple categories to API as comma-separated string', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            const categories = ['catering.fast_food.pizza', 'catering.restaurant.pizza'];
+            autocomplete.setCategory(categories);
+            
+            await wait(WAIT_TIME);
+            
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.stringContaining(`${PLACES_API_URL}?categories=catering.fast_food.pizza,catering.restaurant.pizza&apiKey=XXXXX`)
+            );
         });
 
         it('should clear category using setCategory(null)', async () => {
@@ -150,7 +177,7 @@ describe('Category Search and Places List', () => {
             
             await wait(WAIT_TIME);
             
-            expect(placesRequestStartSpy).toHaveBeenCalledWith('catering.cafe');
+            expect(placesRequestStartSpy).toHaveBeenCalledWith(['catering.cafe']);
         });
 
         it('should trigger places_request_end callback with success and data', async () => {
@@ -433,7 +460,7 @@ describe('Category Search and Places List', () => {
             
             const loadMoreButton = getLoadMoreButton(container);
             expect(loadMoreButton).toBeTruthy();
-            expect(loadMoreButton).toHaveClass('geoapify-places-status-bar-button');
+            expect(loadMoreButton).toHaveClass('geoapify-places-load-more-button');
         });
 
         it('should load more places when button is clicked', async () => {
@@ -698,7 +725,7 @@ describe('Category Search and Places List', () => {
             
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            const category: Category = { category: 'catering.cafe', label: 'Cafes' };
+            const category: Category = { category: ['catering.cafe'], label: 'Cafes' };
             autocomplete.setCategory(category);
             await wait(WAIT_TIME);
             
@@ -719,7 +746,7 @@ describe('Category Search and Places List', () => {
         it('should not clear category on single ESC when dropdown is closed', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            const category: Category = { category: 'catering.cafe', label: 'Cafes' };
+            const category: Category = { category: ['catering.cafe'], label: 'Cafes' };
             autocomplete.setCategory(category);
             await wait(WAIT_TIME);
             
@@ -830,7 +857,7 @@ describe('Category Search and Places List', () => {
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
             
-            expect(customFunc).toHaveBeenCalledWith('catering.cafe', autocomplete, 0, 8);
+            expect(customFunc).toHaveBeenCalledWith(['catering.cafe'], autocomplete, 0, 8);
             expect(fetchMock).not.toHaveBeenCalled();
         });
 
@@ -921,7 +948,7 @@ describe('Category Search and Places List', () => {
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
             
-            expect(startSpy).toHaveBeenCalledWith('catering.cafe');
+            expect(startSpy).toHaveBeenCalledWith(['catering.cafe']);
             
             autocomplete.off('places_request_start', startSpy);
             
@@ -1121,6 +1148,90 @@ describe('Category Search and Places List', () => {
 
             // Should not throw error
             expect(() => autocompleteNoList.selectPlace(0)).not.toThrow();
+        });
+    });
+
+    // ========================================================================
+    // 13. STATUS BAR - TOTAL COUNT AND SELECTED INDEX
+    // ========================================================================
+
+    describe('Status Bar Display', () => {
+        beforeEach(() => {
+            autocomplete = new GeocoderAutocomplete(container, "XXXXX", optionsWithPlacesList);
+        });
+
+        it('should display total count of places in status bar', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            const placesList = container.querySelector('.geoapify-places-list');
+            const statusBar = placesList?.querySelector('.geoapify-places-status-bar');
+            const countContainer = statusBar?.querySelector('.geoapify-places-status-count');
+            
+            expect(countContainer).toBeTruthy();
+            expect(countContainer?.textContent).toContain('8'); // 8 places in mock response
+        });
+
+        it('should update total count after loading more places', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            const placesList = container.querySelector('.geoapify-places-list');
+            let statusBar = placesList?.querySelector('.geoapify-places-status-bar');
+            let countContainer = statusBar?.querySelector('.geoapify-places-status-count');
+            expect(countContainer?.textContent).toContain('8');
+
+            // Load more
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            clickLoadMoreButton(container);
+            await wait(WAIT_TIME);
+
+            statusBar = placesList?.querySelector('.geoapify-places-status-bar');
+            countContainer = statusBar?.querySelector('.geoapify-places-status-count');
+            expect(countContainer?.textContent).toContain('16'); // 8 + 8
+        });
+
+        it('should display selected place index when place is selected', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Select third place (index 2)
+            autocomplete.selectPlace(2);
+
+            const placesList = container.querySelector('.geoapify-places-list');
+            const statusBar = placesList?.querySelector('.geoapify-places-status-bar');
+            const selectedInfo = statusBar?.querySelector('.geoapify-places-status-selected');
+            
+            expect(selectedInfo).toBeTruthy();
+            expect(selectedInfo?.textContent).toBe('3 / 8'); // 3rd place out of 8
+        });
+
+        it('should update selected index display when selection changes', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            autocomplete.setCategory('catering.cafe');
+            await wait(WAIT_TIME);
+
+            // Select first place
+            autocomplete.selectPlace(0);
+            let placesList = container.querySelector('.geoapify-places-list');
+            let statusBar = placesList?.querySelector('.geoapify-places-status-bar');
+            let selectedInfo = statusBar?.querySelector('.geoapify-places-status-selected');
+            expect(selectedInfo?.textContent).toBe('1 / 8');
+
+            // Select last place
+            autocomplete.selectPlace(7);
+            placesList = container.querySelector('.geoapify-places-list');
+            statusBar = placesList?.querySelector('.geoapify-places-status-bar');
+            selectedInfo = statusBar?.querySelector('.geoapify-places-status-selected');
+            expect(selectedInfo?.textContent).toBe('8 / 8');
         });
     });
 });

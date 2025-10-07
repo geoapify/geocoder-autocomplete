@@ -4,8 +4,8 @@
 */
 const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
 
-// The Leaflet map Object
-const map = L.map('map', {zoomControl: false}).setView([38.908838755401035, -77.02346458179596], 12);
+// The Leaflet map Object - centered on Paris to match the bias
+const map = L.map('map', {zoomControl: false}).setView([48.8566, 2.3522], 12);
 
 // Retina displays require different mat tiles quality
 const isRetina = L.Browser.retina;
@@ -65,10 +65,38 @@ const autocompleteInput = new autocomplete.GeocoderAutocomplete(
                             limit: 8
                         });
 
-// Add some bias to get better results (around Paris)
-autocompleteInput.addBiasByProximity({
-    lon: 2.3522,
-    lat: 48.8566
+// Add bias based on map view for better results
+function updateBias() {
+    const center = map.getCenter();
+    autocompleteInput.addBiasByProximity({
+        lon: center.lng,
+        lat: center.lat
+    });
+}
+
+// Set initial bias
+updateBias();
+
+// Update bias and rerun places query when map moves significantly
+let mapMoveTimeout;
+map.on('moveend', () => {
+    updateBias();
+    
+    // Rerun places query if a category is selected and map moved significantly
+    if (currentCategoryObj && lastQueryCenter) {
+        const currentCenter = map.getCenter();
+        const distance = currentCenter.distanceTo(lastQueryCenter); // Distance in meters
+        
+        // Requery if moved more than 500 meters
+        if (distance > 500) {
+            clearTimeout(mapMoveTimeout);
+            mapMoveTimeout = setTimeout(() => {
+                console.log(`Map moved ${Math.round(distance)}m - requerying places`);
+                lastQueryCenter = map.getCenter();
+                autocompleteInput.setCategory(currentCategoryObj); // Pass the full category object
+            }, 500); // Wait 500ms after map stops moving
+        }
+    }
 });
 
 // generate an marker icon with https://apidocs.geoapify.com/playground/icon
@@ -81,6 +109,8 @@ const markerIcon = L.icon({
 
 let marker;
 let placesMarkers = [];
+let currentCategoryObj = null; // Track current selected category object for requerying
+let lastQueryCenter = null; // Track the center of the last places query
 
 // UI elements
 const placesListContainer = document.getElementById('places-list');
@@ -317,6 +347,13 @@ autocompleteInput.on('select', (location) => {
 autocompleteInput.on('places', (places) => {
     clearPlacesMarkers();
     
+    // Store current category object and map center
+    const category = autocompleteInput.getCategory();
+    if (category) {
+        currentCategoryObj = category; // Store the full category object with label
+        lastQueryCenter = map.getCenter(); // Store the center when places are loaded
+    }
+    
     // Show places in the Google Maps-style list
     showPlacesList(places);
     
@@ -340,11 +377,7 @@ autocompleteInput.on('places', (places) => {
         }
     });
     
-    // Fit map to show all places if there are any
-    if (placesMarkers.length > 0) {
-        const group = new L.featureGroup(placesMarkers);
-        map.fitBounds(group.getBounds().pad(0.1));
-    }
+    // Don't auto-zoom to places - let user control the map view
 });
 
 // Handle suggestions (for address results)
@@ -358,6 +391,8 @@ autocompleteInput.on('clear', (context) => {
     if (context === 'category') {
         clearPlacesMarkers();
         clearPlacesList();
+        currentCategoryObj = null; // Clear current category
+        lastQueryCenter = null; // Clear last query center
         if (marker) {
             marker.remove();
             marker = null;
