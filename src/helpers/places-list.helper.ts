@@ -67,6 +67,7 @@ export class PlacesListManager {
 
         if (!places || places.length === 0) {
             this.showEmptyState();
+            this.updateStatusBar();
             this.showList(false);
             return;
         }
