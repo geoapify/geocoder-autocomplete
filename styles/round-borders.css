@@ -54,6 +54,7 @@
     width: 40px;
     height: 24px;
     color: #aaa;
+    flex: 0 0 40px;
 }
 
 .geoapify-autocomplete-item .icon.emoji {
@@ -334,6 +335,73 @@
     display: block;
     height: 64px;
     width: 64px;
+}
+
+.geoapify-places-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 99;
+    display: none;
+}
+
+.geoapify-places-loading-overlay.visible {
+    display: block;
+}
+
+.geoapify-places-loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    display: none;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.geoapify-places-loading-indicator.visible {
+    display: block;
+}
+
+.geoapify-places-loading-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.geoapify-places-loading-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: inline-block;
+    animation: geoapify-places-loading-bounce 1.4s infinite ease-in-out both;
+}
+
+.geoapify-places-loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.geoapify-places-loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes geoapify-places-loading-bounce {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }
 
 .geoapify-autocomplete-items .secondary-part {

@@ -310,6 +310,10 @@ Here's a description of the API methods:
 |-----------------------------------------|---------------------------------------------------------------------|
 | *setType(type: 'country' or 'state' or 'city' or 'postcode' or 'street' or 'amenity'): void* | Sets the type of location for address suggestions. |
 | *setLang(lang: SupportedLanguage): void* | Sets the language for address suggestions. |
+| *setAddDetails(addDetails: boolean): void* | Enables or disables calling Place Details API on selection to get additional place information. |
+| *setSkipIcons(skipIcons: boolean): void* | Enables or disables icons in the suggestions dropdown. |
+| *setAllowNonVerifiedHouseNumber(allowNonVerifiedHouseNumber: boolean): void* | Allows the addition of house numbers that are not verified by the Geocoding API or missing in the database. |
+| *setAllowNonVerifiedStreet(allowNonVerifiedStreet: boolean): void* | Allows the addition of streets that are not verified by the Geocoding API or missing in the database. |
 | *setCountryCodes(codes: CountyCode[]): void* | Sets specific country codes to filter address suggestions. |
 | *setPosition(position: GeoPosition = {lat: number; lon: number}): void* | Sets the geographic position to influence suggestions based on proximity.|
 | *setLimit(limit: number): void* | Sets the maximum number of suggestions to display. |
@@ -331,7 +335,8 @@ Here's a description of the API methods:
 | *isOpen(): boolean* | Checks if the suggestions dropdown is currently open. |
 | *close(): void* | Manually closes the suggestions dropdown. |
 | *open(): void* | Manually opens the suggestions dropdown. |
-| *setCategory(category: Category or string or null): void* | Sets the selected category for places search. Pass null to clear the category. |
+| *setCategory(category: Category or string or string[] or null): void* | Sets the selected category for places search. Pass null to clear the category. |
+| *resendPlacesRequest(): Promise<void>* | Resends the places search request for the currently selected category without changing the category. Useful for refreshing places data when filters or bias have changed (e.g., after map movement). |
 | *getCategory(): Category or null* | Retrieves the currently selected category. |
 | *selectPlace(index: number or null): void* | Programmatically selects a place from the places list by index. Pass null to clear selection. |
 | *setGeocoderUrl(url: string): void* | Overrides the default Geocoder API URL. |
@@ -340,8 +345,8 @@ Here's a description of the API methods:
 | *setIpGeolocationUrl(url: string): void* | Overrides the default IP Geolocation API URL. |
 | *sendGeocoderRequest(value: string): Promise<GeoJSON.FeatureCollection>* | Sends a geocoder request based on the provided value and returns a Promise with the response in [GeoJSON FeatureCollection](https://en.wikipedia.org/wiki/GeoJSON) format containing suggestions. |
 | *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
-| *sendPlacesRequest(category: string, biasLocation?: {lat: number; lon: number}, filterLocation?: {lat: number; lon: number}, offset?: number, limit?: number): Promise<GeoJSON.FeatureCollection>* | Sends a places search request for the specified category and returns a Promise with the response in GeoJSON FeatureCollection format containing places. |
-| *setSendPlacesRequestFunc(sendPlacesRequestFunc: (category: string, geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send places search requests. |
+| *sendPlacesRequest(category: string[], bias?: object, filter?: object, offset?: number, limit?: number): Promise<GeoJSON.FeatureCollection>* | Sends a places search request for the specified category and returns a Promise with the response in GeoJSON FeatureCollection format containing places. |
+| *setSendPlacesRequestFunc(sendPlacesRequestFunc: (category: string[], geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send places search requests. |
 | *setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. |
 | *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. |
 | *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, dropdown open/close, places, and request lifecycle events. |

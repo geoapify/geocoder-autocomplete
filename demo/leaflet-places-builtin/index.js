@@ -82,6 +82,10 @@ let mapMoveTimeout;
 map.on('moveend', () => {
     updateBias();
     
+    if (isProgrammaticMove) {
+        return;
+    }
+    
     // Rerun places query if a category is selected and map moved significantly
     if (currentCategoryObj && lastQueryCenter) {
         const currentCenter = map.getCenter();
@@ -112,6 +116,7 @@ let placesMarkers = [];
 let currentPlaces = [];
 let currentCategoryObj = null; // Track current selected category object for requerying
 let lastQueryCenter = null; // Track the center of the last places query
+let isProgrammaticMove = false; // Flag to prevent requerying when moving map programmatically
 
 function clearPlacesMarkers() {
     placesMarkers.forEach(m => m.remove());
@@ -157,19 +162,27 @@ autocompleteInput.on('places', (places) => {
                 icon: markerIcon
             }).addTo(map);
             
-            // Add popup with place information - just the name
+            // Add popup with place information - just the name (disable autoPan to avoid recentering)
             const name = place.properties.name || place.properties.formatted;
-            placeMarker.bindPopup(name);
+            placeMarker.bindPopup(name, { autoPan: false });
             
             // When marker is clicked, select the place in the built-in list
             placeMarker.on('click', () => {
-                // Highlight in list
                 autocompleteInput.selectPlace(index);
-                // Pan and zoom (same as place_select callback)
-                map.panTo([place.properties.lat, place.properties.lon]);
-                placeMarker.openPopup();
+                isProgrammaticMove = true;
+
+                const target = [place.properties.lat, place.properties.lon];
+                const doPan = () => {
+                    map.panTo(target);
+                    placeMarker.openPopup();
+                    setTimeout(() => { isProgrammaticMove = false; }, 2000);
+                };
+
                 if (map.getZoom() < 16) {
+                    map.once('zoomend', doPan);
                     map.setZoom(16);
+                } else {
+                    doPan();
                 }
             });
             
@@ -199,11 +212,20 @@ autocompleteInput.on('place_select', (place, index) => {
     autocompleteInput.selectPlace(index);
     
     if (placesMarkers[index]) {
-        map.panTo([place.properties.lat, place.properties.lon]);
-        placesMarkers[index].openPopup();
-        
+        isProgrammaticMove = true;
+
+        const target = [place.properties.lat, place.properties.lon];
+        const doPan = () => {
+            map.panTo(target);
+            placesMarkers[index].openPopup();
+            setTimeout(() => { isProgrammaticMove = false; }, 2000);
+        };
+
         if (map.getZoom() < 16) {
+            map.once('zoomend', doPan);
             map.setZoom(16);
+        } else {
+            doPan();
         }
     }
 });

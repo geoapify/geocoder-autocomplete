@@ -61,6 +61,7 @@ export class PlacesListManager {
             this.currentCategoryLabel = categoryLabel ?? category.join(', ');
             this.currentPlacesOffset = 0;
             this.allPlaces = [];
+            this.selectedPlaceIndex = null;
             this.clearPlacesItems();
             this.updateTitleBar(this.currentCategoryLabel);
         }
@@ -98,6 +99,19 @@ export class PlacesListManager {
         this.callbacks.onPlacesUpdate?.(this.allPlaces);
     }
 
+    public filterDuplicatePlaces(newPlaces: GeoJSON.Feature[]): GeoJSON.Feature[] {
+        const existingPlaceIds = new Set(
+            this.allPlaces
+                .map(place => place.properties?.place_id)
+                .filter(id => id !== undefined)
+        );
+        
+        return newPlaces.filter(place => {
+            const placeId = place.properties?.place_id;
+            return !placeId || !existingPlaceIds.has(placeId);
+        });
+    }
+
     public clearPlacesList(): void {
         if (!this.options.showPlacesList) return;
 
@@ -112,6 +126,12 @@ export class PlacesListManager {
         
         this.removeScrollListener();
         this.resetPaginationState();
+    }
+
+    public isPlacesListVisible(): boolean {
+        if (!this.placesListElement) return false;
+        return this.placesListElement.style.display !== 'none' && 
+               this.placesListElement.classList.contains('active');
     }
 
     private clearPlacesItems(): void {
@@ -247,15 +267,15 @@ export class PlacesListManager {
 
         this.titleBar.innerHTML = '';
         
-        const searchIcon = document.createElement('span');
-        searchIcon.className = 'geoapify-places-title-icon';
-        DomHelper.addIcon(searchIcon, 'search');
+        const filterIcon = document.createElement('span');
+        filterIcon.className = 'geoapify-places-title-icon';
+        DomHelper.addIcon(filterIcon, 'filter');
         
         const labelSpan = document.createElement('span');
         labelSpan.className = 'geoapify-places-title-label';
         labelSpan.textContent = categoryLabel;
         
-        this.titleBar.appendChild(searchIcon);
+        this.titleBar.appendChild(filterIcon);
         this.titleBar.appendChild(labelSpan);
     }
 
@@ -416,7 +436,12 @@ export class PlacesListManager {
                 this.options.limit
             );
 
-            const newPlaces = data.features || [];
+            let newPlaces = data.features || [];
+            
+            if (this.options.appendPlacesResult && newPlaces.length > 0) {
+                newPlaces = this.filterDuplicatePlaces(newPlaces);
+            }
+            
             if (newPlaces.length > 0) {
                 this.showPlacesList(newPlaces, this.currentPlacesCategory, this.currentCategoryLabel, true);
             } else {

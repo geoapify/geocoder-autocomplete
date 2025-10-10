@@ -1,0 +1,256 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Café de Flore",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75006",
+                "district": "Paris",
+                "suburb": "6th Arrondissement",
+                "street": "Boulevard Saint-Germain",
+                "housenumber": "172",
+                "lon": 2.3325,
+                "lat": 48.8543,
+                "formatted": "Café de Flore, 172 Boulevard Saint-Germain, 75006 Paris, France",
+                "address_line1": "Café de Flore",
+                "address_line2": "172 Boulevard Saint-Germain, 75006 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "opening_hours": "Mo-Su 07:30-01:30",
+                "distance": 350,
+                "place_id": "51a1ea234b41d2024059e96d6f58bf6d4840f00103f90179756a14020000009203084d61726c65747465"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3325, 48.8543]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Les Deux Magots",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75006",
+                "district": "Paris",
+                "suburb": "6th Arrondissement",
+                "street": "Place Saint-Germain-des-Prés",
+                "lon": 2.3332,
+                "lat": 48.8541,
+                "formatted": "Les Deux Magots, Place Saint-Germain-des-Prés, 75006 Paris, France",
+                "address_line1": "Les Deux Magots",
+                "address_line2": "Place Saint-Germain-des-Prés, 75006 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "opening_hours": "Mo-Su 07:30-01:00",
+                "distance": 365,
+                "place_id": "51b8c3cff2c4cd5024059f0653fe2b26d4840f00103f901245adc290000000092031e4c652052656c616973206465206c2748c3b474656c2064652056696c6c65"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3332, 48.8541]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Café Marly",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75001",
+                "district": "Paris",
+                "suburb": "1st Arrondissement",
+                "street": "Rue de Rivoli",
+                "lon": 2.3364,
+                "lat": 48.8618,
+                "formatted": "Café Marly, Rue de Rivoli, 75001 Paris, France",
+                "address_line1": "Café Marly",
+                "address_line2": "Rue de Rivoli, 75001 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "distance": 380,
+                "place_id": "51cbf27112efd5024059c5d28a10c36d4840f00103f9013ed9bb230000000092030c4c65204361727265666f7572"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3364, 48.8618]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Angelina Paris",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75001",
+                "district": "Paris",
+                "suburb": "1st Arrondissement",
+                "street": "Rue de Rivoli",
+                "housenumber": "226",
+                "lon": 2.3275,
+                "lat": 48.8651,
+                "formatted": "Angelina Paris, 226 Rue de Rivoli, 75001 Paris, France",
+                "address_line1": "Angelina Paris",
+                "address_line2": "226 Rue de Rivoli, 75001 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe",
+                    "catering.cafe.coffee_shop"
+                ],
+                "opening_hours": "Mo-Fr 07:30-19:00; Sa-Su 08:30-19:30",
+                "distance": 400,
+                "place_id": "51aab85ff4cbd602405903b120c9ac6d4840f00103f9018a2016c5000000009203094174737461726275636b73"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3275, 48.8651]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "La Palette",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75006",
+                "district": "Paris",
+                "suburb": "6th Arrondissement",
+                "street": "Rue de Seine",
+                "lon": 2.3378,
+                "lat": 48.8545,
+                "formatted": "La Palette, Rue de Seine, 75006 Paris, France",
+                "address_line1": "La Palette",
+                "address_line2": "Rue de Seine, 75006 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "distance": 420,
+                "place_id": "51aa7cb1f7e2cb02405985d61007bf6d4840f00103f90192acd1830000000092031a4c61205061747c65202044657578205468c3a9c3a274726573"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3378, 48.8545]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Le Procope",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75006",
+                "district": "Paris",
+                "suburb": "6th Arrondissement",
+                "street": "Rue de l'Ancienne Comédie",
+                "lon": 2.3398,
+                "lat": 48.8526,
+                "formatted": "Le Procope, Rue de l'Ancienne Comédie, 75006 Paris, France",
+                "address_line1": "Le Procope",
+                "address_line2": "Rue de l'Ancienne Comédie, 75006 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "opening_hours": "Mo-Su 12:00-24:00",
+                "distance": 450,
+                "place_id": "51aa006dab59d70240592e229965aa6d4840f00103f90192d83fed000000009203094c652050726f636f7065"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3398, 48.8526]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Café de la Paix",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75009",
+                "district": "Paris",
+                "suburb": "9th Arrondissement",
+                "street": "Place de l'Opéra",
+                "lon": 2.3315,
+                "lat": 48.8703,
+                "formatted": "Café de la Paix, Place de l'Opéra, 75009 Paris, France",
+                "address_line1": "Café de la Paix",
+                "address_line2": "Place de l'Opéra, 75009 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe"
+                ],
+                "opening_hours": "Mo-Su 07:00-24:00",
+                "distance": 480,
+                "place_id": "51aac2876de6cb02405956314ed3c26d4840f00103f901320da5bd000000009203104361666520646520506169782070617820"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.3315, 48.8703]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Carette",
+                "country": "France",
+                "country_code": "fr",
+                "region": "Metropolitan France",
+                "state": "Ile-de-France",
+                "city": "Paris",
+                "postcode": "75016",
+                "district": "Paris",
+                "suburb": "16th Arrondissement",
+                "street": "Place du Trocadéro",
+                "lon": 2.2878,
+                "lat": 48.8631,
+                "formatted": "Carette, Place du Trocadéro, 75016 Paris, France",
+                "address_line1": "Carette",
+                "address_line2": "Place du Trocadéro, 75016 Paris, France",
+                "categories": [
+                    "catering",
+                    "catering.cafe",
+                    "catering.cafe.coffee_shop"
+                ],
+                "opening_hours": "Mo-Su 08:00-23:30",
+                "distance": 500,
+                "place_id": "51aaca67791ecc024059ccafd2d9c96d4840f00103f9013a4ab887000000009203074361726574746520"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [2.2878, 48.8631]
+            }
+        }
+    ]
+}
+

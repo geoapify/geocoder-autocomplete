@@ -30,6 +30,7 @@ import {
 import {
     mockGeocoderResponseWithCategories,
     mockPlacesApiResponse,
+    mockPlacesApiResponsePage2,
     mockPlacesApiEmpty,
     mockGeocoderResponseEmpty,
     mockIpInfoResponse
@@ -472,9 +473,9 @@ describe('Category Search and Places List', () => {
             const initialItems = getPlacesListItems(container);
             expect(initialItems?.length).toBe(8);
             
-            // Mock second page
+            // Mock second page - use page 2 with different places
             mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
+            mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
             
@@ -489,7 +490,7 @@ describe('Category Search and Places List', () => {
             await wait(WAIT_TIME);
             
             mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
+            mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
             
@@ -524,7 +525,7 @@ describe('Category Search and Places List', () => {
             const firstPlaceName = firstPlaceInitial?.querySelector('.geoapify-places-main-part')?.textContent;
             
             mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
+            mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
             
@@ -1185,9 +1186,9 @@ describe('Category Search and Places List', () => {
             let countContainer = statusBar?.querySelector('.geoapify-places-status-count');
             expect(countContainer?.textContent).toContain('8');
 
-            // Load more
+            // Load more - use page 2 with different places
             mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
+            mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
 

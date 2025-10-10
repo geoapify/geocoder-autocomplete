@@ -19,6 +19,8 @@ export class GeocoderAutocomplete {
     private inputWrapper: HTMLElement;
     private inputClearButton: HTMLElement;
     private autocompleteItemsElement: HTMLElement = null;
+    private placesLoadingIndicator: HTMLElement = null;
+    private placesLoadingOverlay: HTMLElement = null;
     
     /* Places list manager for showPlacesList functionality */
     private placesListManager: PlacesListManager;
@@ -63,7 +65,8 @@ export class GeocoderAutocomplete {
 
     private options: GeocoderAutocompleteOptions = {
         limit: 5,
-        debounceDelay: 100
+        debounceDelay: 100,
+        appendPlacesResult: true
     };
 
     constructor(private container: HTMLElement, private apiKey: string, options?: GeocoderAutocompleteOptions) {
@@ -324,6 +327,35 @@ export class GeocoderAutocomplete {
         }
     }
 
+    public async resendPlacesRequest(): Promise<void> {
+        const categoryObj = this.categoryManager.getCategory();
+        
+        if (!categoryObj) {
+            console.warn('Cannot resend places request: no category is set');
+            return;
+        }
+
+        this.callbacks.notifyPlacesRequestStart(categoryObj.category);
+        this.showPlacesLoadingIndicator();
+
+        try {
+            const data = await this.sendPlacesRequestOrAlt(categoryObj.category, undefined, undefined, 0, this.options.limit);
+            this.callbacks.notifyPlacesRequestEnd(true, data);
+            
+            const places = data.features || [];
+            
+            if (this.options.showPlacesList) {
+                this.placesListManager.showPlacesList(places, categoryObj.category, categoryObj.label);
+            }
+            this.callbacks.notifyPlaces(places);
+        } catch (error) {
+            this.callbacks.notifyPlacesRequestEnd(false, null, error);
+            console.error('Places API request failed:', error);
+        } finally {
+            this.hidePlacesLoadingIndicator();
+        }
+    }
+
     public getCategory(): Category | null {
         if (!this.isCategoryModeEnabled()) {
             return null;
@@ -350,8 +382,8 @@ export class GeocoderAutocomplete {
 
     public async sendPlacesRequest(
         category: string[],
-        bias?: string,
-        filter?: string,
+        bias?: { [key: string]: ByProximityOptions },
+        filter?: { [key: string]: ByCircleOptions | ByRectOptions | string },
         offset?: number,
         limit?: number
     ): Promise<any> {
@@ -561,6 +593,40 @@ export class GeocoderAutocomplete {
 
     private removeClearButton() {
         this.inputClearButton.classList.remove("visible");
+    }
+
+    private createPlacesLoadingIndicator() {
+        if (!this.placesLoadingOverlay) {
+            this.placesLoadingOverlay = document.createElement("div");
+            this.placesLoadingOverlay.className = "geoapify-places-loading-overlay";
+            this.container.appendChild(this.placesLoadingOverlay);
+        }
+        
+        if (!this.placesLoadingIndicator) {
+            this.placesLoadingIndicator = document.createElement("div");
+            this.placesLoadingIndicator.className = "geoapify-places-loading-indicator";
+            this.placesLoadingIndicator.innerHTML = '<div class="geoapify-places-loading-dots"><span></span><span></span><span></span></div>';
+            this.container.appendChild(this.placesLoadingIndicator);
+        }
+    }
+
+    private showPlacesLoadingIndicator() {
+        if (!this.placesListManager.isPlacesListVisible()) {
+            return;
+        }
+        
+        this.createPlacesLoadingIndicator();
+        this.placesLoadingOverlay.classList.add("visible");
+        this.placesLoadingIndicator.classList.add("visible");
+    }
+
+    private hidePlacesLoadingIndicator() {
+        if (this.placesLoadingOverlay) {
+            this.placesLoadingOverlay.classList.remove("visible");
+        }
+        if (this.placesLoadingIndicator) {
+            this.placesLoadingIndicator.classList.remove("visible");
+        }
     }
 
     private onUserKeyPress(event: KeyboardEvent) {
@@ -820,22 +886,7 @@ export class GeocoderAutocomplete {
         // Close the dropdown when a category is selected
         this.closeDropDownList();
 
-        this.callbacks.notifyPlacesRequestStart(categoryObj.category);
-
-        try {
-            const data = await this.sendPlacesRequestOrAlt(categoryObj.category, undefined, undefined, 0, this.options.limit);
-            this.callbacks.notifyPlacesRequestEnd(true, data);
-            
-            const places = data.features || [];
-            
-            if (this.options.showPlacesList) {
-                this.placesListManager.showPlacesList(places, categoryObj.category, categoryObj.label);
-            }
-            this.callbacks.notifyPlaces(places);
-        } catch (error) {
-            this.callbacks.notifyPlacesRequestEnd(false, null, error);
-            console.error('Places API request failed:', error);
-        }
+        await this.resendPlacesRequest();
     }
 
     private isCategoryModeEnabled(): boolean {
@@ -854,13 +905,10 @@ export class GeocoderAutocomplete {
         }
     }
 
-    /**
-     * Send Places request or use alternative function
-     */
     private async sendPlacesRequestOrAlt(
         category: string[],
-        bias?: string,
-        filter?: string,
+        bias?: { [key: string]: ByProximityOptions },
+        filter?: { [key: string]: ByCircleOptions | ByRectOptions | string },
         offset?: number,
         limit?: number
     ): Promise<any> {
@@ -869,14 +917,17 @@ export class GeocoderAutocomplete {
         }
 
         const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options, this.ipGeolocationUrl);
-        let url = PlacesApiHelper.generatePlacesUrl(category, this.apiKey, this.options, this.placesApiUrl, location, offset, limit);
-
-        if (bias) {
-            url += `&bias=${encodeURIComponent(bias)}`;
-        }
-        if (filter) {
-            url += `&filter=${encodeURIComponent(filter)}`;
-        }
+        const url = PlacesApiHelper.generatePlacesUrl(
+            category, 
+            this.apiKey, 
+            this.options, 
+            this.placesApiUrl, 
+            location, 
+            offset, 
+            limit,
+            bias,
+            filter
+        );
 
         return PlacesApiHelper.sendPlacesRequest(url);
     }
@@ -916,6 +967,7 @@ export interface GeocoderAutocompleteOptions {
     showPlacesList?: boolean;
     hidePlacesListAfterSelect?: boolean;
     enablePlacesLazyLoading?: boolean;
+    appendPlacesResult?: boolean;
 }
 
 export interface GeoPosition {

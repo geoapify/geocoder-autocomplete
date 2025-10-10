@@ -95,6 +95,7 @@ export const mockEmptyResponse = {
 // Mock data for category and places functionality
 import mockGeocoderResponseWithCategories from './test-data/mock-geocoder-response-with-categories.json';
 import mockPlacesApiResponse from './test-data/mock-places-api-response.json';
+import mockPlacesApiResponsePage2 from './test-data/mock-places-api-response-page2.json';
 import mockPlacesApiEmpty from './test-data/mock-places-api-empty.json';
 import mockGeocoderResponseEmpty from './test-data/mock-geocoder-response-empty.json';
 import mockIpInfoResponse from './test-data/mock-ip-info-response.json';
@@ -102,6 +103,7 @@ import mockIpInfoResponse from './test-data/mock-ip-info-response.json';
 export { 
     mockGeocoderResponseWithCategories,
     mockPlacesApiResponse,
+    mockPlacesApiResponsePage2,
     mockPlacesApiEmpty,
     mockGeocoderResponseEmpty,
     mockIpInfoResponse

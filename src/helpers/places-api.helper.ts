@@ -1,10 +1,8 @@
-import { GeocoderAutocompleteOptions, GeoPosition } from "../autocomplete";
+import { GeocoderAutocompleteOptions, GeoPosition, ByProximityOptions, ByCircleOptions, ByRectOptions } from "../autocomplete";
 import { IpGeolocationResponse } from "../types/internal";
 import { CalculationHelper } from "./calculation.helper";
 
 export class PlacesApiHelper {
-    private static readonly DEFAULT_PLACES_API_URL = "https://api.geoapify.com/v2/places";
-    private static readonly IP_GEOLOCATION_URL = "https://api.geoapify.com/v1/ipinfo";
 
     public static generatePlacesUrl(
         category: string[],
@@ -13,7 +11,9 @@ export class PlacesApiHelper {
         placesApiUrl: string,
         location?: GeoPosition | null,
         offset?: number,
-        limit?: number
+        limit?: number,
+        bias?: { [key: string]: ByProximityOptions },
+        filter?: { [key: string]: ByCircleOptions | ByRectOptions | string }
     ): string {
         const categoriesParam = category.map(c => encodeURIComponent(c)).join(',');
         let url = `${placesApiUrl}?categories=${categoriesParam}&apiKey=${apiKey}`;
@@ -30,14 +30,18 @@ export class PlacesApiHelper {
             url += `&offset=${offset}`;
         }
 
-        const filters = this.generateFilterString(options.filter || {});
+        // Merge filter: passed parameter takes precedence over options
+        const effectiveFilter = filter || this.convertGeocoderFilterToPlacesApiFilter(options.filter);
+        const filters = this.generatePlacesApiFilterString(effectiveFilter);
         if (filters) {
             url += `&filter=${filters}`;
         }
 
-        const bias = this.generateBiasString(options.bias || {}, location);
-        if (bias) {
-            url += `&bias=${bias}`;
+        // Merge bias: passed parameter takes precedence over options
+        const effectiveBias = bias || this.convertGeocoderBiasToPlacesApiBias(options.bias);
+        const biasString = this.generatePlacesApiBiasString(effectiveBias, location);
+        if (biasString) {
+            url += `&bias=${biasString}`;
         }
 
         return url;
@@ -90,20 +94,63 @@ export class PlacesApiHelper {
         return null;
     }
 
-    private static generateFilterString(filter: { [key: string]: any }): string {
+    private static convertGeocoderBiasToPlacesApiBias(bias?: { [key: string]: any }): { [key: string]: ByProximityOptions } | undefined {
+        if (!bias) return undefined;
+
+        const placesApiBias: { [key: string]: ByProximityOptions } = {};
+
+        if (bias['proximity']) {
+            placesApiBias.proximity = bias['proximity'];
+        }
+
+        return Object.keys(placesApiBias).length > 0 ? placesApiBias : undefined;
+    }
+
+    private static convertGeocoderFilterToPlacesApiFilter(filter?: { [key: string]: any }): { [key: string]: ByCircleOptions | ByRectOptions | string } | undefined {
+        if (!filter) return undefined;
+
+        const placesApiFilter: { [key: string]: ByCircleOptions | ByRectOptions | string } = {};
+
+        if (filter['circle']) {
+            placesApiFilter.circle = filter['circle'];
+        }
+
+        if (filter['rect']) {
+            placesApiFilter.rect = filter['rect'];
+        }
+
+        if (filter['place'] && typeof filter['place'] === 'string') {
+            placesApiFilter.place = filter['place'];
+        }
+
+        return Object.keys(placesApiFilter).length > 0 ? placesApiFilter : undefined;
+    }
+
+    private static generatePlacesApiFilterString(
+        filter?: { [key: string]: ByCircleOptions | ByRectOptions | string }
+    ): string {
+        if (!filter) return '';
+        
         const filters: string[] = [];
         
         Object.keys(filter).forEach(key => {
             const value = filter[key];
             if (value) {
-                if (key === 'countrycode' && Array.isArray(value)) {
-                    filters.push(`countrycode:${value.join(',').toLowerCase()}`);
-                } else if (key === 'circle' && value.lat && value.lon && value.radiusMeters) {
-                    filters.push(`circle:${value.lon},${value.lat},${value.radiusMeters}`);
-                } else if (key === 'rect' && value.lat1 && value.lon1 && value.lat2 && value.lon2) {
-                    filters.push(`rect:${value.lon1},${value.lat1},${value.lon2},${value.lat2}`);
-                } else if (key === 'place' && typeof value === 'string') {
-                    filters.push(`place:${value}`);
+                if (key === 'circle') {
+                    const circleValue = value as ByCircleOptions;
+                    if (circleValue.lat && circleValue.lon && circleValue.radiusMeters) {
+                        filters.push(`circle:${circleValue.lon},${circleValue.lat},${circleValue.radiusMeters}`);
+                    }
+                } else if (key === 'rect') {
+                    const rectValue = value as ByRectOptions;
+                    if (rectValue.lat1 && rectValue.lon1 && rectValue.lat2 && rectValue.lon2) {
+                        filters.push(`rect:${rectValue.lon1},${rectValue.lat1},${rectValue.lon2},${rectValue.lat2}`);
+                    }
+                } else if (key === 'place' || key === 'geometry') {
+                    const stringValue = value as string;
+                    if (stringValue) {
+                        filters.push(`${key}:${stringValue}`);
+                    }
                 }
             }
         });
@@ -111,28 +158,23 @@ export class PlacesApiHelper {
         return filters.join('|');
     }
 
-    private static generateBiasString(
-        bias: { [key: string]: any },
+    private static generatePlacesApiBiasString(
+        bias?: { [key: string]: ByProximityOptions },
         location?: GeoPosition | null
     ): string {
         const biases: string[] = [];
         
-        Object.keys(bias).forEach(key => {
-            const value = bias[key];
-            if (value) {
-                if (key === 'proximity' && value.lat && value.lon) {
+        if (bias) {
+            Object.keys(bias).forEach(key => {
+                const value = bias[key];
+                if (value && key === 'proximity' && value.lat && value.lon) {
                     biases.push(`proximity:${value.lon},${value.lat}`);
-                } else if (key === 'countrycode' && Array.isArray(value)) {
-                    biases.push(`countrycode:${value.join(',').toLowerCase()}`);
-                } else if (key === 'circle' && value.lat && value.lon && value.radiusMeters) {
-                    biases.push(`circle:${value.lon},${value.lat},${value.radiusMeters}`);
-                } else if (key === 'rect' && value.lat1 && value.lon1 && value.lat2 && value.lon2) {
-                    biases.push(`rect:${value.lon1},${value.lat1},${value.lon2},${value.lat2}`);
                 }
-            }
-        });
+            });
+        }
 
-        if (location && !bias['proximity'] &&
+        // Add location as fallback proximity if no proximity bias was set
+        if (location && (!bias || !bias['proximity']) &&
             CalculationHelper.isLatitude(location.lat) && 
             CalculationHelper.isLongitude(location.lon)) {
             biases.push(`proximity:${location.lon},${location.lat}`);
