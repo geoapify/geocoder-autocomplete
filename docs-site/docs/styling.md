@@ -34,3 +34,22 @@ Moreover, if you prefer to have complete control over the styling, you have the 
 | `.geoapify-places-load-more-button`            | Styles the "Load More" button.                                 |
 | `.geoapify-places-load-more-icon`              | Styles the arrow icon in the "Load More" button.               |
 | `.geoapify-places-spinner-icon`                | Styles the loading spinner icon.                               |
+| `.geoapify-input-wrapper`                      | Wrapper container for the input and close button.             |
+| `.geoapify-category-item`                      | Styles category suggestion items.                              |
+| `.geoapify-places-title-bar`                   | Styles the title bar at the top of the places list.           |
+| `.geoapify-places-title-icon`                  | Styles the icon in the title bar.                              |
+| `.geoapify-places-title-label`                 | Styles the label text in the title bar.                        |
+| `.geoapify-places-scroll-container`            | Styles the scrollable container for places items.              |
+| `.geoapify-places-text-container`              | Styles the container for place name and address.               |
+| `.geoapify-places-secondary-part`              | Styles the place address (secondary content).                  |
+| `.geoapify-places-hours-info`                  | Styles the container for opening hours information.            |
+| `.geoapify-places-status-bar`                  | Styles the status bar at the bottom of places list.           |
+| `.geoapify-places-status-count`                | Styles the count indicator in the status bar.                  |
+| `.geoapify-places-status-selected`             | Styles the selected place indicator (e.g., "1 / 10").          |
+| `.geoapify-places-load-more`                   | Styles the load more section container.                        |
+| `.geoapify-places-load-more-loading`           | Styles the loading dots indicator.                             |
+| `.geoapify-places-empty-state`                 | Styles the empty state container when no places are found.     |
+| `.geoapify-places-empty-icon`                  | Styles the icon in the empty state.                            |
+| `.geoapify-places-loading-overlay`             | Styles the loading overlay.                                    |
+| `.geoapify-places-loading-indicator`           | Styles the loading indicator container.                        |
+| `.geoapify-places-loading-dots`                | Styles the loading dots animation.                             |
