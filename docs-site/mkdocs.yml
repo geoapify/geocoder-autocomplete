@@ -1,0 +1,40 @@
+site_name: Geoapify Geocoder Autocomplete
+site_url: https://geoapify.github.io/geocoder-autocomplete/
+
+theme:
+  name: material
+  logo: assets/geoapify-white-logo-only.png
+  favicon: assets/favicon.ico
+  features:
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - tables
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quick Start: quick-start.md
+  - API Reference: api-reference.md
+  - Styling: styling.md
+  - Non-Verified Addresses: non-verified-addresses.md
+
+repo_url: https://github.com/geoapify/geocoder-autocomplete
+repo_name: GitHub
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/geoapify

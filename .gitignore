@@ -3,4 +3,6 @@ node_modules
 *.tgz
 .vscode/*
 /.idea/
+/docs-site/site/
+
 coverage

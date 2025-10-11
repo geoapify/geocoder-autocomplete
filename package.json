@@ -46,7 +46,7 @@
   "bugs": {
     "url": "https://github.com/geoapify/geocoder-autocomplete/issues"
   },
-  "homepage": "https://github.com/geoapify/geocoder-autocomplete#readme",
+  "homepage": "https://geoapify.github.io/geocoder-autocomplete/",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-json": "^6.1.0",
