@@ -1,5 +1,3 @@
-## Styling
-
 We offer a variety of built-in themes within the library, catering to different webpage styles:
 
 1. **Minimal Theme** (`minimal.css`): Designed for webpages with a light background color.
