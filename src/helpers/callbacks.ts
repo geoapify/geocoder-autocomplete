@@ -1,4 +1,4 @@
-import { GeocoderEventType, ItemType } from "../types/external";
+import { GeocoderEventType, ItemType, Category } from "../types/external";
 
 export class Callbacks {
     public changeCallbacks: ((selectedOption: any) => void)[] = [];
@@ -10,7 +10,7 @@ export class Callbacks {
     public requestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
     
     public placesCallbacks: ((places: GeoJSON.Feature[]) => void)[] = [];
-    public placesRequestStartCallbacks: ((category: string[]) => void)[] = [];
+    public placesRequestStartCallbacks: ((category: Category) => void)[] = [];
     public placesRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
     public placeDetailsRequestStartCallbacks: ((place: GeoJSON.Feature) => void)[] = [];
     public placeDetailsRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[] = [];
@@ -71,7 +71,7 @@ export class Callbacks {
         this.placesCallbacks.forEach(callback => callback(places));
     }
 
-    notifyPlacesRequestStart(category: string[]) {
+    notifyPlacesRequestStart(category: Category) {
         this.placesRequestStartCallbacks.forEach(callback => callback(category));
     }
 

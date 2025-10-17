@@ -87,7 +87,7 @@ map.on('moveend', () => {
     }
     
     // Rerun places query if a category is selected and map moved significantly
-    if (currentCategoryObj && lastQueryCenter) {
+    if (lastQueryCenter) {
         const currentCenter = map.getCenter();
         const distance = currentCenter.distanceTo(lastQueryCenter); // Distance in meters
         
@@ -97,7 +97,16 @@ map.on('moveend', () => {
             mapMoveTimeout = setTimeout(() => {
                 console.log(`Map moved ${Math.round(distance)}m - requerying places`);
                 lastQueryCenter = map.getCenter();
-                autocompleteInput.setCategory(currentCategoryObj); // Pass the full category object
+                const mapBounds = map.getBounds();
+
+                autocompleteInput.resendPlacesRequestForMore(true /* appen places */, 0 /* call with 0 offset */, {
+                    'rect': {
+                        lat1: mapBounds.getSouthWest().lat,
+                        lon1: mapBounds.getSouthWest().lng,
+                        lat2: mapBounds.getNorthEast().lat,
+                        lon2: mapBounds.getNorthEast().lng,
+                    }
+                }); // Pass the full category object
             }, 500); // Wait 500ms after map stops moving
         }
     }

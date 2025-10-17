@@ -1,4 +1,7 @@
 import { GeocoderAutocomplete } from "../src";
+import { Category } from "../src";
+import { CategoryManager } from "../src/helpers/category.helper";
+
 import fetchMock from "jest-fetch-mock";
 import '@testing-library/jest-dom';
 import { mockResponseWithData, options } from "./test-data";
@@ -120,7 +123,7 @@ export function selectDropdownItem(container: HTMLDivElement, itemIndex: number)
 export function getDropDownItem(container: HTMLDivElement, itemIndex: number) {
     const dropdown = container.querySelector('.geoapify-autocomplete-items');
     const items = dropdown?.querySelectorAll('.geoapify-autocomplete-item');
-    return items[itemIndex] as HTMLDivElement;
+    return items![itemIndex] as HTMLDivElement;
 }
 
 export function getDropDownItemValue(container: HTMLDivElement, itemIndex: number) {

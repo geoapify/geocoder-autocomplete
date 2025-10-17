@@ -2,9 +2,9 @@ import { DomHelper } from "./dom.helper";
 import { GeocoderAutocompleteOptions } from "../autocomplete";
 
 export interface PlacesListCallbacks {
-    onPlaceSelect?: (place: GeoJSON.Feature, index: number) => void;
-    onLoadMore?: (category: string[], offset: number, limit?: number) => Promise<any>;
-    onPlacesUpdate?: (allPlaces: GeoJSON.Feature[]) => void;
+    onPlaceSelect: (place: GeoJSON.Feature, index: number) => void;
+    onLoadMore: (offset: number) => Promise<any>;
+    onPlacesUpdate: (allPlaces: GeoJSON.Feature[]) => void;
 }
 
 interface PlaceData {
@@ -23,31 +23,36 @@ export class PlacesListManager {
     private scrollContainer: HTMLElement = null;
     private statusBar: HTMLElement = null;
     private loadMoreElement: HTMLElement = null;
-    
+
     // Pagination state
     private currentPlacesOffset: number = 0;
     private currentPlacesCategory: string[] = null;
     private currentCategoryLabel: string = null;
     private isLoadingMorePlaces: boolean = false;
     private hasMorePlaces: boolean = true;
-    private allPlaces: GeoJSON.Feature[] = [];
-    
+    private places: GeoJSON.Feature[] = [];
+
     // Scroll detection
     private scrollListener: ((event: Event) => void) | null = null;
-    
+
     private selectedPlaceIndex: number | null = null;
 
     constructor(
-        container: HTMLElement, 
-        options: GeocoderAutocompleteOptions, 
-        callbacks: PlacesListCallbacks = {}
+        container: HTMLElement,
+        options: GeocoderAutocompleteOptions,
+        callbacks: PlacesListCallbacks
     ) {
         this.container = container;
         this.options = options;
         this.callbacks = callbacks;
     }
 
-    public showPlacesList(places: GeoJSON.Feature[], category: string[], categoryLabel?: string, isLoadMore: boolean = false): void {
+    public setCategory(category: string[], categoryLabel: string) {
+        this.currentPlacesCategory = category;
+        this.currentCategoryLabel = categoryLabel ?? category.join(', ');
+    }
+
+    public showPlacesList(placesToRender: GeoJSON.Feature[],  isLoadMore: boolean = false): void {
         if (!this.options.showPlacesList) return;
 
         // Create elements if they don't exist
@@ -55,18 +60,7 @@ export class PlacesListManager {
             this.createPlacesElements();
         }
 
-        // Handle initial vs load more
-        if (!isLoadMore) {
-            this.currentPlacesCategory = category;
-            this.currentCategoryLabel = categoryLabel ?? category.join(', ');
-            this.currentPlacesOffset = 0;
-            this.allPlaces = [];
-            this.selectedPlaceIndex = null;
-            this.clearPlacesItems();
-            this.updateTitleBar(this.currentCategoryLabel);
-        }
-
-        if (!places || places.length === 0) {
+        if (!this.places || this.places.length === 0  /* places contain already pleaseToRender */) {
             this.showEmptyState();
             this.updateStatusBar();
             this.showList(false);
@@ -74,15 +68,10 @@ export class PlacesListManager {
         }
 
         // Add new places
-        this.allPlaces.push(...places);
-        this.renderPlaces(places, isLoadMore);
-
-        // Update pagination
-        this.currentPlacesOffset += places.length;
-        this.hasMorePlaces = places.length >= (this.options.limit || 5);
+        this.renderPlaces(placesToRender, isLoadMore);
 
         this.updateStatusBar();
-        
+
         this.updateStatusBarState('empty');
 
         // Setup scroll detection
@@ -94,22 +83,50 @@ export class PlacesListManager {
 
         // Show list
         this.showList(isLoadMore);
-        
-        // Notify callback
-        this.callbacks.onPlacesUpdate?.(this.allPlaces);
     }
 
     public filterDuplicatePlaces(newPlaces: GeoJSON.Feature[]): GeoJSON.Feature[] {
         const existingPlaceIds = new Set(
-            this.allPlaces
+            this.places
                 .map(place => place.properties?.place_id)
                 .filter(id => id !== undefined)
         );
-        
+
         return newPlaces.filter(place => {
             const placeId = place.properties?.place_id;
             return !placeId || !existingPlaceIds.has(placeId);
         });
+    }
+
+    public addPlaces(places: GeoJSON.Feature[], currentPlacesOffset: number) {
+            
+        this.hasMorePlaces = places.length === this.options.placesLimit;
+        this.currentPlacesOffset = currentPlacesOffset;
+
+        const newPlaces = this.filterDuplicatePlaces(places);
+        this.places.push(...newPlaces);
+        this.showPlacesList(newPlaces); 
+
+        // Notify callback
+        this.callbacks.onPlacesUpdate?.(this.places);
+    }
+
+    public setPlaces(places: GeoJSON.Feature[], currentPlacesOffset: number) {
+        this.places = [];
+        this.selectedPlaceIndex = null;
+        this.clearPlacesItems();
+        this.updateTitleBar(this.currentCategoryLabel);
+        this.places.push(...places);
+        this.showPlacesList(places); 
+
+        this.currentPlacesOffset = currentPlacesOffset;
+
+        // Notify callback
+        this.callbacks.onPlacesUpdate?.(this.places);
+    }
+
+    public getPlaces(): GeoJSON.Feature[] {
+        return this.places;
     }
 
     public clearPlacesList(): void {
@@ -118,20 +135,20 @@ export class PlacesListManager {
         if (this.scrollContainer) {
             this.scrollContainer.innerHTML = '';
         }
-        
+
         if (this.placesListElement) {
             this.placesListElement.classList.remove('active', 'standalone');
             this.placesListElement.style.display = 'none';
         }
-        
+
         this.removeScrollListener();
         this.resetPaginationState();
     }
 
     public isPlacesListVisible(): boolean {
         if (!this.placesListElement) return false;
-        return this.placesListElement.style.display !== 'none' && 
-               this.placesListElement.classList.contains('active');
+        return this.placesListElement.style.display !== 'none' &&
+            this.placesListElement.classList.contains('active');
     }
 
     private clearPlacesItems(): void {
@@ -156,7 +173,7 @@ export class PlacesListManager {
         placeItems.forEach(item => {
             item.classList.remove('active');
         });
-        
+
         // Add selection to the specified item
         const targetItem = this.scrollContainer.querySelector(`[data-index="${index}"]`);
         if (targetItem) {
@@ -214,14 +231,14 @@ export class PlacesListManager {
         if (this.loadMoreElement.parentNode === this.scrollContainer) {
             this.loadMoreElement.remove();
         }
-        
+
         const startIndex = isLoadMore ? this.scrollContainer.children.length : 0;
-        
+
         places.forEach((place, index) => {
             const placeElement = this.createPlaceItem(place, startIndex + index);
             this.scrollContainer.appendChild(placeElement);
         });
-        
+
         this.scrollContainer.appendChild(this.loadMoreElement);
     }
 
@@ -244,9 +261,9 @@ export class PlacesListManager {
 
         const iconElement = document.createElement('div');
         iconElement.className = 'geoapify-places-empty-icon';
-        
+
         DomHelper.addIcon(iconElement, 'ban');
-        
+
         emptyState.appendChild(iconElement);
 
         this.scrollContainer.appendChild(emptyState);
@@ -258,7 +275,7 @@ export class PlacesListManager {
         this.currentCategoryLabel = null;
         this.hasMorePlaces = true;
         this.isLoadingMorePlaces = false;
-        this.allPlaces = [];
+        this.places = [];
         this.selectedPlaceIndex = null;
     }
 
@@ -266,15 +283,15 @@ export class PlacesListManager {
         if (!this.titleBar) return;
 
         this.titleBar.innerHTML = '';
-        
+
         const filterIcon = document.createElement('span');
         filterIcon.className = 'geoapify-places-title-icon';
         DomHelper.addIcon(filterIcon, 'filter');
-        
+
         const labelSpan = document.createElement('span');
         labelSpan.className = 'geoapify-places-title-label';
         labelSpan.textContent = categoryLabel;
-        
+
         this.titleBar.appendChild(filterIcon);
         this.titleBar.appendChild(labelSpan);
     }
@@ -287,22 +304,22 @@ export class PlacesListManager {
         // Create icon + count on the left
         const countContainer = document.createElement('div');
         countContainer.className = 'geoapify-places-status-count';
-        
+
         const iconElement = document.createElement('span');
         DomHelper.addIcon(iconElement, 'map-marker');
         countContainer.appendChild(iconElement);
-        
+
         const countText = document.createElement('span');
-        countText.textContent = this.allPlaces.length.toString();
+        countText.textContent = this.places.length.toString();
         countContainer.appendChild(countText);
-        
+
         this.statusBar.appendChild(countContainer);
 
         // Show selected item index on the right if a place is selected
         if (this.selectedPlaceIndex !== null) {
             const selectedInfo = document.createElement('div');
             selectedInfo.className = 'geoapify-places-status-selected';
-            selectedInfo.textContent = `${this.selectedPlaceIndex + 1} / ${this.allPlaces.length}`;
+            selectedInfo.textContent = `${this.selectedPlaceIndex + 1} / ${this.places.length}`;
             this.statusBar.appendChild(selectedInfo);
         }
     }
@@ -311,14 +328,14 @@ export class PlacesListManager {
         if (!this.loadMoreElement) return;
 
         this.loadMoreElement.innerHTML = '';
-        
+
         // Hide the element when there are no more results
         if (state === 'end' || state === 'empty') {
             this.loadMoreElement.style.display = 'none';
             this.loadMoreElement.className = 'geoapify-places-load-more';
             return;
         }
-        
+
         // Show the element for button and loading states
         this.loadMoreElement.style.display = '';
         this.loadMoreElement.className = `geoapify-places-load-more ${state}`;
@@ -329,11 +346,11 @@ export class PlacesListManager {
             button.setAttribute('type', 'button');
             button.setAttribute('aria-label', 'Load more places');
             button.addEventListener('click', () => this.loadMorePlaces());
-            
+
             const iconElement = document.createElement('span');
             DomHelper.addIcon(iconElement, 'chevron-down');
             button.appendChild(iconElement);
-            
+
             this.loadMoreElement.appendChild(button);
         } else if (state === 'loading') {
             const dots = document.createElement('span');
@@ -351,19 +368,19 @@ export class PlacesListManager {
         const placeElement = document.createElement('div');
         placeElement.className = 'geoapify-places-item';
         placeElement.dataset.index = index.toString();
-        
+
         const placeData = this.extractPlaceData(place);
-        
+
         // Container for name and address
         const textContainer = document.createElement('div');
         textContainer.className = 'geoapify-places-text-container';
-        
+
         // Place name
         const nameElement = document.createElement('span');
         nameElement.className = 'geoapify-places-main-part';
         nameElement.textContent = placeData.name;
         textContainer.appendChild(nameElement);
-        
+
         // Address - only if available
         if (placeData.address) {
             const addressElement = document.createElement('span');
@@ -371,33 +388,33 @@ export class PlacesListManager {
             addressElement.textContent = placeData.address;
             textContainer.appendChild(addressElement);
         }
-        
+
         placeElement.appendChild(textContainer);
-        
+
         // Opening hours (text + icon) - only if available
         if (placeData.openingHours) {
             const hoursContainer = document.createElement('span');
             hoursContainer.className = 'geoapify-places-hours-info';
-            
+
             const clockIcon = document.createElement('span');
             clockIcon.className = 'geoapify-places-clock-icon';
             DomHelper.addIcon(clockIcon, 'clock');
-            
+
             const hoursText = document.createElement('span');
             hoursText.className = 'geoapify-places-hours-text';
             hoursText.textContent = placeData.openingHours;
-            
+
             hoursContainer.appendChild(clockIcon);
             hoursContainer.appendChild(hoursText);
             placeElement.appendChild(hoursContainer);
         }
-        
+
         placeElement.addEventListener('click', () => {
             this.selectedPlaceIndex = index;
             this.updateStatusBar();
             this.selectPlaceFromList(place, index);
         });
-        
+
         return placeElement;
     }
 
@@ -430,24 +447,11 @@ export class PlacesListManager {
         this.updateStatusBarState('loading');
 
         try {
-            const data = await this.callbacks.onLoadMore(
-                this.currentPlacesCategory,
-                this.currentPlacesOffset,
-                this.options.limit
+            await this.callbacks.onLoadMore(
+                this.currentPlacesOffset
             );
 
-            let newPlaces = data.features || [];
-            
-            if (this.options.appendPlacesResult && newPlaces.length > 0) {
-                newPlaces = this.filterDuplicatePlaces(newPlaces);
-            }
-            
-            if (newPlaces.length > 0) {
-                this.showPlacesList(newPlaces, this.currentPlacesCategory, this.currentCategoryLabel, true);
-            } else {
-                this.hasMorePlaces = false;
-                this.updateStatusBarState('end');
-            }
+            this.updateStatusBarState('end');
         } catch (error) {
             console.error('Failed to load more places:', error);
             // Revert to button state on error

@@ -1,4 +1,4 @@
 export interface Category {
-    category: string[];
+    keys: string[];
     label: string;
 }

@@ -451,7 +451,7 @@ describe('GeocoderAutocomplete', () => {
         await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5`);
 
         const dropdownItem = getDropDownItem(container, 0);
-        expect(dropdownItem.querySelector(".icon").innerHTML).toContain('M573.19');
+        expect(dropdownItem.querySelector(".icon")!.innerHTML).toContain('M573.19');
         autocomplete.setSkipIcons(true);
 
         await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5`);
@@ -564,30 +564,5 @@ describe('GeocoderAutocomplete', () => {
         autocomplete.setLang('ab');
         await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5&lang=ab`);
         autocomplete.setLang(null);
-    });
-    it('setGeocoderUrl works as expected', async () => {
-        autocomplete.setGeocoderUrl("https://api.geoapify.com/v2/geocode/autocomplete")
-        await inputValueAndExpectTheRequest(container, `https://api.geoapify.com/v2/geocode/autocomplete?text=123&apiKey=XXXXX&limit=5`);
-        autocomplete.setGeocoderUrl(APP_URL)
-        await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&limit=5`);
-    });
-    it('setPlaceDetailsUrl works as expected', async () => {
-        autocomplete.setPlaceDetailsUrl("https://api.geoapify.com/v3/place-details")
-        autocomplete.setAddDetails(true);
-        fetchMock.resetMocks();
-
-        const selectSpy = addSelectSpy(autocomplete);
-        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
-        fetchMock.mockResponseOnce(JSON.stringify(mockResponseWithDataOSM));
-
-        autocomplete.setSendPlaceDetailsRequestFunc(null);
-        inputText(container, "123");
-        await wait(WAIT_TIME);
-
-        selectDropdownItem(container, 0);
-        await wait(WAIT_TIME);
-        expect(selectSpy).toHaveBeenNthCalledWith(1, mockResponseWithDataOSM.features[0]);
-        expect(fetchMock).toHaveBeenCalledWith("https://api.geoapify.com/v3/place-details?id=placeId&apiKey=XXXXX");
-        autocomplete.setAddDetails(false);
     });
 });

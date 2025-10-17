@@ -48,7 +48,7 @@ describe('Category Search and Places List', () => {
         skipIcons: true,
         addCategorySearch: true,
         placeholder: "Search location or category",
-        limit: 8
+        placesLimit: 8
     };
 
     const optionsWithPlacesList: GeocoderAutocompleteOptions = {
@@ -56,7 +56,7 @@ describe('Category Search and Places List', () => {
         addCategorySearch: true,
         showPlacesList: true,
         placeholder: "Search location or category",
-        limit: 8
+        placesLimit: 8
     };
 
     beforeEach(() => {
@@ -82,14 +82,17 @@ describe('Category Search and Places List', () => {
         });
 
         it('should set category properly using setCategory()', async () => {
-            const category: Category = { category: ['catering.cafe'], label: 'Cafes' };
-            
+            const category: Category = { keys: ['catering.cafe'], label: 'Cafes' };
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory(category);
             await wait(WAIT_TIME);
-            
-            expect(autocomplete.getCategory()).toEqual(category);
+
+            expect(autocomplete.getCategory()).toEqual(expect.objectContaining({
+                keys: ['catering.cafe'],
+                label: 'Cafes'
+            }));
             expect(autocomplete.getValue()).toBe('Cafes');
         });
 
@@ -97,23 +100,26 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             const category = autocomplete.getCategory();
-            expect(category).toEqual({ category: ['catering.cafe'], label: 'catering.cafe' });
+            expect(category).toEqual(expect.objectContaining({
+                keys: ['catering.cafe'],
+                label: 'catering.cafe'
+            }));
         });
 
         it('should get category using getCategory()', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             const category = autocomplete.getCategory();
             expect(category).toBeTruthy();
-            expect(category?.category).toStrictEqual(['catering.cafe']);
+            expect(category?.keys).toStrictEqual(['catering.cafe']);
         });
 
         it('should set category using array of strings', async () => {
@@ -121,12 +127,12 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             const categories = ['catering.fast_food.pizza', 'catering.restaurant.pizza'];
             autocomplete.setCategory(categories);
-            
+
             await wait(WAIT_TIME);
-            
+
             const category = autocomplete.getCategory();
             expect(category).toBeTruthy();
-            expect(category?.category).toStrictEqual(categories);
+            expect(category?.keys).toStrictEqual(categories);
             expect(category?.label).toBe('catering.fast_food.pizza, catering.restaurant.pizza');
         });
 
@@ -135,9 +141,9 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             const categories = ['catering.fast_food.pizza', 'catering.restaurant.pizza'];
             autocomplete.setCategory(categories);
-            
+
             await wait(WAIT_TIME);
-            
+
             expect(fetchMock).toHaveBeenCalledWith(
                 expect.stringContaining(`${PLACES_API_URL}?categories=catering.fast_food.pizza,catering.restaurant.pizza&apiKey=XXXXX`)
             );
@@ -148,82 +154,104 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             autocomplete.setCategory(null);
-            
+
             expect(autocomplete.getCategory()).toBeNull();
         });
 
         it('should send places request when category is selected', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             expect(fetchMock).toHaveBeenCalledWith(
                 expect.stringContaining(`${PLACES_API_URL}?categories=catering.cafe&apiKey=XXXXX&limit=8`)
             );
-            expect(placesSpy).toHaveBeenCalledWith(mockPlacesApiResponse.features);
+
+            // Safely get the last call args
+            const [places] = placesSpy.mock.lastCall!; // or: placesSpy.mock.calls.at(-1)!
+            expect(Array.isArray(places)).toBe(true);
+
+            // Example checks on content (not strict object identity)
+            expect(places).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        properties: expect.objectContaining({
+                            place_id: expect.any(String),
+                        }),
+                    }),
+                ])
+            );
+
+            // Or just length / simple fields
+            expect(places).toHaveLength(mockPlacesApiResponse.features.length);
+            expect(places.map((p : any) => p.properties.name ?? p.properties.formatted))
+                .toEqual(expect.any(Array));
         });
 
         it('should trigger places_request_start callback with category', async () => {
             const placesRequestStartSpy = addPlacesRequestStartSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
-            expect(placesRequestStartSpy).toHaveBeenCalledWith(['catering.cafe']);
+
+            expect(placesRequestStartSpy).toHaveBeenCalledWith(expect.objectContaining({
+                keys: ['catering.cafe'],
+                label: 'catering.cafe'
+            }));
         });
 
         it('should trigger places_request_end callback with success and data', async () => {
             const placesRequestEndSpy = addPlacesRequestEndSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             expect(placesRequestEndSpy).toHaveBeenCalledWith(true, mockPlacesApiResponse, undefined);
         });
 
         it('should trigger places callback with places array', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(1);
             expect(placesSpy).toHaveBeenCalledWith(mockPlacesApiResponse.features);
         });
 
         it('should handle failed places API requests properly', async () => {
             const placesRequestEndSpy = addPlacesRequestEndSpy(autocomplete);
-            
+
             const errorResponse = {
                 statusCode: 401,
                 error: "Unauthorized",
                 message: "Invalid apiKey"
             };
-            
+
             mockIpInfo(mockIpInfoResponse);
             fetchMock.mockResponseOnce(
                 JSON.stringify(errorResponse),
                 { status: 401, statusText: 'Unauthorized' }
             );
-            
+
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(placesRequestEndSpy).toHaveBeenCalledWith(false, null, expect.any(Object));
         });
 
@@ -233,7 +261,7 @@ describe('Category Search and Places List', () => {
                 "XXXXX",
                 { skipIcons: true }
             );
-            
+
             expect(autocompleteNoCategory.getCategory()).toBeNull();
         });
     });
@@ -249,34 +277,34 @@ describe('Category Search and Places List', () => {
 
         it('should extract categories from geocoder response when available', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
-            
+
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             const dropdown = container.querySelector('.geoapify-autocomplete-items');
             expect(dropdown).toBeTruthy();
         });
 
         it('should display category suggestions in dropdown', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
-            
+
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             expectCategoryInDropdown(container, 2); // Should have 2 categories
         });
 
         it('should render categories before address results', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
-            
+
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             const dropdown = container.querySelector('.geoapify-autocomplete-items');
             const allItems = dropdown?.querySelectorAll('.geoapify-autocomplete-item, .geoapify-category-item');
             const firstItem = allItems?.[0];
             const secondItem = allItems?.[1];
-            
+
             // First two items should be categories
             expect(firstItem).toHaveClass('geoapify-category-item');
             expect(secondItem).toHaveClass('geoapify-category-item');
@@ -284,46 +312,46 @@ describe('Category Search and Places List', () => {
 
         it('should allow selecting a category from dropdown', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             selectCategoryDropdownItem(container, 0);
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalled();
             expect(autocomplete.getCategory()).toBeTruthy();
         });
 
         it('should display category labels correctly', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
-            
+
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             const categoryItem = getCategoryDropdownItem(container, 0);
             const labelElement = categoryItem?.querySelector('.main-part');
-            
+
             expect(labelElement?.textContent).toBe('Food & Dining Places');
         });
 
         it('should navigate dropdown with arrow down key and populate input with category', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
-            
+
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             // Verify dropdown is open with categories
             const dropdown = container.querySelector('.geoapify-autocomplete-items');
             expect(dropdown).toBeTruthy();
             expectCategoryInDropdown(container, 2);
-            
+
             // Press arrow down to select first item (first category)
             inputTextWithEvent(container, 'caf', 'ArrowDown');
-            
+
             // Check that the first category label is populated in the input
             const inputElement = container.querySelector('input') as HTMLInputElement;
             expect(inputElement.value).toBe('Food & Dining Places');
@@ -331,30 +359,30 @@ describe('Category Search and Places List', () => {
 
         it('should close dropdown and trigger places request when Enter is pressed on category', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             // Verify dropdown is open
             let dropdown = container.querySelector('.geoapify-autocomplete-items');
             expect(dropdown).toBeTruthy();
-            
+
             // Press arrow down to navigate to first category
             inputTextWithEvent(container, 'caf', 'ArrowDown');
-            
+
             // Mock IP info and places API for when category is selected
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            
+
             // Press Enter to select the category
             inputTextWithEvent(container, 'Food & Dining Places', 'Enter');
             await wait(WAIT_TIME);
-            
+
             // Dropdown should be closed
             dropdown = container.querySelector('.geoapify-autocomplete-items');
             expect(dropdown).toBeNull();
-            
+
             // Category should be set and places request should be triggered
             expect(autocomplete.getCategory()).toBeTruthy();
             expect(placesSpy).toHaveBeenCalledWith(mockPlacesApiResponse.features);
@@ -374,9 +402,9 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             expectPlacesListVisible(container);
         });
 
@@ -384,9 +412,9 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             const placeItems = getPlacesListItems(container);
             expect(placeItems?.length).toBe(8); // 8 cafes in mock data
         });
@@ -395,15 +423,15 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             const placeItems = getPlacesListItems(container);
             const firstPlace = placeItems?.[0];
-            
+
             const nameElement = firstPlace?.querySelector('.geoapify-places-main-part');
             expect(nameElement?.textContent).toBe('Marlette');
-            
+
             // Check that hours info is displayed
             const hoursInfo = firstPlace?.querySelector('.geoapify-places-hours-info');
             expect(hoursInfo).toBeTruthy();
@@ -413,12 +441,12 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             const placeItems = getPlacesListItems(container);
             const firstPlace = placeItems?.[0]; // Marlette has opening_hours
-            
+
             const hoursElement = firstPlace?.querySelector('.geoapify-places-hours-text');
             expect(hoursElement?.textContent).toBe('Mo-Su 11:30-19:30');
         });
@@ -430,12 +458,12 @@ describe('Category Search and Places List', () => {
                 "XXXXX",
                 optionsWithCategorySearch
             );
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocompleteNoList.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expectPlacesListHidden(container);
         });
     });
@@ -453,12 +481,12 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
-            
+
             await wait(WAIT_TIME);
-            
+
             // Scroll to bottom to trigger button
             scrollPlacesToBottom(container);
-            
+
             const loadMoreButton = getLoadMoreButton(container);
             expect(loadMoreButton).toBeTruthy();
             expect(loadMoreButton).toHaveClass('geoapify-places-load-more-button');
@@ -469,16 +497,16 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             const initialItems = getPlacesListItems(container);
             expect(initialItems?.length).toBe(8);
-            
+
             // Mock second page - use page 2 with different places
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
-            
+
             const updatedItems = getPlacesListItems(container);
             expect(updatedItems?.length).toBe(16); // 8 + 8
         });
@@ -488,12 +516,12 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
-            
+
             expect(fetchMock).toHaveBeenLastCalledWith(
                 expect.stringContaining('offset=8')
             );
@@ -505,12 +533,12 @@ describe('Category Search and Places List', () => {
                 type: "FeatureCollection",
                 features: mockPlacesApiResponse.features.slice(0, 3) // Only 3 items
             };
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(smallResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             const loadMoreButton = getLoadMoreButton(container);
             expect(loadMoreButton).toBeFalsy();
         });
@@ -520,18 +548,18 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             const firstPlaceInitial = getPlacesListItems(container)?.[0];
             const firstPlaceName = firstPlaceInitial?.querySelector('.geoapify-places-main-part')?.textContent;
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
             await wait(WAIT_TIME);
-            
+
             const firstPlaceAfter = getPlacesListItems(container)?.[0];
             const firstPlaceNameAfter = firstPlaceAfter?.querySelector('.geoapify-places-main-part')?.textContent;
-            
+
             // First place should remain the same
             expect(firstPlaceNameAfter).toBe(firstPlaceName);
         });
@@ -548,14 +576,14 @@ describe('Category Search and Places List', () => {
 
         it('should trigger place_select callback when place is clicked', async () => {
             const placeSelectSpy = addPlaceSelectSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             selectPlaceFromList(container, 0);
-            
+
             expect(placeSelectSpy).toHaveBeenCalledTimes(1);
             expect(placeSelectSpy).toHaveBeenCalledWith(
                 mockPlacesApiResponse.features[0],
@@ -565,14 +593,14 @@ describe('Category Search and Places List', () => {
 
         it('should pass correct place data and index', async () => {
             const placeSelectSpy = addPlaceSelectSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             selectPlaceFromList(container, 2); // Select third place
-            
+
             expect(placeSelectSpy).toHaveBeenCalledWith(
                 mockPlacesApiResponse.features[2],
                 2
@@ -585,16 +613,16 @@ describe('Category Search and Places List', () => {
                 "XXXXX",
                 { ...optionsWithPlacesList, hidePlacesListAfterSelect: true }
             );
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocompleteWithHide.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expectPlacesListVisible(container);
-            
+
             selectPlaceFromList(container, 0);
-            
+
             const placeItems = getPlacesListItems(container);
             expect(placeItems?.length).toBe(0);
         });
@@ -604,9 +632,9 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             selectPlaceFromList(container, 0);
-            
+
             expectPlacesListVisible(container);
         });
     });
@@ -622,14 +650,14 @@ describe('Category Search and Places List', () => {
 
         it('should trigger clear callback with "category" type when category is cleared', async () => {
             const clearSpy = addClearSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             autocomplete.setCategory(null);
-            
+
             expect(clearSpy).toHaveBeenCalledWith('category');
         });
 
@@ -638,43 +666,43 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             const clearButton = container.querySelector('.geoapify-close-button') as HTMLElement;
             clearButton.click();
             await wait(WAIT_TIME);
-            
+
             expect(autocomplete.getValue()).toBe('');
         });
 
         it('should notify "category" when user types and category was active', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            
+
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             const clearSpy = addClearSpy(autocomplete);
-            
+
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
             inputText(container, 'new search');
             await wait(WAIT_TIME);
-            
+
             expect(clearSpy).toHaveBeenCalledWith('category');
         });
 
         it('should NOT send duplicate clear events when clearing category via clear button', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            
+
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             const clearSpy = addClearSpy(autocomplete);
-            
+
             const clearButton = container.querySelector('.geoapify-close-button') as HTMLElement;
             clearButton.click();
             await wait(WAIT_TIME);
-            
+
             // Should only be called once with 'category'
             expect(clearSpy).toHaveBeenCalledTimes(1);
             expect(clearSpy).toHaveBeenCalledWith('category');
@@ -684,13 +712,13 @@ describe('Category Search and Places List', () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
             inputText(container, 'some text');
             await wait(WAIT_TIME);
-            
+
             const clearSpy = addClearSpy(autocomplete);
-            
+
             const clearButton = container.querySelector('.geoapify-close-button') as HTMLElement;
             clearButton.click();
             await wait(WAIT_TIME);
-            
+
             expect(clearSpy).toHaveBeenCalledWith('place');
         });
     });
@@ -708,14 +736,14 @@ describe('Category Search and Places List', () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             // Dropdown should be open
             const dropdown = container.querySelector('.geoapify-autocomplete-items');
             expect(dropdown).toBeTruthy();
-            
+
             // Press ESC
             inputTextWithEvent(container, 'caf', 'Escape');
-            
+
             // Dropdown should be closed
             expectDropdownIsClosed(container);
             expect(autocomplete.getValue()).toBe('caf');
@@ -723,22 +751,22 @@ describe('Category Search and Places List', () => {
 
         it('should clear category on double ESC press (within threshold)', async () => {
             const clearSpy = addClearSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            const category: Category = { category: ['catering.cafe'], label: 'Cafes' };
+            const category: Category = { keys: ['catering.cafe'], label: 'Cafes' };
             autocomplete.setCategory(category);
             await wait(WAIT_TIME);
-            
+
             expect(autocomplete.getCategory()).toBeTruthy();
             expect(autocomplete.getValue()).toBe('Cafes');
-            
+
             // First ESC (no dropdown to close in this case)
             inputTextWithEvent(container, 'Cafes', 'Escape');
-            
+
             // Second ESC within threshold (500ms)
             inputTextWithEvent(container, 'Cafes', 'Escape');
-            
+
             expect(autocomplete.getCategory()).toBeNull();
             expect(autocomplete.getValue()).toBe('');
             expect(clearSpy).toHaveBeenCalledWith('category');
@@ -747,15 +775,15 @@ describe('Category Search and Places List', () => {
         it('should not clear category on single ESC when dropdown is closed', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            const category: Category = { category: ['catering.cafe'], label: 'Cafes' };
+            const category: Category = { keys: ['catering.cafe'], label: 'Cafes' };
             autocomplete.setCategory(category);
             await wait(WAIT_TIME);
-            
+
             expect(autocomplete.getCategory()).toBeTruthy();
-            
+
             // Single ESC
             inputTextWithEvent(container, 'Cafes', 'Escape');
-            
+
             // Category should still be set
             expect(autocomplete.getCategory()).toBeTruthy();
             expect(autocomplete.getValue()).toBe('Cafes');
@@ -766,18 +794,18 @@ describe('Category Search and Places List', () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
             inputText(container, 'caf');
             await wait(WAIT_TIME);
-            
+
             // Verify dropdown is open
             const dropdown = container.querySelector('.geoapify-autocomplete-items');
             expect(dropdown).toBeTruthy();
-            
+
             // First ESC - close dropdown
             inputTextWithEvent(container, 'caf', 'Escape');
             expectDropdownIsClosed(container);
-            
+
             // Second ESC within threshold - should NOT clear anything (no category is set)
             inputTextWithEvent(container, 'caf', 'Escape');
-            
+
             // Value should remain
             expect(autocomplete.getValue()).toBe('caf');
         });
@@ -797,13 +825,13 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(autocomplete.getCategory()).toBeTruthy();
-            
+
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
             inputText(container, 'test address');
             await wait(WAIT_TIME);
-            
+
             expect(autocomplete.getCategory()).toBeNull();
         });
 
@@ -812,13 +840,13 @@ describe('Category Search and Places List', () => {
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expectPlacesListVisible(container);
-            
+
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
             inputText(container, 'test');
             await wait(WAIT_TIME);
-            
+
             const placeItems = getPlacesListItems(container);
             expect(placeItems?.length).toBe(0);
         });
@@ -839,38 +867,38 @@ describe('Category Search and Places List', () => {
                 type: "FeatureCollection",
                 features: [{ properties: { name: 'Custom Cafe' } }]
             };
-            
+
             autocomplete.setSendPlacesRequestFunc(() => {
                 return Promise.resolve(customResponse);
             });
-            
+
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(fetchMock).not.toHaveBeenCalled();
             expect(placesSpy).toHaveBeenCalledWith(customResponse.features);
         });
 
         it('should use custom function instead of API when set', async () => {
             const customFunc = jest.fn().mockResolvedValue(mockPlacesApiResponse);
-            
+
             autocomplete.setSendPlacesRequestFunc(customFunc);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
-            expect(customFunc).toHaveBeenCalledWith(['catering.cafe'], autocomplete, 0, 8);
+
+            expect(customFunc).toHaveBeenCalledWith(['catering.cafe'], 0, autocomplete);
             expect(fetchMock).not.toHaveBeenCalled();
         });
 
         it('should reset to default when set to undefined', async () => {
             autocomplete.setSendPlacesRequestFunc(() => Promise.resolve(mockPlacesApiResponse));
             autocomplete.setSendPlacesRequestFunc(undefined);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(fetchMock).toHaveBeenCalled();
         });
     });
@@ -886,95 +914,98 @@ describe('Category Search and Places List', () => {
 
         it('should handle on("places", callback) properly', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(1);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.restaurant');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(2);
         });
 
         it('should handle off("places", callback) properly', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(1);
-            
+
             autocomplete.off('places', placesSpy);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.restaurant');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(1); // Should not be called again
         });
 
         it('should handle once("places", callback) properly', async () => {
             const placesSpy = jest.fn();
             autocomplete.once('places', placesSpy);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(1);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.restaurant');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledTimes(1); // Should only be called once
         });
 
         it('should handle places_request_start callbacks properly', async () => {
             const startSpy = addPlacesRequestStartSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
-            expect(startSpy).toHaveBeenCalledWith(['catering.cafe']);
-            
+
+            expect(startSpy).toHaveBeenCalledWith(expect.objectContaining({
+                keys: ['catering.cafe'],
+                label: 'catering.cafe'
+            }));
+
             autocomplete.off('places_request_start', startSpy);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.restaurant');
             await wait(WAIT_TIME);
-            
+
             expect(startSpy).toHaveBeenCalledTimes(1);
         });
 
         it('should handle places_request_end callbacks properly', async () => {
             const endSpy = addPlacesRequestEndSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             expect(endSpy).toHaveBeenCalledWith(true, mockPlacesApiResponse, undefined);
         });
 
         it('should handle place_select callbacks properly', async () => {
             const selectSpy = addPlaceSelectSpy(autocomplete);
-            
+
             const autocompleteWithList = new GeocoderAutocomplete(
                 container,
                 "XXXXX",
@@ -982,27 +1013,27 @@ describe('Category Search and Places List', () => {
             );
             selectSpy.mockClear();
             autocompleteWithList.on('place_select', selectSpy);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocompleteWithList.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             selectPlaceFromList(container, 0);
-            
+
             expect(selectSpy).toHaveBeenCalledWith(mockPlacesApiResponse.features[0], 0);
         });
 
         it('should handle clear callbacks properly', async () => {
             const clearSpy = addClearSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
-            
+
             autocomplete.setCategory(null);
-            
+
             expect(clearSpy).toHaveBeenCalledWith('category');
         });
     });
@@ -1018,21 +1049,21 @@ describe('Category Search and Places List', () => {
 
         it('should handle empty places response', async () => {
             const placesSpy = addPlacesSpy(autocomplete);
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiEmpty);
             autocomplete.setCategory('invalid.category');
             await wait(WAIT_TIME);
-            
+
             expect(placesSpy).toHaveBeenCalledWith([]);
         });
 
         it('should handle geocoder response without categories', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseEmpty));
-            
+
             inputText(container, 'test');
             await wait(WAIT_TIME);
-            
+
             const dropdown = container.querySelector('.geoapify-autocomplete-items');
             const categoryItems = dropdown?.querySelectorAll('.geoapify-category-item');
             expect(categoryItems?.length || 0).toBe(0); // No categories
@@ -1044,12 +1075,12 @@ describe('Category Search and Places List', () => {
                 "XXXXX",
                 optionsWithPlacesList
             );
-            
+
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiEmpty);
             autocompleteWithList.setCategory('invalid.category');
             await wait(WAIT_TIME);
-            
+
             const loadMoreButton = getLoadMoreButton(container);
             expect(loadMoreButton).toBeFalsy();
         });
@@ -1064,11 +1095,20 @@ describe('Category Search and Places List', () => {
             autocomplete = new GeocoderAutocomplete(container, "XXXXX", optionsWithPlacesList);
         });
 
-        it('should add active class to selected place using selectPlace()', async () => {
+        const preparePlacesList = async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
+
+            fetchMock.resetMocks();
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            await autocomplete.resendPlacesRequestForMore(false);
+        };
+
+        it('should add active class to selected place using selectPlace()', async () => {
+            await preparePlacesList();
 
             // Select the second place (index 1)
             autocomplete.selectPlace(1);
@@ -1080,10 +1120,7 @@ describe('Category Search and Places List', () => {
         });
 
         it('should clear active class when selectPlace(null) is called', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
+            await preparePlacesList();
 
             // Select a place first
             autocomplete.selectPlace(2);
@@ -1099,10 +1136,7 @@ describe('Category Search and Places List', () => {
         });
 
         it('should clear active class when selectPlace(-1) is called', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
+            await preparePlacesList();
 
             // Select a place first
             autocomplete.selectPlace(1);
@@ -1118,10 +1152,7 @@ describe('Category Search and Places List', () => {
         });
 
         it('should move selection when selectPlace is called multiple times', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
+            await preparePlacesList();
 
             // Select first place
             autocomplete.selectPlace(0);
@@ -1161,25 +1192,31 @@ describe('Category Search and Places List', () => {
             autocomplete = new GeocoderAutocomplete(container, "XXXXX", optionsWithPlacesList);
         });
 
-        it('should display total count of places in status bar', async () => {
+        const preparePlacesList = async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             autocomplete.setCategory('catering.cafe');
             await wait(WAIT_TIME);
 
+            fetchMock.resetMocks();
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            await autocomplete.resendPlacesRequestForMore(false);
+        };
+
+        it('should display total count of places in status bar', async () => {
+            await preparePlacesList();
+
             const placesList = container.querySelector('.geoapify-places-list');
             const statusBar = placesList?.querySelector('.geoapify-places-status-bar');
             const countContainer = statusBar?.querySelector('.geoapify-places-status-count');
-            
+
             expect(countContainer).toBeTruthy();
             expect(countContainer?.textContent).toContain('8'); // 8 places in mock response
         });
 
         it('should update total count after loading more places', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
+            await preparePlacesList();
 
             const placesList = container.querySelector('.geoapify-places-list');
             let statusBar = placesList?.querySelector('.geoapify-places-status-bar');
@@ -1187,6 +1224,7 @@ describe('Category Search and Places List', () => {
             expect(countContainer?.textContent).toContain('8');
 
             // Load more - use page 2 with different places
+            fetchMock.resetMocks();
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponsePage2);
             clickLoadMoreButton(container);
@@ -1198,10 +1236,7 @@ describe('Category Search and Places List', () => {
         });
 
         it('should display selected place index when place is selected', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
+            await preparePlacesList();
 
             // Select third place (index 2)
             autocomplete.selectPlace(2);
@@ -1209,16 +1244,13 @@ describe('Category Search and Places List', () => {
             const placesList = container.querySelector('.geoapify-places-list');
             const statusBar = placesList?.querySelector('.geoapify-places-status-bar');
             const selectedInfo = statusBar?.querySelector('.geoapify-places-status-selected');
-            
+
             expect(selectedInfo).toBeTruthy();
             expect(selectedInfo?.textContent).toBe('3 / 8'); // 3rd place out of 8
         });
 
         it('should update selected index display when selection changes', async () => {
-            mockIpInfo(mockIpInfoResponse);
-            mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
-            await wait(WAIT_TIME);
+            await preparePlacesList();
 
             // Select first place
             autocomplete.selectPlace(0);
@@ -1236,4 +1268,3 @@ describe('Category Search and Places List', () => {
         });
     });
 });
-

@@ -12,12 +12,13 @@ export class CategoryManager {
 
         if (typeof category === 'string') {
             // Convert single string to array
-            this.selectedCategory = { category: [category], label: category };
+            this.selectedCategory = { keys: [category], label: category };
         } else if (Array.isArray(category)) {
             // Convert array of strings to Category with joined label
-            this.selectedCategory = { category, label: category.join(', ') };
+            this.selectedCategory = { keys: category, label: category.join(', ') };
         } else {
             this.selectedCategory = category;
+            
         }
 
         this.isCategoryMode = true;
@@ -43,7 +44,7 @@ export class CategoryManager {
 
         return data.query.categories.map((cat: any) => ({
             // Normalize category to always be an array
-            category: Array.isArray(cat.category) ? cat.category : [cat.category],
+            keys: cat.keys,
             label: cat.label
         }));
     }
