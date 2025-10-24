@@ -1,5 +1,14 @@
 .geoapify-input-wrapper {
     position: relative;
+    flex: 0 0 auto;
+}
+
+.geoapify-geocoder-autocomplete-container {
+    display: flex;
+    flex-direction: column;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
 }
 
 .geoapify-autocomplete-input {
@@ -95,13 +104,16 @@
 
 .geoapify-places-list {
     border: 1px solid rgba(0, 0, 0, 0.3);
-    border-top: none;
     background-color: #fff;
     display: none;
+    margin-top: 5px;
 }
 
 .geoapify-places-list.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .geoapify-places-title-bar {
@@ -135,6 +147,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
+    max-height: 100%;
 }
 
 .geoapify-places-scroll-container::-webkit-scrollbar {
@@ -188,7 +201,7 @@
 }
 
 .geoapify-places-main-part {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     color: #202124;
     overflow: hidden;
@@ -212,6 +225,7 @@
     margin-left: auto;
     font-size: 13px;
     color: rgba(0, 0, 0, 0.6);
+    max-width: 150px;
 }
 
 .geoapify-places-clock-icon {
@@ -228,6 +242,8 @@
 .geoapify-places-hours-text {
     white-space: nowrap;
     font-size: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .geoapify-places-status-bar {

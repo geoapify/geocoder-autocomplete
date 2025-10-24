@@ -81,12 +81,12 @@ describe('Category Search and Places List', () => {
             autocomplete = new GeocoderAutocomplete(container, "XXXXX", optionsWithCategorySearch);
         });
 
-        it('should set category properly using setCategory()', async () => {
+        it('should set category properly using selectCategory()', async () => {
             const category: Category = { keys: ['catering.cafe'], label: 'Cafes' };
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory(category);
+            autocomplete.selectCategory(category);
             await wait(WAIT_TIME);
 
             expect(autocomplete.getCategory()).toEqual(expect.objectContaining({
@@ -99,7 +99,7 @@ describe('Category Search and Places List', () => {
         it('should set category using string', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -113,7 +113,7 @@ describe('Category Search and Places List', () => {
         it('should get category using getCategory()', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -126,7 +126,7 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             const categories = ['catering.fast_food.pizza', 'catering.restaurant.pizza'];
-            autocomplete.setCategory(categories);
+            autocomplete.selectCategory(categories);
 
             await wait(WAIT_TIME);
 
@@ -140,7 +140,7 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             const categories = ['catering.fast_food.pizza', 'catering.restaurant.pizza'];
-            autocomplete.setCategory(categories);
+            autocomplete.selectCategory(categories);
 
             await wait(WAIT_TIME);
 
@@ -149,13 +149,13 @@ describe('Category Search and Places List', () => {
             );
         });
 
-        it('should clear category using setCategory(null)', async () => {
+        it('should clear category using selectCategory(null)', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
-            autocomplete.setCategory(null);
+            autocomplete.selectCategory(null);
 
             expect(autocomplete.getCategory()).toBeNull();
         });
@@ -165,7 +165,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -199,7 +199,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -214,7 +214,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -226,7 +226,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -249,7 +249,7 @@ describe('Category Search and Places List', () => {
                 { status: 401, statusText: 'Unauthorized' }
             );
 
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(placesRequestEndSpy).toHaveBeenCalledWith(false, null, expect.any(Object));
@@ -401,7 +401,7 @@ describe('Category Search and Places List', () => {
         it('should display places list in the DOM', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -411,7 +411,7 @@ describe('Category Search and Places List', () => {
         it('should render multiple place items', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -422,7 +422,7 @@ describe('Category Search and Places List', () => {
         it('should display place names and details', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -440,7 +440,7 @@ describe('Category Search and Places List', () => {
         it('should show opening hours if available', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -461,7 +461,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocompleteNoList.setCategory('catering.cafe');
+            autocompleteNoList.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expectPlacesListHidden(container);
@@ -480,7 +480,7 @@ describe('Category Search and Places List', () => {
         it('should display "Load More" button when scrolled to bottom', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
 
             await wait(WAIT_TIME);
 
@@ -495,7 +495,7 @@ describe('Category Search and Places List', () => {
         it('should load more places when button is clicked', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             const initialItems = getPlacesListItems(container);
@@ -514,7 +514,7 @@ describe('Category Search and Places List', () => {
         it('should update offset correctly', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             mockIpInfo(mockIpInfoResponse);
@@ -536,7 +536,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(smallResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             const loadMoreButton = getLoadMoreButton(container);
@@ -546,7 +546,7 @@ describe('Category Search and Places List', () => {
         it('should append new places to existing list', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             const firstPlaceInitial = getPlacesListItems(container)?.[0];
@@ -579,7 +579,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             selectPlaceFromList(container, 0);
@@ -596,7 +596,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             selectPlaceFromList(container, 2); // Select third place
@@ -616,7 +616,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocompleteWithHide.setCategory('catering.cafe');
+            autocompleteWithHide.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expectPlacesListVisible(container);
@@ -630,7 +630,7 @@ describe('Category Search and Places List', () => {
         it('should keep places list visible if hidePlacesListAfterSelect is false', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             selectPlaceFromList(container, 0);
@@ -653,10 +653,10 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
-            autocomplete.setCategory(null);
+            autocomplete.selectCategory(null);
 
             expect(clearSpy).toHaveBeenCalledWith('category');
         });
@@ -664,7 +664,7 @@ describe('Category Search and Places List', () => {
         it('should clear places list when clear button is clicked', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             const clearButton = container.querySelector('.geoapify-close-button') as HTMLElement;
@@ -678,7 +678,7 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
 
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             const clearSpy = addClearSpy(autocomplete);
@@ -694,7 +694,7 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
 
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             const clearSpy = addClearSpy(autocomplete);
@@ -755,7 +755,7 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             const category: Category = { keys: ['catering.cafe'], label: 'Cafes' };
-            autocomplete.setCategory(category);
+            autocomplete.selectCategory(category);
             await wait(WAIT_TIME);
 
             expect(autocomplete.getCategory()).toBeTruthy();
@@ -776,7 +776,7 @@ describe('Category Search and Places List', () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             const category: Category = { keys: ['catering.cafe'], label: 'Cafes' };
-            autocomplete.setCategory(category);
+            autocomplete.selectCategory(category);
             await wait(WAIT_TIME);
 
             expect(autocomplete.getCategory()).toBeTruthy();
@@ -823,7 +823,7 @@ describe('Category Search and Places List', () => {
         it('should clear category mode when user types in input', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(autocomplete.getCategory()).toBeTruthy();
@@ -838,7 +838,7 @@ describe('Category Search and Places List', () => {
         it('should reset places list when switching back to geocoding mode', async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expectPlacesListVisible(container);
@@ -872,7 +872,7 @@ describe('Category Search and Places List', () => {
                 return Promise.resolve(customResponse);
             });
 
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(fetchMock).not.toHaveBeenCalled();
@@ -883,7 +883,7 @@ describe('Category Search and Places List', () => {
             const customFunc = jest.fn().mockResolvedValue(mockPlacesApiResponse);
 
             autocomplete.setSendPlacesRequestFunc(customFunc);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(customFunc).toHaveBeenCalledWith(['catering.cafe'], 0, autocomplete);
@@ -896,7 +896,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(fetchMock).toHaveBeenCalled();
@@ -917,14 +917,14 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledTimes(1);
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.restaurant');
+            autocomplete.selectCategory('catering.restaurant');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledTimes(2);
@@ -935,7 +935,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledTimes(1);
@@ -944,7 +944,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.restaurant');
+            autocomplete.selectCategory('catering.restaurant');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledTimes(1); // Should not be called again
@@ -956,14 +956,14 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledTimes(1);
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.restaurant');
+            autocomplete.selectCategory('catering.restaurant');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledTimes(1); // Should only be called once
@@ -974,7 +974,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(startSpy).toHaveBeenCalledWith(expect.objectContaining({
@@ -986,7 +986,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.restaurant');
+            autocomplete.selectCategory('catering.restaurant');
             await wait(WAIT_TIME);
 
             expect(startSpy).toHaveBeenCalledTimes(1);
@@ -997,7 +997,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             expect(endSpy).toHaveBeenCalledWith(true, mockPlacesApiResponse, undefined);
@@ -1016,7 +1016,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocompleteWithList.setCategory('catering.cafe');
+            autocompleteWithList.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             selectPlaceFromList(container, 0);
@@ -1029,10 +1029,10 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
-            autocomplete.setCategory(null);
+            autocomplete.selectCategory(null);
 
             expect(clearSpy).toHaveBeenCalledWith('category');
         });
@@ -1052,7 +1052,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiEmpty);
-            autocomplete.setCategory('invalid.category');
+            autocomplete.selectCategory('invalid.category');
             await wait(WAIT_TIME);
 
             expect(placesSpy).toHaveBeenCalledWith([]);
@@ -1078,7 +1078,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiEmpty);
-            autocompleteWithList.setCategory('invalid.category');
+            autocompleteWithList.selectCategory('invalid.category');
             await wait(WAIT_TIME);
 
             const loadMoreButton = getLoadMoreButton(container);
@@ -1098,7 +1098,7 @@ describe('Category Search and Places List', () => {
         const preparePlacesList = async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             fetchMock.resetMocks();
@@ -1175,7 +1175,7 @@ describe('Category Search and Places List', () => {
 
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocompleteNoList.setCategory('catering.cafe');
+            autocompleteNoList.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             // Should not throw error
@@ -1195,7 +1195,7 @@ describe('Category Search and Places List', () => {
         const preparePlacesList = async () => {
             mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
-            autocomplete.setCategory('catering.cafe');
+            autocomplete.selectCategory('catering.cafe');
             await wait(WAIT_TIME);
 
             fetchMock.resetMocks();

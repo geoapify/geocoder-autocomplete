@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type & Language Demo — Find only cities or postcodes in your language.</title>
+  <link rel="stylesheet" href="./index.css">
+  <script type="text/javascript" src="../../dist/index.min.js"></script>
+  <link id="geocoder-theme" rel="stylesheet" type="text/css" href="../../styles/minimal.css">
+</head>
+
+<body>
+  <div class="theme-selector">
+    <span class="theme-label">Theme:</span>
+    <select id="theme-selector" onchange="setTheme(this.value)">
+      <option value="minimal">Light</option>
+      <option value="minimal-dark">Dark</option>
+      <option value="round-borders">Light (Round)</option>
+      <option value="round-borders-dark">Dark (Round)</option>
+    </select>
+  </div>
+
+  <div class="container">
+    <h1>Type & Language Demo — Find only cities or postcodes in your language.</h1>
+    <p class="hint">Type limits what you search; Language changes labels. Try “city” for city‑only results or “any” for
+      full addresses, then switch the language to compare label localization.</p>
+    <p class="hint">
+      Note: The language and country code lists in this demo are examples only. You can use any valid ISO&nbsp;639‑1
+      language code and ISO&nbsp;3166‑1 alpha‑2 country code.
+    </p>
+    <div class="panel">
+      <h3>1. Options</h3>
+      <div class="row">
+
+        <div class="option-selector"> <label for="type-select">Type</label> <select id="type-select">
+            <option value="">any</option>
+            <option value="country">country</option>
+            <option value="state">state</option>
+            <option value="city">city</option>
+            <option value="postcode">postcode</option>
+            <option value="street">street</option>
+            <option value="amenity">amenity</option>
+            <option value="locality">locality</option>
+          </select>
+        </div>
+
+        <div class="option-selector">
+          <label for="lang-select">Language</label>
+          <select id="lang-select" class="option-selector">
+            <option value="en" selected>en</option>
+            <option value="de">de</option>
+            <option value="fr">fr</option>
+            <option value="ru">ru</option>
+            <option value="es">es</option>
+            <option value="it">it</option>
+            <option value="pl">pl</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:6px;">
+        Location type: 'country', 'state', 'city', 'postcode', 'street', 'amenity', 'locality'. The
+        <code>type=locality</code> parameter returns administrative areas including postcodes, districts, cities,
+        counties, and states.
+      </div>
+      <div class="hint" style="margin-top:4px;">
+        Language: 2‑character ISO&nbsp;639‑1 language codes are supported (e.g., en, de, fr).
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <h3>2. Autocomplete</h3>
+      <div id="ac" class="autocomplete-container"></div>
+      <div class="row" id="postcode-filter-row" style="margin-top:8px;display:none;">
+        <div class="option-selector">
+        <label for="country-filter">Country (for postcode search)</label>
+        <select id="country-filter" class="option-selector">
+          <option value="">None</option>
+          <option value="us">United States (US)</option>
+          <option value="gb">United Kingdom (GB)</option>
+          <option value="de">Germany (DE)</option>
+          <option value="fr">France (FR)</option>
+          <option value="es">Spain (ES)</option>
+          <option value="it">Italy (IT)</option>
+          <option value="nl">Netherlands (NL)</option>
+          <option value="pl">Poland (PL)</option>
+          <option value="cz">Czechia (CZ)</option>
+          <option value="se">Sweden (SE)</option>
+          <option value="no">Norway (NO)</option>
+          <option value="fi">Finland (FI)</option>
+        </select>
+        </div>
+        <span class="hint">Recommended: combine postcode search with a country filter.</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>3. Info</h3>
+      <div class="kv" id="info-current"><strong>Current:</strong> type=any, lang=en</div>
+      <div class="kv" id="info-selected"><strong>Selected:</strong> —</div>
+      <pre class="code" id="info-json"></pre>
+    </div>
+  </div>
+
+  <script>
+    /* WARNING: This API key is provided for DEMO purposes only.
+       Please sign up at https://www.geoapify.com and generate your own API key.
+       The demo key may be rotated or blocked at any moment without notice.
+    */
+    const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
+
+    function setTheme(themeName) {
+      const themeLink = document.getElementById('geocoder-theme');
+      themeLink.href = `../../styles/${themeName}.css`;
+      document.body.className = document.body.className.replace(/theme-\w+/g, '');
+      document.body.classList.add(`theme-${themeName}`);
+      localStorage.setItem('geocoder-theme', themeName);
+    }
+    window.addEventListener('load', () => {
+      const savedTheme = localStorage.getItem('geocoder-theme') || 'minimal';
+      document.getElementById('theme-selector').value = savedTheme;
+      setTheme(savedTheme);
+    });
+
+    // Initialize
+    const ac = new autocomplete.GeocoderAutocomplete(document.getElementById('ac'), myAPIKey, {
+      skipIcons: false,
+      placeholder: 'Start typing…'
+    });
+
+    // Elements
+    const typeSel = document.getElementById('type-select');
+    const langSel = document.getElementById('lang-select');
+    const infoCurrent = document.getElementById('info-current');
+    const infoSelected = document.getElementById('info-selected');
+    const infoJson = document.getElementById('info-json');
+    const countryFilterRow = document.getElementById('postcode-filter-row');
+    const countryFilter = document.getElementById('country-filter');
+
+    function updateCurrent() {
+      const type = typeSel.value || 'any';
+      const lang = langSel.value || 'en';
+      infoCurrent.innerHTML = `<strong>Current:</strong> type=${type}, lang=${lang}`;
+    }
+
+    typeSel.addEventListener('change', () => {
+      const val = typeSel.value;
+      if (val) ac.setType && ac.setType(val); else ac.setType && ac.setType(null);
+      // Toggle postcode country filter UI and apply filter when needed
+      if (val === 'postcode') {
+        countryFilterRow.style.display = '';
+      } else {
+        countryFilterRow.style.display = 'none';
+      }
+      applyCountryFilterIfNeeded();
+      updateCurrent();
+    });
+    langSel.addEventListener('change', () => {
+      const val = langSel.value;
+      ac.setLang && ac.setLang(val);
+      updateCurrent();
+    });
+
+    countryFilter.addEventListener('change', () => {
+      applyCountryFilterIfNeeded();
+    });
+
+    function applyCountryFilterIfNeeded() {
+      if (!ac || !ac.clearFilters) return;
+      ac.clearFilters();
+      if (typeSel.value === 'postcode') {
+        const code = countryFilter.value;
+        if (code && ac.addFilterByCountry) {
+          ac.addFilterByCountry([code]);
+        }
+      }
+    }
+
+    ac.on('select', (feature) => {
+      const p = feature && feature.properties || {};
+      const formatted = p.formatted || p.address_line1 || '';
+      const parts = [];
+      ['country', 'state', 'city', 'postcode', 'street', 'housenumber', 'name'].forEach(k => {
+        if (p[k]) parts.push(`${k}=${p[k]}`);
+      });
+      infoSelected.innerHTML = `<strong>Selected:</strong> ${formatted || '—'}${parts.length ? ' — ' + parts.join(', ') : ''}`;
+      const snippet = JSON.stringify(p, null, 2);
+      infoJson.textContent = snippet.length > 4000 ? snippet.slice(0, 4000) + '\n…' : snippet;
+    });
+
+    // Initialize current panel
+    updateCurrent();
+    // Ensure filters are in a consistent state on load
+    applyCountryFilterIfNeeded();
+  </script>
+</body>
+
+</html>

@@ -5,7 +5,7 @@
 const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
 
 // The Leaflet map Object - centered on Paris to match the bias
-const map = L.map('map', {zoomControl: false}).setView([48.8566, 2.3522], 12);
+const map = L.map('map', {zoomControl: false}).setView([48.8566, 2.3522], 16);
 
 // Retina displays require different mat tiles quality
 const isRetina = L.Browser.retina;
@@ -65,51 +65,120 @@ const autocompleteInput = new autocomplete.GeocoderAutocomplete(
                             limit: 8
                         });
 
-// Add bias based on map view for better results
-function updateBias() {
-    const center = map.getCenter();
-    autocompleteInput.addBiasByProximity({
-        lon: center.lng,
-        lat: center.lat
+// --- Places request progress indicator (non-invasive) ---
+(function initPlacesProgress() {
+    const container = document.querySelector('#autocomplete');
+    if (!container) return;
+
+    // Create indicator element once
+    const indicator = document.createElement('div');
+    indicator.className = 'places-loading-indicator hidden';
+    indicator.setAttribute('role', 'status');
+    indicator.setAttribute('aria-live', 'polite');
+
+    const spinner = document.createElement('div');
+    spinner.className = 'places-loading-spinner';
+    const label = document.createElement('span');
+    label.textContent = 'Loading places…';
+
+    indicator.appendChild(spinner);
+    indicator.appendChild(label);
+    container.appendChild(indicator);
+
+    const show = () => indicator.classList.remove('hidden');
+    const hide = () => indicator.classList.add('hidden');
+
+    // Attach separate listeners to avoid touching existing ones
+    autocompleteInput.on('places_request_start', () => {
+        show();
     });
+
+    autocompleteInput.on('places_request_end', () => {
+        hide();
+    });
+})();
+
+
+function extendRectByPercent(rect, percent) {
+  const minLon = Math.min(rect.lon1, rect.lon2);
+  const maxLon = Math.max(rect.lon1, rect.lon2);
+  const minLat = Math.min(rect.lat1, rect.lat2);
+  const maxLat = Math.max(rect.lat1, rect.lat2);
+
+  const width = maxLon - minLon;
+  const height = maxLat - minLat;
+
+  const lonPad = width * percent;
+  const latPad = height * percent;
+
+  let lon1 = minLon - lonPad;
+  let lon2 = maxLon + lonPad;
+  let lat1 = minLat - latPad;
+  let lat2 = maxLat + latPad;
+
+  // Clamp to valid ranges
+  lon1 = Math.max(-180, lon1);
+  lon2 = Math.min(180, lon2);
+  lat1 = Math.max(-90, lat1);
+  lat2 = Math.min(90, lat2);
+
+  return { lon1, lat1, lon2, lat2 };
+}
+
+// Add bias based on map view for better results
+function updateBiasAndFilters() {
+    const center = map.getCenter();
+
+    autocompleteInput.addBiasByProximity({
+      lon: center.lng,
+      lat: center.lat,
+    });
+
+    const mapBounds = map.getBounds();
+    const rect = {
+      lat1: mapBounds.getSouthWest().lat,
+      lon1: mapBounds.getSouthWest().lng,
+      lat2: mapBounds.getNorthEast().lat,
+      lon2: mapBounds.getNorthEast().lng,
+    };
+    
+    autocompleteInput.setPlacesBiasByRect(rect);
+    autocompleteInput.setPlacesFilterByRect(extendRectByPercent(rect, 0.2));   
 }
 
 // Set initial bias
-updateBias();
+updateBiasAndFilters();
 
-// Update bias and rerun places query when map moves significantly
+function anyMarkerVisible() {
+  const bounds = map.getBounds();
+  return placesMarkers.some(m => bounds.contains(m.getLatLng()));
+}
+
 let mapMoveTimeout;
 map.on('moveend', () => {
-    updateBias();
-    
-    if (isProgrammaticMove) {
-        return;
-    }
-    
-    // Rerun places query if a category is selected and map moved significantly
-    if (lastQueryCenter) {
-        const currentCenter = map.getCenter();
-        const distance = currentCenter.distanceTo(lastQueryCenter); // Distance in meters
-        
-        // Requery if moved more than 500 meters
-        if (distance > 500) {
-            clearTimeout(mapMoveTimeout);
-            mapMoveTimeout = setTimeout(() => {
-                console.log(`Map moved ${Math.round(distance)}m - requerying places`);
-                lastQueryCenter = map.getCenter();
-                const mapBounds = map.getBounds();
+  if (isProgrammaticMove) return;
 
-                autocompleteInput.resendPlacesRequestForMore(true /* appen places */, 0 /* call with 0 offset */, {
-                    'rect': {
-                        lat1: mapBounds.getSouthWest().lat,
-                        lon1: mapBounds.getSouthWest().lng,
-                        lat2: mapBounds.getNorthEast().lat,
-                        lon2: mapBounds.getNorthEast().lng,
-                    }
-                }); // Pass the full category object
-            }, 500); // Wait 500ms after map stops moving
-        }
-    }
+  updateBiasAndFilters();
+
+  // Only when a category is active
+  if (!currentCategoryObj) return;
+
+  // no search on small zoom levels
+  if (map.getZoom() < 14) return;
+
+  // Decide append vs replace
+  const hasVisible = anyMarkerVisible();
+
+  // Requery only when moved significantly
+  const currentCenter = map.getCenter();
+  const distance = lastQueryCenter ? currentCenter.distanceTo(lastQueryCenter) : Infinity;
+  if (distance <= 500) return;
+
+  clearTimeout(mapMoveTimeout);
+  mapMoveTimeout = setTimeout(() => {
+    lastQueryCenter = map.getCenter();
+    autocompleteInput.resendPlacesRequestForMore(hasVisible /* append? */);
+  }, 500);
 });
 
 // generate an marker icon with https://apidocs.geoapify.com/playground/icon
@@ -178,21 +247,6 @@ autocompleteInput.on('places', (places) => {
             // When marker is clicked, select the place in the built-in list
             placeMarker.on('click', () => {
                 autocompleteInput.selectPlace(index);
-                isProgrammaticMove = true;
-
-                const target = [place.properties.lat, place.properties.lon];
-                const doPan = () => {
-                    map.panTo(target);
-                    placeMarker.openPopup();
-                    setTimeout(() => { isProgrammaticMove = false; }, 2000);
-                };
-
-                if (map.getZoom() < 16) {
-                    map.once('zoomend', doPan);
-                    map.setZoom(16);
-                } else {
-                    doPan();
-                }
             });
             
             placesMarkers.push(placeMarker);
@@ -221,21 +275,16 @@ autocompleteInput.on('place_select', (place, index) => {
     autocompleteInput.selectPlace(index);
     
     if (placesMarkers[index]) {
-        isProgrammaticMove = true;
 
         const target = [place.properties.lat, place.properties.lon];
         const doPan = () => {
+            isProgrammaticMove = true;
             map.panTo(target);
             placesMarkers[index].openPopup();
             setTimeout(() => { isProgrammaticMove = false; }, 2000);
         };
 
-        if (map.getZoom() < 16) {
-            map.once('zoomend', doPan);
-            map.setZoom(16);
-        } else {
-            doPan();
-        }
+        doPan();
     }
 });
 

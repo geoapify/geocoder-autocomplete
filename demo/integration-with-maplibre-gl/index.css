@@ -21,6 +21,7 @@ body {
 
 .autocomplete-container {
   position: relative;
+  height: calc(100vh - 20px);
 }
 
 /* Theme selector styling */

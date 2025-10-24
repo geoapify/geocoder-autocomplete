@@ -269,7 +269,7 @@ export function expectPlacesListHidden(container: HTMLDivElement) {
 
 export async function setCategory(autocomplete: GeocoderAutocomplete, category: string, mockResponse: any) {
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
-    autocomplete.setCategory(category);
+    autocomplete.selectCategory(category);
     await wait(WAIT_TIME);
 }
 

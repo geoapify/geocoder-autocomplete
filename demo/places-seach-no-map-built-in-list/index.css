@@ -5,12 +5,13 @@
 
 .autocomplete-container {
     position: relative;
+    max-height: 400px;
 }
 
 .address-row {
     display: flex;
     flex-direction: row;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     gap: 10px;
 }
 
@@ -41,24 +42,29 @@
     border-color: #ffb610;
 }
 
-.geoapify-autocomplete-input {
-    width: 100% !important;
-    box-sizing: border-box;
-}
-
 /* Ensure proper spacing for autocomplete containers */
 .address-field {
     min-height: 36px;
 }
 
-.geoapify-places-list {
-    top: 100% !important;
-    max-width: 500px;
+/* Info block (developer hint) */
+.info-block {
+    background: #fff8e1;
+    border: 1px solid #ffe08a;
+    border-left: 4px solid #ffb300;
+    color: #5f5200;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin: 6px 0 10px;
+    font-size: 12.5px;
+}
+body.theme-minimal-dark .info-block,
+body.theme-round-borders-dark .info-block {
+    background: #3a320f;
+    border-color: #5a4a12;
+    color: #ffe9a3;
 }
 
-.geoapify-places-scroll-container {
-    max-height: 320px;
-}
 
 /* Theme selector styling */
 .theme-selector {

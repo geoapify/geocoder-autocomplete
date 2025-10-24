@@ -16,6 +16,49 @@ html, body, #map {
 
 .autocomplete-container {
   position: relative;
+  height: calc(100vh - 20px);
+}
+
+/* Places loading indicator */
+.places-loading-indicator {
+  position: absolute;
+  top: 3px;
+  right: -170px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 1003;
+}
+
+.places-loading-indicator.hidden {
+  display: none;
+}
+
+.places-loading-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #cfd8dc;
+  border-top-color: #2ea2ff;
+  border-radius: 50%;
+  animation: places-spin 0.8s linear infinite;
+}
+
+@keyframes places-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Dark theme variant */
+body.theme-minimal-dark .places-loading-indicator,
+body.theme-round-borders-dark .places-loading-indicator {
+  background: rgba(34, 34, 34, 0.95);
+  border-color: #444;
+  color: #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 /* Theme selector styling */
@@ -95,13 +138,4 @@ body.theme-minimal-dark .theme-selector:hover,
 body.theme-round-borders-dark .theme-selector:hover {
   border-color: #007bff;
   box-shadow: 0 2px 12px rgba(0, 123, 255, 0.2);
-}
-
-.geoapify-places-list {
-  margin-top: 15px;
-  max-width: 400px;
-}
-
-.geoapify-places-scroll-container {
-  max-height: 320px;
 }

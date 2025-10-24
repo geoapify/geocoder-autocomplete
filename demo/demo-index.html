@@ -4,123 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Geoapify Geocoder Autocomplete - Demo Collection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #2ea2ff;
+      --primary-600: #1b91f0;
+      --text: #0b1526;
+      --muted: #6b7a90;
+      --card-border: #e6ecf5;
+      --card-bg: #ffffff;
+      --bg: #f7faff;
+      --gradient: radial-gradient(1200px 600px at 10% -10%, rgba(46,162,255,0.12), transparent 60%),
+                  radial-gradient(800px 400px at 90% -20%, rgba(46,162,255,0.10), transparent 60%),
+                  linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+    }
+    html, body { height: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       line-height: 1.6;
       margin: 0;
-      padding: 20px;
-      background-color: #f5f5f5;
+      color: var(--text);
+      background: var(--gradient);
+      background-attachment: fixed;
     }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 2.5em;
-    }
-    
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 30px;
-      margin-top: 40px;
-    }
-    
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 48px 24px 64px; }
+
+    h1 { text-align: center; margin-bottom: 16px; font-size: 2.25rem; letter-spacing: -0.02em; }
+
+    .brand-title { display: flex; align-items: center; gap: 12px; margin: 0; line-height: 1.2; justify-content: center; margin-top: 8px; }
+    .brand-title .brand-icon { display: flex; align-items: center; }
+    .brand-title svg { width: 50px; height: 50px; display: block; }
+
+    .description { text-align: center; color: var(--muted); font-size: 1.05rem; margin: 8px auto 28px; max-width: 860px; }
+
+    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; margin-top: 18px; }
+
     .demo-card {
-      border: 1px solid #e1e8ed;
-      border-radius: 8px;
-      padding: 25px;
-      background: white;
-      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 14px;
+      padding: 22px;
+      background: var(--card-bg);
       text-decoration: none;
       color: inherit;
+      position: relative;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      box-shadow: 0 6px 18px rgba(16,24,40,.04);
     }
-    
-    .demo-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    .demo-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(46,162,255,0.35), rgba(46,162,255,0));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none;
     }
-    
-    .demo-card h3 {
-      color: #3498db;
-      margin-top: 0;
-      margin-bottom: 15px;
-      font-size: 1.4em;
+    /* Card hover effect removed for a calmer UI */
+    /* .demo-card:hover { } */
+
+    /* Card typography tweaks for clearer hierarchy */
+    .demo-card h3 { color: var(--text); margin: 0 0 8px; font-size: 1.32rem; line-height: 1.35; letter-spacing: -0.01em; }
+    .demo-card p { color: var(--muted); margin: 0 0 14px; font-size: .98rem; line-height: 1.55; }
+    .demo-card .features { margin: 12px 0 12px; font-size: .93rem; line-height: 1.45; }
+    .demo-card .features strong { color: var(--text); }
+    .demo-card .tech-stack { background: #f3f7fb; padding: 10px 12px; border-radius: 8px; font-size: .9rem; color: #425569; border: 1px solid #e9eff7; line-height: 1.45; }
+    .demo-card .tech-stack strong { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .demo-card h3 { font-size: 1.18rem; }
+      .demo-card p { font-size: .95rem; }
+      .demo-card .features { font-size: .9rem; }
+      .demo-card .tech-stack { font-size: .88rem; }
     }
-    
-    .demo-card p {
-      color: #7f8c8d;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    
-    .demo-card .features {
-      margin-bottom: 20px;
-    }
-    
-    .demo-card .features strong {
-      color: #2c3e50;
-    }
-    
-    .demo-card .tech-stack {
-      background: #ecf0f1;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 0.9em;
-      color: #34495e;
-    }
-    
-    .demo-card .tech-stack strong {
-      color: #2c3e50;
-    }
-    
+
+    .demo-card a { text-decoration: none; }
     .demo-card .cta {
-      display: inline-block;
-      background: #3498db;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: background 0.2s;
+      display: inline-block; background: var(--primary); color: white; padding: 10px 16px; border-radius: 999px;
+      text-decoration: none; font-weight: 600; letter-spacing: .01em; transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+      margin-top: 16px; box-shadow: 0 6px 16px rgba(46,162,255,.3);
     }
-    
-    .demo-card .cta:hover {
-      background: #2980b9;
-    }
-    
-    .description {
-      text-align: center;
-      color: #7f8c8d;
-      font-size: 1.1em;
-      margin-bottom: 40px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+    .demo-card .cta:hover { background: var(--primary-600); transform: translateY(-1px); box-shadow: 0 10px 20px rgba(46,162,255,.35); }
+
+    .footer-note { margin-top: 40px; text-align: center; color: var(--muted); }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🌍 Geoapify Geocoder Autocomplete</h1>
+
+    <h1 class="brand-title">
+      <span class="brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" class="" viewBox="0 0 66.145832 66.145835" version="1.1"><g transform="translate(0,-230.85415)"><g id="g1644" transform="matrix(7.218137,0,0,7.218137,737.87653,1482.3405)"><g transform="matrix(0.36807926,0,0,0.36807926,-36.510506,-111.70966)" style="fill:#6d62c7;fill-opacity:1" id="g7894"><g id="g7150-8" style="fill:#6d62c7;fill-opacity:1"><path id="use7148-2" d="m -171.43659,-150.59598 h 2.80723 l 0.16139,0.23812 0.24871,0.36777 0.254,0.37307 0.25929,0.38629 0.2593,0.39158 0.26458,0.39952 0.26987,0.41011 0.27252,0.42068 0.27517,0.42863 0.27781,0.43656 0.27782,-0.43656 0.27516,-0.42863 0.27252,-0.42068 0.26723,-0.41011 0.26723,-0.39952 0.25929,-0.39158 0.2593,-0.38629 0.254,-0.37307 0.2487,-0.36777 0.1614,-0.23812 h 2.80723 l 3.30464,4.29419 -8.65452,2.65377 v 0 l -8.65452,-2.65377 z" style="fill:#6d62c7;fill-opacity:1;stroke-width:0.26458332"></path></g><g id="g7154-0" style="fill:#6d62c7;fill-opacity:1"><path id="use7152-2" d="m -165.58665,-166.53448 0.2487,0.0291 0.24078,0.0344 0.24077,0.045 0.23812,0.0556 0.23548,0.0661 0.22754,0.0741 0.22754,0.0847 0.21961,0.0926 0.21696,0.10054 0.21431,0.10848 0.20637,0.11906 0.20373,0.127 0.19579,0.1323 0.19315,0.14287 0.18521,0.14552 0.18256,0.15611 0.17463,0.16404 0.16933,0.16933 0.16404,0.17463 0.15346,0.1852 0.15346,0.18786 0.14023,0.19579 0.13758,0.20108 0.127,0.20638 0.11906,0.20902 0.11377,0.21696 0.10584,0.22225 0.0979,0.22489 0.0873,0.23284 0.0794,0.23548 0.0741,0.24077 0.0582,0.24341 0.0556,0.24607 0.045,0.25135 0.0344,0.254 0.0265,0.25665 0.0132,0.25929 0.005,0.26193 -0.005,0.26459 -0.0132,0.25929 -0.0265,0.25929 -0.0344,0.25929 -0.045,0.254 -0.0556,0.25665 -0.0582,0.25135 -0.0741,0.25665 -0.0794,0.25135 -0.0873,0.254 -0.0979,0.254 -0.10584,0.25665 -0.11377,0.254 -0.11906,0.25929 -0.127,0.25929 -0.13758,0.25929 -0.14023,0.26459 -0.15346,0.26458 -0.15346,0.26988 -0.16404,0.26987 -0.16933,0.27517 -0.17463,0.28046 -0.18256,0.2831 -0.18521,0.2884 -0.19315,0.29368 -0.39952,0.59796 -0.20637,0.30956 -0.21431,0.31221 -0.21696,0.32279 -0.21961,0.32544 -0.22754,0.33338 -0.22754,0.33866 -0.23548,0.34925 -0.23812,0.35455 -0.24077,0.36247 -0.24078,0.37042 -0.2487,0.38365 -0.24871,0.38629 -0.25136,0.39952 -0.254,-0.39952 -0.24606,-0.38629 -0.24871,-0.38365 -0.24077,-0.37042 -0.24077,-0.36247 -0.23812,-0.35455 -0.23548,-0.34925 -0.22755,-0.33866 -0.22754,-0.33338 -0.2196,-0.32544 -0.21696,-0.32279 -0.21431,-0.31221 -0.20638,-0.30956 -0.39952,-0.59796 -0.19314,-0.29368 -0.18786,-0.2884 -0.17991,-0.2831 -0.17463,-0.28046 -0.16933,-0.27517 -0.16404,-0.26987 -0.15611,-0.26988 -0.15081,-0.26458 -0.14023,-0.26459 -0.13758,-0.25929 -0.127,-0.25929 -0.12171,-0.25929 -0.11377,-0.254 -0.10319,-0.25665 -0.0979,-0.254 -0.0873,-0.254 -0.0794,-0.25135 -0.0741,-0.25665 -0.0609,-0.25135 -0.0556,-0.25665 -0.0423,-0.254 -0.0344,-0.25929 -0.0265,-0.25929 -0.0159,-0.25929 -0.003,-0.26459 0.003,-0.26193 0.0159,-0.25929 0.0265,-0.25665 0.0344,-0.254 0.0423,-0.25135 0.0556,-0.24607 0.0609,-0.24341 0.0741,-0.24077 0.0794,-0.23548 0.0873,-0.23284 0.0979,-0.22489 0.10319,-0.22225 0.11377,-0.21696 0.12171,-0.20902 0.127,-0.20638 0.13758,-0.20108 0.14023,-0.19579 0.15081,-0.18786 0.15611,-0.1852 0.16404,-0.17463 0.16933,-0.16933 0.17463,-0.16404 0.17991,-0.15611 0.18786,-0.14552 0.19314,-0.14287 0.19579,-0.1323 0.20373,-0.127 0.20638,-0.11906 0.21431,-0.10848 0.21696,-0.10054 0.2196,-0.0926 0.22754,-0.0847 0.22755,-0.0741 0.23548,-0.0661 0.23812,-0.0556 0.24077,-0.045 0.24077,-0.0344 0.24871,-0.0291 0.24606,-0.0132 0.254,-0.005 0.25136,0.005 z m -0.73819,3.01096 -0.11642,0.0132 -0.11642,0.0132 -0.11377,0.0238 -0.11112,0.0238 -0.11113,0.0344 -0.10847,0.0344 -0.10584,0.0397 -0.10583,0.045 -0.10319,0.0476 -0.10054,0.0503 -0.0979,0.0556 -0.0952,0.0608 -0.0953,0.0635 -0.0926,0.0661 -0.0873,0.0688 -0.0873,0.0741 -0.0794,0.0794 -0.082,0.0794 -0.0767,0.0847 -0.0741,0.0847 -0.0714,0.09 -0.0688,0.0926 -0.0609,0.0952 -0.0608,0.0979 -0.0582,0.10055 -0.0529,0.10054 -0.0979,0.21166 -0.0397,0.11113 -0.037,0.11112 -0.037,0.11377 -0.0265,0.11378 -0.0265,0.11906 -0.0212,0.11906 -0.0159,0.11906 -0.0132,0.12436 -0.008,0.12171 -0.003,0.12435 0.003,0.12435 0.008,0.12436 0.0132,0.12171 0.0159,0.11906 0.0212,0.11906 0.0265,0.11642 0.0265,0.11377 0.037,0.11377 0.037,0.11112 0.0397,0.11113 0.0979,0.21431 0.0529,0.10054 0.0582,0.10055 0.0608,0.0979 0.0609,0.0952 0.0688,0.0926 0.0714,0.0873 0.0741,0.0873 0.0767,0.082 0.082,0.082 0.0794,0.0794 0.0873,0.0714 0.0873,0.0714 0.0926,0.0661 0.0953,0.0635 0.0952,0.0608 0.0979,0.0556 0.10054,0.0529 0.10319,0.045 0.10583,0.045 0.10584,0.037 0.10847,0.037 0.11113,0.0317 0.11112,0.0265 0.11377,0.0212 0.11642,0.0185 0.11642,0.0106 0.11906,0.008 0.11906,0.003 0.11907,-0.003 0.11906,-0.008 0.11642,-0.0106 0.11641,-0.0185 0.11377,-0.0212 0.11113,-0.0265 0.11112,-0.0317 0.10848,-0.037 0.10584,-0.037 0.10583,-0.045 0.10319,-0.045 0.10054,-0.0529 0.0979,-0.0556 0.0952,-0.0608 0.0953,-0.0635 0.0926,-0.0661 0.0873,-0.0714 0.0847,-0.0714 0.082,-0.0794 0.082,-0.082 0.0767,-0.082 0.0741,-0.0873 0.0714,-0.0873 0.0661,-0.0926 0.0635,-0.0952 0.0609,-0.0979 0.0582,-0.10055 0.0529,-0.10054 0.0952,-0.21431 0.0423,-0.11113 0.037,-0.11112 0.0344,-0.11377 0.0291,-0.11377 0.0265,-0.11642 0.0212,-0.11906 0.0159,-0.11906 0.0132,-0.12171 0.005,-0.12436 0.003,-0.12435 -0.003,-0.12435 -0.005,-0.12171 -0.0132,-0.12436 -0.0159,-0.11906 -0.0212,-0.11906 -0.0265,-0.11906 -0.0291,-0.11378 -0.0344,-0.11377 -0.037,-0.11112 -0.0423,-0.11113 -0.0952,-0.21166 -0.0529,-0.10054 -0.0582,-0.10055 -0.0609,-0.0979 -0.0635,-0.0952 -0.0661,-0.0926 -0.0714,-0.09 -0.0741,-0.0847 -0.0767,-0.0847 -0.082,-0.0794 -0.082,-0.0794 -0.0847,-0.0741 -0.0873,-0.0688 -0.0926,-0.0661 -0.0953,-0.0635 -0.0952,-0.0608 -0.0979,-0.0556 -0.10054,-0.0503 -0.10319,-0.0476 -0.10583,-0.045 -0.10584,-0.0397 -0.10848,-0.0344 -0.11112,-0.0344 -0.11113,-0.0238 -0.11377,-0.0238 -0.11641,-0.0132 -0.11642,-0.0132 -0.11906,-0.008 -0.11907,-0.003 -0.11906,0.003 z" style="fill:#6d62c7;fill-opacity:1;stroke-width:0.26458332"></path></g></g></g></g></svg>      
+      </span>
+        Geoapify Geocoder Autocomplete Demos
+    </h1>
     <p class="description">
-      A comprehensive collection of demos showcasing the integration of our address autocomplete library 
-      with popular mapping libraries. Each demo demonstrates different use cases and integration patterns.
+      Technical demos for developers showing how to implement Geoapify’s address autocomplete — complete with code, best practices, and integrations with major map libraries - MapLibre GL, Leaflet, OpenLayers. 
     </p>
     
     <div class="demo-grid">
-      <a href="./basic/index.html" class="demo-card">
-        <h3>📝 Basic Address Form</h3>
+      <div class="demo-card">
+        <h3>Basic Address Form</h3>
         <p>A comprehensive address input form with street, city, state, and country autocomplete fields. Perfect for e-commerce, registration forms, and any application requiring address collection.</p>
         <div class="features">
           <strong>Features:</strong> Multi-field address input, automatic field population, address validation, theme switching, loading indicators
@@ -128,11 +115,14 @@
         <div class="tech-stack">
           <strong>Tech:</strong> Vanilla JavaScript, CSS themes, Geoapify Geocoding API
         </div>
-        <span class="cta">View Demo →</span>
-      </a>
+
+        <a href="./basic/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
       
-      <a href="./basic-places-builtin/index.html" class="demo-card">
-        <h3>📝⚡ Basic Address Form + Places</h3>
+      <div class="demo-card">
+        <h3>Basic Address Form + Places</h3>
         <p>A comprehensive address input form enhanced with built-in places search functionality. Perfect for applications that need both address collection and nearby places discovery.</p>
         <div class="features">
           <strong>Features:</strong> Multi-field address input, places search, built-in places UI, category search, automatic field population, theme switching, loading indicators
@@ -140,11 +130,13 @@
         <div class="tech-stack">
           <strong>Tech:</strong> Vanilla JavaScript, Places API, showPlacesList option, CSS themes, Geoapify Geocoding API
         </div>
-        <span class="cta">View Demo →</span>
-      </a>
+        <a href="./basic-places-builtin/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
       
-      <a href="./leaflet/index.html" class="demo-card">
-        <h3>🍃 Leaflet Integration</h3>
+      <div class="demo-card">
+        <h3>Leaflet Integration</h3>
         <p>Interactive map with address autocomplete integration. Users can search for addresses and see them marked on the map with automatic panning and custom markers.</p>
         <div class="features">
           <strong>Features:</strong> Interactive map, address search, marker placement, map panning, custom icons, theme switching
@@ -152,11 +144,55 @@
         <div class="tech-stack">
           <strong>Tech:</strong> Leaflet.js, Geoapify Maps API, Custom marker icons, CSS themes
         </div>
-        <span class="cta">View Demo →</span>
-      </a>
+        <a href="./leaflet/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
+
+      <div class="demo-card">
+        <h3>Address Form — Search, Check, Confirm</h3>
+        <p>One-field address search that prefills structured fields. Users review and correct if needed, then confirm. Clear assistive UX with match-level cues and soft validation.</p>
+        <div class="features">
+          <strong>Features:</strong> Single-field search, prefilling, match-level guidance, manual entry path, disabled confirm until complete
+        </div>
+        <div class="tech-stack">
+          <strong>Tech:</strong> Vanilla JS, Geoapify Geocoder Autocomplete, CSS themes
+        </div>
+        <a href="./address-form-one-field/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
+
+      <div class="demo-card">
+        <h3>Structured Address — Country → Postcode → City → Street → House No.</h3>
+        <p>Collect a structured address top‑down. Country is user‑selectable; postcode narrows city and street. Verification uses the Geocoding API with confidence hints and a developer panel.</p>
+        <div class="features">
+          <strong>Features:</strong> Country select, filtered postcode/city/street, postcode-only dropdown, confidence-based messages, dev info
+        </div>
+        <div class="tech-stack">
+          <strong>Tech:</strong> Vanilla JS, Geocoder Autocomplete filters, Geocoding API
+        </div>
+        <a href="./address-form-from-country-to-housenumber/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
+
+      <div class="demo-card">
+        <h3>Delivery Address: Autocomplete + Draggable Pin</h3>
+        <p>Start with type‑ahead search, then adjust a pin to the exact entrance. Reverse geocoding keeps the address in sync and the app saves the final coordinates plus the confirmed address.</p>
+        <div class="features">
+          <strong>Features:</strong> Leaflet map, draggable pin, reverse geocoding, IP bias, developer diagnostics
+        </div>
+        <div class="tech-stack">
+          <strong>Tech:</strong> Leaflet.js, Geoapify Autocomplete, Reverse Geocoding, IP info
+        </div>
+        <a href="./address-form-search-plus-map/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>      
       
-      <a href="./maplibre/index.html" class="demo-card">
-        <h3>🗺️ MapLibre GL Integration</h3>
+      <div class="demo-card">
+        <h3>MapLibre GL Integration</h3>
         <p>Advanced vector map with address autocomplete and reverse geocoding. Click anywhere on the map to get the address, or search for addresses to place markers.</p>
         <div class="features">
           <strong>Features:</strong> Vector tiles, address search, reverse geocoding, smooth animations, navigation controls, theme switching
@@ -164,11 +200,13 @@
         <div class="tech-stack">
           <strong>Tech:</strong> MapLibre GL, Vector tiles, Reverse geocoding, Smooth animations, CSS themes
         </div>
-        <span class="cta">View Demo →</span>
-      </a>
+        <a href="./maplibre/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
       
-      <a href="./leaflet-places-custom/index.html" class="demo-card">
-        <h3>🍃🎨 Leaflet + Custom Places UI</h3>
+      <div class="demo-card">
+        <h3>Leaflet + Custom Places UI</h3>
         <p>Interactive map with custom-designed places list. Search for categories and see detailed place cards with ratings, reviews, tags, and opening hours in a Google Maps-style interface.</p>
         <div class="features">
           <strong>Features:</strong> Custom places UI, detailed place cards, ratings & reviews, opening hours, rich categorization, theme switching
@@ -176,11 +214,13 @@
         <div class="tech-stack">
           <strong>Tech:</strong> Leaflet.js, Places API, Custom HTML/CSS, Manual UI implementation
         </div>
-        <span class="cta">View Demo →</span>
-      </a>
+        <a href="./leaflet-places-custom/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
       
-      <a href="./leaflet-places-builtin/index.html" class="demo-card">
-        <h3>🍃⚡ Leaflet + Built-in Places UI</h3>
+      <div class="demo-card">
+        <h3>Leaflet + Built-in Places UI</h3>
         <p>Same map functionality but using the built-in places list feature. Demonstrates how to achieve similar results with much less code by leveraging the component's native capabilities.</p>
         <div class="features">
           <strong>Features:</strong> Built-in places UI, simplified place items, automatic styling, reduced complexity, theme switching
@@ -188,8 +228,10 @@
         <div class="tech-stack">
           <strong>Tech:</strong> Leaflet.js, showPlacesList option, Minimal CSS, Component reuse
         </div>
-        <span class="cta">View Demo →</span>
-      </a>
+        <a href="./leaflet-places-builtin/index.html">
+          <span class="cta">View Demo →</span>
+        </a>
+      </div>
     </div>
     
     <div style="margin-top: 40px; text-align: center; color: #7f8c8d;">

@@ -25,8 +25,8 @@ export class PlacesListManager {
     private loadMoreElement: HTMLElement = null;
 
     // Pagination state
-    private currentPlacesOffset: number = 0;
-    private currentPlacesCategory: string[] = null;
+    private currentOffset: number = 0;
+    private currentCategory: string[] = null;
     private currentCategoryLabel: string = null;
     private isLoadingMorePlaces: boolean = false;
     private hasMorePlaces: boolean = true;
@@ -47,8 +47,16 @@ export class PlacesListManager {
         this.callbacks = callbacks;
     }
 
+    public setCurrentOffset(offset: number) {
+        this.currentOffset = offset;
+    }
+
+    public getCurrentOffset(): number {
+        return this.currentOffset;
+    }
+
     public setCategory(category: string[], categoryLabel: string) {
-        this.currentPlacesCategory = category;
+        this.currentCategory = category;
         this.currentCategoryLabel = categoryLabel ?? category.join(', ');
     }
 
@@ -98,7 +106,28 @@ export class PlacesListManager {
         });
     }
 
-    public addPlaces(places: GeoJSON.Feature[], currentPlacesOffset: number) {
+    public setPlaces(places: GeoJSON.Feature[], append?: boolean) {
+        this.hasMorePlaces = places.length === this.options.placesLimit;
+
+        if (append) {
+            const newPlaces = this.filterDuplicatePlaces(places);
+            this.places.push(...newPlaces);
+            this.showPlacesList(newPlaces, true); 
+        } else {
+            this.selectedPlaceIndex = null;
+            this.clearPlacesItems();
+            this.places = [];
+            this.places.push(...places);
+            this.showPlacesList(places); 
+        }
+
+        this.updateTitleBar(this.currentCategoryLabel);
+
+        // Notify callback
+        this.callbacks.onPlacesUpdate?.(this.places);
+    }
+
+/*    public addPlaces(places: GeoJSON.Feature[], currentPlacesOffset: number) {
             
         this.hasMorePlaces = places.length === this.options.placesLimit;
         this.currentPlacesOffset = currentPlacesOffset;
@@ -125,6 +154,8 @@ export class PlacesListManager {
         this.callbacks.onPlacesUpdate?.(this.places);
     }
 
+*/
+
     public getPlaces(): GeoJSON.Feature[] {
         return this.places;
     }
@@ -138,7 +169,6 @@ export class PlacesListManager {
 
         if (this.placesListElement) {
             this.placesListElement.classList.remove('active', 'standalone');
-            this.placesListElement.style.display = 'none';
         }
 
         this.removeScrollListener();
@@ -147,8 +177,7 @@ export class PlacesListManager {
 
     public isPlacesListVisible(): boolean {
         if (!this.placesListElement) return false;
-        return this.placesListElement.style.display !== 'none' &&
-            this.placesListElement.classList.contains('active');
+        return this.placesListElement.classList.contains('active');
     }
 
     private clearPlacesItems(): void {
@@ -158,7 +187,7 @@ export class PlacesListManager {
     }
 
     public resetCategory(): void {
-        this.currentPlacesCategory = null;
+        this.currentCategory = null;
         this.clearPlacesList();
     }
 
@@ -206,9 +235,9 @@ export class PlacesListManager {
         this.placesListElement.className = 'geoapify-places-list';
 
         // Title bar
-        this.titleBar = document.createElement('div');
+        /*this.titleBar = document.createElement('div');
         this.titleBar.className = 'geoapify-places-title-bar';
-        this.placesListElement.appendChild(this.titleBar);
+        this.placesListElement.appendChild(this.titleBar);*/
 
         // Scroll container
         this.scrollContainer = document.createElement('div');
@@ -216,9 +245,9 @@ export class PlacesListManager {
         this.placesListElement.appendChild(this.scrollContainer);
 
         // Status bar (at the bottom, outside scroll container - currently empty)
-        this.statusBar = document.createElement('div');
+        /*this.statusBar = document.createElement('div');
         this.statusBar.className = 'geoapify-places-status-bar';
-        this.placesListElement.appendChild(this.statusBar);
+        this.placesListElement.appendChild(this.statusBar);*/
 
         // Load more element (will be inside scroll container at the end of the list)
         this.loadMoreElement = document.createElement('div');
@@ -244,7 +273,6 @@ export class PlacesListManager {
 
     private showList(isLoadMore: boolean): void {
         this.placesListElement.classList.add('active', 'standalone');
-        this.placesListElement.style.display = 'block';
 
         if (!isLoadMore && this.scrollContainer) {
             this.scrollContainer.scrollTop = 0;
@@ -270,8 +298,8 @@ export class PlacesListManager {
     }
 
     private resetPaginationState(): void {
-        this.currentPlacesOffset = 0;
-        this.currentPlacesCategory = null;
+        this.currentOffset = 0;
+        this.currentCategory = null;
         this.currentCategoryLabel = null;
         this.hasMorePlaces = true;
         this.isLoadingMorePlaces = false;
@@ -286,7 +314,7 @@ export class PlacesListManager {
 
         const filterIcon = document.createElement('span');
         filterIcon.className = 'geoapify-places-title-icon';
-        DomHelper.addIcon(filterIcon, 'filter');
+        //DomHelper.addIcon(filterIcon, 'filter');
 
         const labelSpan = document.createElement('span');
         labelSpan.className = 'geoapify-places-title-label';
@@ -403,6 +431,7 @@ export class PlacesListManager {
             const hoursText = document.createElement('span');
             hoursText.className = 'geoapify-places-hours-text';
             hoursText.textContent = placeData.openingHours;
+            hoursText.title = placeData.openingHours;
 
             hoursContainer.appendChild(clockIcon);
             hoursContainer.appendChild(hoursText);
@@ -421,7 +450,7 @@ export class PlacesListManager {
     private extractPlaceData(place: GeoJSON.Feature): PlaceData {
         const props = place.properties;
         return {
-            name: props.name || 'Unknown Place',
+            name: props.name || '---',
             address: props.address_line2 || props.formatted || null,
             openingHours: props.opening_hours || null
         };
@@ -439,7 +468,7 @@ export class PlacesListManager {
     }
 
     private async loadMorePlaces(): Promise<void> {
-        if (!this.currentPlacesCategory || this.isLoadingMorePlaces || !this.hasMorePlaces || !this.callbacks.onLoadMore) {
+        if (!this.currentCategory || this.isLoadingMorePlaces || !this.hasMorePlaces || !this.callbacks.onLoadMore) {
             return;
         }
 
@@ -448,7 +477,7 @@ export class PlacesListManager {
 
         try {
             await this.callbacks.onLoadMore(
-                this.currentPlacesOffset
+                this.currentOffset
             );
 
             this.updateStatusBarState('end');

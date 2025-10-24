@@ -1,1 +1,1 @@
-export type ItemType = 'place' | 'category';
+export type ItemType = 'address' | 'category';

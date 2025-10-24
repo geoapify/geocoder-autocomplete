@@ -515,11 +515,11 @@
         },
         "categories": [
             {
-                "category": "catering",
+                "keys": ["catering"],
                 "label": "Food & Dining Places"
             },
             {
-                "category": "catering.cafe",
+                "keys": ["catering.cafe"],
                 "label": "Cafes"
             }
         ]

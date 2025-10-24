@@ -1,5 +1,7 @@
 /* Basic layout */
-html, body, #map {
+html,
+body,
+#map {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -14,12 +16,11 @@ html, body, #map {
   border-radius: 8px;
 }
 
-
 /* Places list styling (Google Maps style) */
 .places-list-container {
   background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  max-height: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 80px);
   overflow-y: auto;
   display: none;
 }
@@ -48,7 +49,7 @@ html, body, #map {
 
 .place-item:hover {
   background-color: #f8f9fa;
-  box-shadow: 0 1px 6px rgba(32,33,36,.28);
+  box-shadow: 0 1px 6px rgba(32, 33, 36, .28);
 }
 
 .place-item.selected {
@@ -100,7 +101,7 @@ html, body, #map {
   font-size: 14px;
   line-height: 1;
   margin-right: 4px;
-  text-shadow: 0 0 1px rgba(0,0,0,0.1);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 .rating-number {
@@ -230,6 +231,9 @@ html, body, #map {
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Category-specific styling */
@@ -349,7 +353,7 @@ body.theme-round-borders-dark .geoapify-category-item:hover {
 body.theme-minimal-dark .places-list-container,
 body.theme-round-borders-dark .places-list-container {
   background: #2d3748;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 body.theme-minimal-dark .place-item,
@@ -361,7 +365,7 @@ body.theme-round-borders-dark .place-item {
 body.theme-minimal-dark .place-item:hover,
 body.theme-round-borders-dark .place-item:hover {
   background-color: #1e293b;
-  box-shadow: 0 1px 6px rgba(0,0,0,.4);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .4);
 }
 
 body.theme-minimal-dark .place-item.selected,
@@ -447,4 +451,48 @@ body.theme-round-borders-dark .hours-label {
 body.theme-minimal-dark .hours-text,
 body.theme-round-borders-dark .hours-text {
   color: #e8eaed;
+}
+
+/* Search here control */
+.search-here-control {
+  display: none;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1003;
+  padding: 0;
+  margin: 0;
+}
+
+.search-here-control.visible {
+  display: block;
+}
+
+.search-here-button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cfd9e5;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, .12);
+  font-size: 13px;
+}
+
+.search-here-button:hover {
+  background: #f7fbff;
+}
+
+/* Dark theme for control */
+body.theme-minimal-dark .search-here-button,
+body.theme-round-borders-dark .search-here-button {
+  background: #2d2e30;
+  border-color: #3a3a3a;
+  color: #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .35);
+}
+
+body.theme-minimal-dark .search-here-button:hover,
+body.theme-round-borders-dark .search-here-button:hover {
+  background: #383a3d;
 }

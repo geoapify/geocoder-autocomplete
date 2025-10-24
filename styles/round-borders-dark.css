@@ -122,9 +122,9 @@
     background-color: #313131;
     color: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-top: none;
-    border-radius: 0 0 5px 5px;
+    border-radius: 5px 5px 5px 5px;
     display: none;
+    margin-top: 5px;
 }
 
 .geoapify-places-list.active {
@@ -163,6 +163,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
+    max-height: 100%;
 }
 
 .geoapify-places-scroll-container::-webkit-scrollbar {
@@ -215,7 +216,7 @@
 }
 
 .geoapify-places-main-part {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     color: #ffffff;
     overflow: hidden;
@@ -239,6 +240,7 @@
     margin-left: auto;
     font-size: 13px;
     color: rgba(255, 255, 255, 0.7);
+    max-width: 150px;
 }
 
 .geoapify-places-clock-icon {
@@ -255,6 +257,8 @@
 .geoapify-places-hours-text {
     white-space: nowrap;
     font-size: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .geoapify-places-status-bar {
