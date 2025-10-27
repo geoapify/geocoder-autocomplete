@@ -25,8 +25,23 @@ Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, u
 | addCategorySearch | boolean | Enable category search functionality. When enabled, the autocomplete will show category suggestions alongside address results, allowing users to search for places by category (e.g., restaurants, hotels). |
 | showPlacesList | boolean | Enable built-in places list functionality. When a category is selected, displays a list of places within that category showing name, address, and opening hours. Requires `addCategorySearch` to be enabled. |
 | hidePlacesListAfterSelect | boolean | Automatically hide the places list after a place is selected. Defaults to `false`. |
+| enablePlacesLazyLoading | boolean | Enable lazy loading for places list. When enabled, more places will be loaded as the user scrolls down. Defaults to `false`. |
+| placesLimit | number | The maximal number of places to fetch per request. Default is 20. |
+| placesFilter | `{ [key: string]: ByCircleOptions \| ByRectOptions \| string }` | Filter options specifically for Places API requests. Supports `circle` (ByCircleOptions), `rect` (ByRectOptions), `place` (string), and `geometry` (string) filters. Separate from the geocoder `filter` option. |
+| placesBias | `{ [key: string]: ByCircleOptions \| ByRectOptions \| ByProximityOptions }` | Bias options specifically for Places API requests. Supports `circle` (ByCircleOptions), `rect` (ByRectOptions), and `proximity` (ByProximityOptions) bias. Separate from the geocoder `bias` option. |
 | placesApiUrl | string | Custom URL for the Places API. Defaults to Geoapify Places API if not specified. |
 | ipGeolocationUrl | string | Custom URL for IP geolocation service. Used for location-based bias when no explicit location is provided. |
+
+#### Category
+
+The `Category` interface is used for category-based place searches:
+
+```typescript
+interface Category {
+  keys: string[];   // Array of category keys (e.g., ['accommodation.hotel'])
+  label: string;    // Display label for the category (e.g., 'Hotels')
+}
+```
 
 #### LanguageCode
 2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code: `ab`, `aa`, `af`, `ak`, `sq`, `am`, `ar`, `an`, `hy`, `as`, `av`, `ae`, `ay`, `az`, `bm`, `ba`, `eu`, `be`, `bn`, `bh`, `bi`, `bs`, `br`, `bg`, `my`, `ca`, `ch`, `ce`, `ny`, `zh`, `cv`, `kw`, `co`, `cr`, `hr`, `cs`, `da`, `dv`, `nl`, `en`, `eo`, `et`, `ee`, `fo`, `fj`, `fi`, `fr`, `ff`, `gl`, `ka`, `de`, `el`, `gn`, `gu`, `ht`, `ha`, `he`, `hz`, `hi`, `ho`, `hu`, `ia`, `id`, `ie`, `ga`, `ig`, `ik`, `io`, `is`, `it`, `iu`, `ja`, `jv`, `kl`, `kn`, `kr`, `ks`, `kk`, `km`, `ki`, `rw`, `ky`, `kv`, `kg`, `ko`, `ku`, `kj`, `la`, `lb`, `lg`, `li`, `ln`, `lo`, `lt`, `lu`, `lv`, `gv`, `mk`, `mg`, `ms`, `ml`, `mt`, `mi`, `mr`, `mh`, `mn`, `na`, `nv`, `nb`, `nd`, `ne`, `ng`, `nn`, `no`, `ii`, `nr`, `oc`, `oj`, `cu`, `om`, `or`, `os`, `pa`, `pi`, `fa`, `pl`, `ps`, `pt`, `qu`, `rm`, `rn`, `ro`, `ru`, `sa`, `sc`, `sd`, `se`, `sm`, `sg`, `sr`, `gd`, `sn`, `si`, `sk`, `sl`, `so`, `st`, `es`, `su`, `sw`, `ss`, `sv`, `ta`, `te`, `tg`, `th`, `ti`, `bo`, `tk`, `tl`, `tn`, `to`, `tr`, `ts`, `tt`, `tw`, `ty`, `ug`, `uk`, `ur`, `uz`, `ve`, `vi`, `vo`, `wa`, `cy`, `wo`, `fy`, `xh`, `yi`, `yo`, `za`.
@@ -40,6 +55,7 @@ By circle | *circle* | `{ lon: number ,lat: number, radiusMeters: number }`  | S
 By rectangle | *rect* | `{ lon1: number ,lat1: number, lon2: number ,lat2: number}`  | Search places inside the rectangle | `filter['rect'] = {lon1: 89.097540, lat1: 39.668983, lon2: -88.399274, lat2: 40.383412}`
 By country | *countrycode* | `CountyCode[]`  | Search places in the countries | `filter['countrycode'] = ['de', 'fr', 'es']`
 By place | *place* | `string` | Search for places within a given city or postal code. For example, search for streets within a city. Use the 'place_id' returned by another search to specify a filter. | `filter['place'] = '51ac66e77e9826274059f9426dc08c114840f00101f901dcf3000000000000c00208'`
+By geometry | *geometry* | `string` | Filter places by a custom geometry (GeoJSON string or Well-Known Text). Only available for Places API requests via `placesFilter`. | `placesFilter['geometry'] = '{"type":"Polygon","coordinates":[...]}'`
 
 You can provide filters as initial options or add by calling a function:
 ```
@@ -103,7 +119,8 @@ Here's a description of the API methods:
 | *setAllowNonVerifiedStreet(allowNonVerifiedStreet: boolean): void* | Allows the addition of streets that are not verified by the Geocoding API or missing in the database. |
 | *setCountryCodes(codes: CountyCode[]): void* | Sets specific country codes to filter address suggestions. |
 | *setPosition(position: GeoPosition = {lat: number; lon: number}): void* | Sets the geographic position to influence suggestions based on proximity.|
-| *setLimit(limit: number): void* | Sets the maximum number of suggestions to display. |
+| *setLimit(limit: number): void* | Sets the maximum number of address suggestions to display. |
+| *setPlacesLimit(limit: number): void* | Sets the maximum number of places to fetch per Places API request. |
 | *setValue(value: string): void* | Sets the value of the input field programmatically. |
 | *getValue(): string* | Retrieves the current value of the input field. |
 | *addFilterByCountry(codes: CountyCode[]): void* | Adds a filter to include or exclude suggestions based on specific country codes. |
@@ -116,26 +133,32 @@ Here's a description of the API methods:
 | *addBiasByRect(biasByRect: ByRectOptions = { lon1: number; lat1: number; lon2: number; lat2: number}): void* | Adds a rectangular bias to prioritize suggestions within a specified geographic area. |
 | *addBiasByProximity(biasByProximity: ByProximityOptions = { lon: number; lat: number }): void* | Adds a bias based on proximity to a specific location. |
 | *clearBias(): void* | Clears all previously added biases. |
+| *setPlacesFilterByCircle(filterByCircle: ByCircleOptions): void* | Adds a circular filter for Places API requests. |
+| *setPlacesFilterByRect(filterByRect: ByRectOptions): void* | Adds a rectangular filter for Places API requests. |
+| *setPlacesFilterByPlace(filterByPlace: string): void* | Adds a place filter for Places API requests. |
+| *setPlacesFilterByGeometry(filterByGeometry: string): void* | Adds a custom geometry filter for Places API requests. |
+| *clearPlacesFilters(): void* | Clears all Places API filters. |
+| *setPlacesBiasByCircle(biasByCircle: ByCircleOptions): void* | Adds a circular bias for Places API requests. |
+| *setPlacesBiasByRect(biasByRect: ByRectOptions): void* | Adds a rectangular bias for Places API requests. |
+| *setPlacesBiasByProximity(biasByProximity: ByProximityOptions): void* | Adds a proximity bias for Places API requests. |
+| *clearPlacesBias(): void* | Clears all Places API biases. |
 | *setSuggestionsFilter(suggestionsFilterFunc?: (suggestions: GeoJSON.Feature[]) => GeoJSON.Feature[]): void* | Sets a custom filter function for suggestions. |
 | *setPreprocessHook(preprocessHookFunc?: (value: string) => string): void* | Sets a preprocessing hook to modify the input value before sending a request. |
 | *setPostprocessHook(postprocessHookFunc?: (value: string) => string): void* | Sets a post-processing hook to modify the suggestion values after retrieval. |
 | *isOpen(): boolean* | Checks if the suggestions dropdown is currently open. |
 | *close(): void* | Manually closes the suggestions dropdown. |
 | *open(): void* | Manually opens the suggestions dropdown. |
-| *setCategory(category: Category or string or string[] or null): void* | Sets the selected category for places search. Pass null to clear the category. |
-| *resendPlacesRequest(): Promise<void>* | Resends the places search request for the currently selected category without changing the category. Useful for refreshing places data when filters or bias have changed (e.g., after map movement). |
+| *selectCategory(category: Category or string or string[] or null): Promise<void>* | Selects a category for places search and automatically triggers a places request. Pass null to clear the category. |
+| *clearCategory(): Promise<void>* | Clears the currently selected category and resets the places list. |
+| *sendPlacesRequest(): Promise<void>* | Sends a places search request for the currently selected category. Uses internal state (category, filters, bias). |
+| *resendPlacesRequestForMore(appendPlaces?: boolean): Promise<void>* | Resends the places search request for the currently selected category. If `appendPlaces` is true, new places are appended to the existing list. Useful for pagination or refreshing places data. |
 | *getCategory(): Category or null* | Retrieves the currently selected category. |
 | *selectPlace(index: number or null): void* | Programmatically selects a place from the places list by index. Pass null to clear selection. |
-| *setGeocoderUrl(url: string): void* | Overrides the default Geocoder API URL. |
-| *setPlaceDetailsUrl(url: string): void* | Overrides the default Place Details API URL. |
-| *setPlacesApiUrl(url: string): void* | Overrides the default Places API URL. |
-| *setIpGeolocationUrl(url: string): void* | Overrides the default IP Geolocation API URL. |
 | *sendGeocoderRequest(value: string): Promise<GeoJSON.FeatureCollection>* | Sends a geocoder request based on the provided value and returns a Promise with the response in [GeoJSON FeatureCollection](https://en.wikipedia.org/wiki/GeoJSON) format containing suggestions. |
 | *sendPlaceDetailsRequest(feature: GeoJSON.Feature): Promise<GeoJSON.Feature>* | Sends a place details request based on the provided [GeoJSON feature](https://en.wikipedia.org/wiki/GeoJSON) and returns a Promise with the response in GeoJSON Feature format containing place details. |
-| *sendPlacesRequest(category: string[], bias?: object, filter?: object, offset?: number, limit?: number): Promise<GeoJSON.FeatureCollection>* | Sends a places search request for the specified category and returns a Promise with the response in GeoJSON FeatureCollection format containing places. |
-| *setSendPlacesRequestFunc(sendPlacesRequestFunc: (category: string[], geocoderAutocomplete: GeocoderAutocomplete, offset?: number, limit?: number) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send places search requests. |
-| *setSendGeocoderRequestFunc(sendGeocoderRequestFunc: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. |
-| *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. |
+| *setSendPlacesRequestFunc(sendPlacesRequestFunc?: (category: string[], offset: number, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send places search requests. Pass null to clear. |
+| *setSendGeocoderRequestFunc(sendGeocoderRequestFunc?: (value: string, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.FeatureCollection>): void* | Sets a custom function to send geocoder requests. Pass null to clear. |
+| *setSendPlaceDetailsRequestFunc(sendPlaceDetailsRequestFunc?: (feature: GeoJSON.Feature, geocoderAutocomplete: GeocoderAutocomplete) => Promise<GeoJSON.Feature>): void* | Sets a custom function to send place details requests. Pass null to clear. |
 | *on(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback: (param: any) => void): void* | Attaches event listeners to various operations such as selection, suggestions, input changes, dropdown open/close, places, and request lifecycle events. |
 | *off(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback?: (param: any) => void): void* | Detaches previously attached event listeners. |
 | *once(operation: 'select' or 'suggestions' or 'input' or 'close' or 'open' or 'request_start' or 'request_end' or 'places' or 'places_request_start' or 'places_request_end' or 'place_details_request_start' or 'place_details_request_end' or 'place_select' or 'clear', callback: (param: any) => void): void* | Attaches a one-time event listener that triggers only once for the specified operation. |

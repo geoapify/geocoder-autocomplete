@@ -47,10 +47,27 @@ This code demonstrates how to set up a custom geocoding function. It customizes 
 ### Local Demos Collection
 
 This repository includes a comprehensive collection of working demos that you can run locally:
-* [Demo Collection Overview](demo/demo-index.html) - Navigate to all available demos
-* [Basic Address Form](demo/basic/index.html) - Multi-field address input with validation
-* [Basic Address Form with Built-in Places List](demo/basic-places-builtin/index.html) - Address input with category search and built-in places list functionality
-* [Leaflet Integration](demo/leaflet/index.html) - Interactive map with address search and markers
-* [Leaflet with Custom Places UI](demo/leaflet-places-custom/index.html) - Interactive map with category search and custom places list implementation
-* [Leaflet with Built-in Places List](demo/leaflet-places-builtin/index.html) - Interactive map with category search and built-in places list functionality
-* [MapLibre GL Integration](demo/maplibre/index.html) - Vector map with reverse geocoding on click
+
+* [Demo Collection Overview](../../demo/demo-index.html) - Navigate to all available demos
+
+* [One Field Address Form](../../demo/address-form-one-field/index.html) - Single field address input with autocomplete
+
+* [Multi-field Address Form](../../demo/address-form-from-country-to-housenumber/index.html) - Progressive address input from country to house number
+
+* [Address Form with Map](../../demo/address-form-search-plus-map/index.html) - Address search integrated with interactive map
+
+* [Autocomplete Features - Types](../../demo/autocomplete-features-types/index.html) - Demonstrates location type filtering
+
+* [Autocomplete Features - Filters & Bias](../../demo/autocomplete-features-filters-and-bias/index.html) - Shows filter and bias options
+
+* [Autocomplete Features - Events](../../demo/autocomplete-features-events/index.html) - Event handling examples
+
+* [Places Search - No Map](../../demo/places-seach-no-map-built-in-list/index.html) - Category search with built-in places list (no map)
+
+* [Leaflet Integration](../../demo/integration-with-leaflet/index.html) - Interactive map with address search and markers
+
+* [Leaflet with Custom Places UI](../../demo/places-search-leaflet-custom-list/index.html) - Interactive map with category search and custom places list implementation
+
+* [Leaflet with Built-in Places List](../../demo/places-search-leaflet-built-in-list/index.html) - Interactive map with category search and built-in places list functionality
+
+* [MapLibre GL Integration](../../demo/integration-with-maplibre-gl/index.html) - Vector map with reverse geocoding on click
