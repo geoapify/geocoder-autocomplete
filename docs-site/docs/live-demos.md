@@ -40,20 +40,20 @@ Demonstrates how to configure a custom geocoding function to return countries, s
 
 ---
 
-### Local Demo Collection
+### Live Demo Collection
 
 A full set of ready-to-run demo projects is available in the repository. These examples show how to use the autocomplete in various contexts, from simple forms to complex map integrations.
 
-* [Demo Collection Overview](/demo/demo-index.html) — Explore all available demos
-* [One Field Address Form](/demo/address-form-one-field/index.html) — Single-field input with autocomplete
-* [Multi-field Address Form](/demo/address-form-from-country-to-housenumber/index.html) — Step-by-step input from country to house number
-* [Address Form with Map](/demo/address-form-search-plus-map/index.html) — Combined address search and interactive map
-* [Autocomplete Features — Types](/demo/autocomplete-features-types/index.html) — Filtering by location type
-* [Autocomplete Features — Filters & Bias](/demo/autocomplete-features-filters-and-bias/index.html) — Demonstrates filter and bias options
-* [Autocomplete Features — Events](/demo/autocomplete-features-events/index.html) — Shows available events and callbacks
-* [Places Search — No Map](/demo/places-seach-no-map-built-in-list/index.html) — Category search with built-in places list
-* [Leaflet Integration](/demo/integration-with-leaflet/index.html) — Interactive map with address search and markers
-* [Leaflet with Custom Places UI](/demo/places-search-leaflet-custom-list/index.html) — Category search with custom places list
-* [Leaflet with Built-in Places List](/demo/places-search-leaflet-built-in-list/index.html) — Category search with built-in places list
-* [MapLibre GL Integration](/demo/integration-with-maplibre-gl/index.html) — Vector map with reverse geocoding on click
-
+| Preview | Description |  |  |
+|---|---|---|---|
+| [![One Field](assets/code_samples/address-collection-address-input-location-verifivation.png)](../demo/address-form-one-field/index.html) | One Field Address Form — Single-field input with autocomplete | [Open](../demo/address-form-one-field/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/address-form-one-field) |
+| [![Multi-field](assets/code_samples/address-collection-standard-structured-address-form.png)](../demo/address-form-from-country-to-housenumber/index.html) | Multi-field Address Form — Step-by-step input from country to house number | [Open](../demo/address-form-from-country-to-housenumber/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/address-form-from-country-to-housenumber) |
+| [![Form + Map](assets/code_samples/geocoder-autocomplete-and-leaflet.png)](../demo/address-form-search-plus-map/index.html) | Address Form with Map — Combined address search and interactive map | [Open](../demo/address-form-search-plus-map/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/address-form-search-plus-map) |
+| [![Types](assets/code_samples/geocoder-autocomplete-type-parameter.png)](../demo/autocomplete-features-types/index.html) | Autocomplete Features — Types — Filtering by location type | [Open](../demo/autocomplete-features-types/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/autocomplete-features-types) |
+| [![Filters & Bias](assets/code_samples/geocoder-autocomplete-filter-and-bias.png)](../demo/autocomplete-features-filters-and-bias/index.html) | Autocomplete Features — Filters & Bias — Demonstrates filter and bias options | [Open](../demo/autocomplete-features-filters-and-bias/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/autocomplete-features-filters-and-bias) |
+| [![Events](assets/code_samples/geocoder-autocomplete-events.png)](../demo/autocomplete-features-events/index.html) | Autocomplete Features — Events — Shows available events and callbacks | [Open](../demo/autocomplete-features-events/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/autocomplete-features-events) |
+| [![Places — No Map](assets/code_samples/category-search-in-line.png)](../demo/places-seach-no-map-built-in-list/index.html) | Places Search — No Map — Category search with built-in places list | [Open](../demo/places-seach-no-map-built-in-list/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/places-seach-no-map-built-in-list) |
+| [![Leaflet](assets/code_samples/geocoder-autocomplete-and-leaflet.png)](../demo/integration-with-leaflet/index.html) | Leaflet Integration — Interactive map with address search and markers | [Open](../demo/integration-with-leaflet/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/integration-with-leaflet) |
+| [![Leaflet + Custom List](assets/code_samples/category-search-custom-places-list.png)](../demo/places-search-leaflet-custom-list/index.html) | Leaflet with Custom Places UI — Category search with custom places list | [Open](../demo/places-search-leaflet-custom-list/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/places-search-leaflet-custom-list) |
+| [![Leaflet + Built-in List](assets/code_samples/category-search-with-map.png)](../demo/places-search-leaflet-built-in-list/index.html) | Leaflet with Built-in Places List — Category search with built-in places list | [Open](../demo/places-search-leaflet-built-in-list/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/places-search-leaflet-built-in-list) |
+| [![MapLibre GL](assets/code_samples/geocoder-autocomplete-and-maplibregl.png)](../demo/integration-with-maplibre-gl/index.html) | MapLibre GL Integration — Vector map with reverse geocoding on click | [Open](../demo/integration-with-maplibre-gl/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/main../demo/integration-with-maplibre-gl) |
