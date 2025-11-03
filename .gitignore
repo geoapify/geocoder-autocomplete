@@ -4,5 +4,6 @@ node_modules
 .vscode/*
 /.idea/
 /docs-site/site/
-
 coverage
+.DS_Store
+config.bat
