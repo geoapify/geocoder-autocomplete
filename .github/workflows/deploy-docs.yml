@@ -12,21 +12,46 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # --- 1. Build your JS library ---
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and build library
+        run: |
+          npm ci
+          npm run build-all
+
+      # --- 2. Build the MkDocs documentation ---
       - name: Set up Python 3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
+      - name: Install MkDocs dependencies
         working-directory: docs-site
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Build and deploy to GitHub Pages
+      - name: Build MkDocs site
         working-directory: docs-site
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mkdocs build --strict
+
+      # --- 3. Copy demos and dist into built site ---
+      - name: Copy demo and dist folders
         run: |
-          mkdocs gh-deploy --force --remote-name origin
+          mkdir -p docs-site/site/demo
+          rsync -a demo/ docs-site/site/demo/
+          mkdir -p docs-site/site/dist
+          rsync -a dist/ docs-site/site/dist/
+
+      # --- 4. Deploy everything to GitHub Pages ---
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: docs-site/site
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force_orphan: true
 
