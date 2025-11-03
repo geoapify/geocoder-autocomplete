@@ -44,16 +44,16 @@ Demonstrates how to configure a custom geocoding function to return countries, s
 
 A full set of ready-to-run demo projects is available in the repository. These examples show how to use the autocomplete in various contexts, from simple forms to complex map integrations.
 
-* [Demo Collection Overview](../../demo/demo-index.html) — Explore all available demos
-* [One Field Address Form](../../demo/address-form-one-field/index.html) — Single-field input with autocomplete
-* [Multi-field Address Form](../../demo/address-form-from-country-to-housenumber/index.html) — Step-by-step input from country to house number
-* [Address Form with Map](../../demo/address-form-search-plus-map/index.html) — Combined address search and interactive map
-* [Autocomplete Features — Types](../../demo/autocomplete-features-types/index.html) — Filtering by location type
-* [Autocomplete Features — Filters & Bias](../../demo/autocomplete-features-filters-and-bias/index.html) — Demonstrates filter and bias options
-* [Autocomplete Features — Events](../../demo/autocomplete-features-events/index.html) — Shows available events and callbacks
-* [Places Search — No Map](../../demo/places-seach-no-map-built-in-list/index.html) — Category search with built-in places list
-* [Leaflet Integration](../../demo/integration-with-leaflet/index.html) — Interactive map with address search and markers
-* [Leaflet with Custom Places UI](../../demo/places-search-leaflet-custom-list/index.html) — Category search with custom places list
-* [Leaflet with Built-in Places List](../../demo/places-search-leaflet-built-in-list/index.html) — Category search with built-in places list
-* [MapLibre GL Integration](../../demo/integration-with-maplibre-gl/index.html) — Vector map with reverse geocoding on click
+* [Demo Collection Overview](/demo/demo-index.html) — Explore all available demos
+* [One Field Address Form](/demo/address-form-one-field/index.html) — Single-field input with autocomplete
+* [Multi-field Address Form](/demo/address-form-from-country-to-housenumber/index.html) — Step-by-step input from country to house number
+* [Address Form with Map](/demo/address-form-search-plus-map/index.html) — Combined address search and interactive map
+* [Autocomplete Features — Types](/demo/autocomplete-features-types/index.html) — Filtering by location type
+* [Autocomplete Features — Filters & Bias](/demo/autocomplete-features-filters-and-bias/index.html) — Demonstrates filter and bias options
+* [Autocomplete Features — Events](/demo/autocomplete-features-events/index.html) — Shows available events and callbacks
+* [Places Search — No Map](/demo/places-seach-no-map-built-in-list/index.html) — Category search with built-in places list
+* [Leaflet Integration](/demo/integration-with-leaflet/index.html) — Interactive map with address search and markers
+* [Leaflet with Custom Places UI](/demo/places-search-leaflet-custom-list/index.html) — Category search with custom places list
+* [Leaflet with Built-in Places List](/demo/places-search-leaflet-built-in-list/index.html) — Category search with built-in places list
+* [MapLibre GL Integration](/demo/integration-with-maplibre-gl/index.html) — Vector map with reverse geocoding on click
 

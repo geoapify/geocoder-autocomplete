@@ -128,7 +128,7 @@ Signature: `setLang(lang: SupportedLanguage | null)`
 Defines the **language of returned suggestions**.
 Set this to localize addresses or display place names in a user’s preferred language.
 
-**Type:** [`SupportedLanguage`](../api-reference/geocoderautocompleteoptions.md#lang)
+**Type:** [`SupportedLanguage`](../api-reference/geocoderautocompleteoptions/#lang)
 
 **Example:**
 
@@ -273,7 +273,7 @@ Signature: `addFilterByCountry(codes: ByCountryCodeOptions)`
 Applies a **hard filter** limiting results to one or more specific countries.
 Only addresses within the listed countries will appear in autocomplete suggestions.
 
-**Type:** [`ByCountryCodeOptions`](../api-reference/geocoderautocompleteoptions.md#bycountrycodeoptions)
+**Type:** [`ByCountryCodeOptions`](../api-reference/geocoderautocompleteoptions/#bycountrycodeoptions)
 
 **Example:**
 
@@ -290,7 +290,7 @@ Signature: `addFilterByCircle(opts: ByCircleOptions)`
 Restricts autocomplete results to a **circular area**.
 Useful for location-based search scenarios such as “addresses within 5 km of city center”.
 
-**Type:** [`ByCircleOptions`](../api-reference/geocoderautocompleteoptions.md#bycircleoptions)
+**Type:** [`ByCircleOptions`](/geocoderautocompleteoptions/#bycircleoptions)
 
 **Example:**
 
@@ -310,7 +310,7 @@ Signature: `addFilterByRect(opts: ByRectOptions)`
 
 Filters results to a **rectangular bounding box**, defined by two corner coordinates.
 
-**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions.md#byrectoptions)
+**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions/#byrectoptions)
 
 **Example:**
 
@@ -412,7 +412,7 @@ Signature: `addBiasByProximity(p: ByProximityOptions)`
 Prioritizes results **closest to a specific point**.
 Commonly used to rank addresses near the user's current location or map center.
 
-**Type:** [`ByProximityOptions`](../api-reference/geocoderautocompleteoptions.md#byproximityoptions)
+**Type:** [`ByProximityOptions`](../api-reference/geocoderautocompleteoptions/#byproximityoptions)
 
 **Example:**
 
@@ -445,7 +445,7 @@ Signature: `setPlacesFilterByCircle(opts: ByCircleOptions)`
 Applies a **hard filter** for Places API results within a circular area.
 Useful for showing POIs (e.g., restaurants or hotels) inside a certain radius around a point.
 
-**Type:** [`ByCircleOptions`](../api-reference/geocoderautocompleteoptions.md#bycircleoptions)
+**Type:** [`ByCircleOptions`](/geocoderautocompleteoptions/#bycircleoptions)
 
 **Example:**
 
@@ -465,7 +465,7 @@ Signature: `setPlacesFilterByRect(opts: ByRectOptions)`
 
 Applies a **rectangular bounding box filter** for Places API searches.
 
-**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions.md#byrectoptions)
+**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions/#byrectoptions)
 
 **Example:**
 
@@ -529,7 +529,7 @@ Signature: `setPlacesBiasByCircle(opts: ByCircleOptions)`
 
 Adds a **soft bias** to prioritize Places API results within or near a circular area.
 
-**Type:** [`ByCircleOptions`](../api-reference/geocoderautocompleteoptions.md#bycircleoptions)
+**Type:** [`ByCircleOptions`](/geocoderautocompleteoptions/#bycircleoptions)
 
 **Example:**
 
@@ -549,7 +549,7 @@ Signature: `setPlacesBiasByRect(opts: ByRectOptions)`
 
 Adds a **soft bias** toward POIs within a rectangular region.
 
-**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions.md#byrectoptions)
+**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions/#byrectoptions)
 
 **Example:**
 
@@ -570,7 +570,7 @@ Signature: `setPlacesBiasByProximity(p: ByProximityOptions)`
 
 Prioritizes Places API results near a **specific coordinate point**, typically the user’s location or map center.
 
-**Type:** [`ByProximityOptions`](../api-reference/geocoderautocompleteoptions.md#byproximityoptions)
+**Type:** [`ByProximityOptions`](../api-reference/geocoderautocompleteoptions/#byproximityoptions)
 
 **Example:**
 
