@@ -46,6 +46,8 @@ jobs:
           rsync -a demo/ docs-site/site/demo/
           mkdir -p docs-site/site/dist
           rsync -a dist/ docs-site/site/dist/
+          mkdir -p docs-site/site/styles
+          rsync -a styles/ docs-site/site/styles/
 
       # --- 4. Deploy everything to GitHub Pages ---
       - name: Deploy to GitHub Pages
