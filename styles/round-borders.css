@@ -1,5 +1,6 @@
 .geoapify-input-wrapper {
     position: relative;
+    flex: 0 0 auto;    
 }
 
 .geoapify-autocomplete-input {
@@ -98,8 +99,19 @@
     margin-top: 5px;
 }
 
+.geoapify-geocoder-autocomplete-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    pointer-events: all;
+}
+
 .geoapify-places-list.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .geoapify-places-title-bar {

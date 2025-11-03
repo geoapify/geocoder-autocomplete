@@ -1,73 +1,45 @@
 # Geoapify Geocoder Autocomplete
 
-The Geoapify Geocoder Autocomplete is a JavaScript (TypeScript) library designed to enhance web applications and HTML pages by adding advanced **address autocomplete** functionality and **address autofill** input fields. It harnesses the power of the [Geoapify Geocoding API](https://www.geoapify.com/geocoding-api/) to provide accurate and efficient address search capabilities, making it an essential tool for enhancing the geolocation services of web-based applications.
+The **Geoapify Geocoder Autocomplete** is a **JavaScript / TypeScript** library that brings advanced **address and place autocomplete** functionality to web applications and HTML pages. It helps users quickly find and select accurate locations while improving form usability and map interaction.
 
-![Geocoder Autocomplete](https://github.com/geoapify/geocoder-autocomplete/blob/9b46b3e458d18b45e2957298e8833f830ed6252a/img/address-autocomplete-example.png?raw=true)
+Powered by Geoapify’s APIs, the library combines the strengths of:
+
+* [**Address Autocomplete API**](https://www.geoapify.com/address-autocomplete/) — for real-time, high-quality address and place suggestions as the user types.
+* [**Places API**](https://www.geoapify.com/places-api/) — for category-based search and exploring points of interest such as restaurants, cafes, and landmarks.
+
+By integrating both APIs, the library supports intelligent **address search**, **autofill**, and **category-based place discovery** within a single, easy-to-use component. It can be embedded in any modern web app, works without UI frameworks, and is fully compatible with mapping libraries like **Leaflet**, **MapLibre GL**, or **OpenLayers**.
+
+![Geocoder Autocomplete](assets/address-autocomplete-example.png)
 
 ## Features
-* **Customizable Address Input**: Easily embed address input fields within your web application by adding them to provided HTML containers (e.g., `DIV` elements), allowing for flexible integration and styling.
-* **API Integration Flexibility**: By default, the library seamlessly connects to the [Geoapify Address Autocomplete API](https://www.geoapify.com/address-autocomplete/) to retrieve address suggestions. However, developers have the freedom to integrate and combine other third-party Address Search APIs, allowing for extensive customization and the incorporation of multiple data sources.
-* **Search Customization**: Tailor your address search with precision by adding filters and bias parameters. This level of customization empowers developers to fine-tune search queries, ensuring more accurate and relevant address suggestions for users.
-* **Structured Address Forms**: Utilize the type parameter to craft address input forms that enable users to enter structured addresses, including postal codes, cities, countries, address lines, and more.
-* **Category Search**: Enable category-based search functionality that allows users to search for places by categories (e.g., restaurants, hotels, gas stations). When enabled, the autocomplete will display category suggestions alongside address results, providing a more comprehensive search experience.
-* **Places List Integration**: Optionally display a list of places within selected categories using the [Geoapify Places API](https://www.geoapify.com/places-api/). The built-in places list shows essential place information including name, address, and opening hours, with a "Load More" button to fetch additional results. For more detailed place information, you can implement custom places list handling.
-* **Place Details Integration**: Optionally, the library can call the [Geoapify Place Details API](https://www.geoapify.com/place-details-api/), providing users with detailed city and building boundaries as part of the search results. This enhances location context and visualization for a richer user experience.
-* **Customizable Look-and-Feel**: Tailor the appearance of the address input and autocomplete suggestions effortlessly. The library offers four distinct styles for both light and dark themes, providing design flexibility. Moreover, developers can further fine-tune the visual aspects using CSS classes to achieve a seamless integration with their application's aesthetics.
-* **Zero Dependencies**: The library is intentionally built with zero external dependencies. This means that it operates independently and does not rely on external libraries or packages. 
 
-## Live Demos
+1. **Easy to Integrate**
+   Quickly add smart address or place autocomplete to any web page or application. The component can be embedded inside any HTML container (e.g., a `DIV` element) and works seamlessly with your existing UI and map setup.
 
-Try the address autocomplete in the Playground. Experiment with different options, such as geocoding, biasing results, and more, to see how the autocomplete behavior adapts:
-* [Playground](https://apidocs.geoapify.com/playground/geocoding/#autocomplete)
+2. **Fine-Tuning and Control**
+   Adjust search behavior with **filters** and **bias parameters** — limit results by country, bounding box, circle, or proximity. This flexibility helps return the most relevant and context-aware suggestions for your users.
 
-### JSFiddle demos
+3. **Address Collection and Verification**
+   Use the library to build structured address input forms, collect verified addresses, and automatically fill in city, postal code, and country fields. Perfect for checkout pages, registration forms, and delivery address validation.
 
-A live example of the address autocomplete field integrated with map libraries:
-* [JSFiddle demo: Address Field + Leaflet Map](https://jsfiddle.net/Geoapify/jsgw53z8/)
-* [JSFiddle demo: Address Field + MapLibreGL map](https://jsfiddle.net/Geoapify/sf3hp2a6/)
+4. **Optional Place Details Integration**
+   Enhance selected results with detailed information and geometries by connecting to the [Geoapify Place Details API](https://www.geoapify.com/place-details-api/). Retrieve building outlines, city boundaries, and additional metadata for improved map visualization.
 
-A simple address form demos showcasing how to implement address search and autocomplete for user input:
-* [JSFiddle demo: Address Form 1](https://jsfiddle.net/Geoapify/t0eg541k/)
-* [JSFiddle demo: Address Form 2](https://jsfiddle.net/Geoapify/stgek5wf/)
+5. **Optional Category Search**
+   Extend the autocomplete to support category-based search using the [Geoapify Places API](https://www.geoapify.com/places-api/). Let users explore nearby points of interest such as restaurants, hotels, or gas stations directly from the dropdown.
 
-This example demonstrates obtaining precise address details for shipping and delivery:
-* [JSFiddle demo: Getting precise location for Shipping](https://jsfiddle.net/Geoapify/g9xhcye0/)
+6. **Customizable Look and Feel**
+   Style the autocomplete to match your application’s design. Choose from built-in light and dark themes or override styles using your own CSS classes for complete visual consistency.
 
-> **⚠️ Warning**: While address autocomplete can help users quickly select locations, it is important to note that no autocomplete service provides 100% coverage or guaranteed precision. For critical use cases like shipping or delivery, it is essential to verify and confirm the location.
->
-> **Here's how you can ensure accuracy**:
-> 1. After selecting an address, display a map or marker to show the user's selected location.
-> 2. Prompt the user to confirm the address details, including street, city, and postal code.
-> 3. Optionally, use reverse geocoding to verify the location after selecting the address. You can also use [Geoapify Reverse Geocoding API](https://www.geoapify.com/reverse-geocoding-api/) to confirm the precise location.
-
-This code demonstrates how to set up a custom geocoding function. It customizes the autocomplete input to return countries, states, cities, and counties based on user input, using Geoapify's Address Autocomplete API:
-* [JSFiddle demo: Custom Geocoding Function](https://jsfiddle.net/Geoapify/916oxfja/)
+7. **Zero Dependencies**
+   Built with no external dependencies, the library is lightweight, fast, and framework-agnostic. It integrates easily with any modern frontend or map library such as Leaflet, MapLibre GL, or OpenLayers.
 
 
-### Local Demos Collection
+## Learn more
 
-This repository includes a comprehensive collection of working demos that you can run locally:
+* [**API Reference**](api/methods.md) – Explore all available methods, options, and event callbacks.
+* [**Geoapify Geocoding & Autocomplete API Documentation**](https://apidocs.geoapify.com/docs/geocoding/) – Detailed API descriptions, parameters, and response formats.
+* [**API Playground**](https://apidocs.geoapify.com/playground/geocoding/#autocomplete) – Try the autocomplete interactively and experiment with API parameters.
+* [**JSFiddle Demos**](/live-demo/#jsfiddle-demos) – Live examples showing how to integrate the autocomplete with maps and forms.
+* [**Local Demo Collection**](/live-demo/#local-demo-collection) – Run ready-made demo projects locally to explore advanced integrations.
 
-* [Demo Collection Overview](../../demo/demo-index.html) - Navigate to all available demos
-
-* [One Field Address Form](../../demo/address-form-one-field/index.html) - Single field address input with autocomplete
-
-* [Multi-field Address Form](../../demo/address-form-from-country-to-housenumber/index.html) - Progressive address input from country to house number
-
-* [Address Form with Map](../../demo/address-form-search-plus-map/index.html) - Address search integrated with interactive map
-
-* [Autocomplete Features - Types](../../demo/autocomplete-features-types/index.html) - Demonstrates location type filtering
-
-* [Autocomplete Features - Filters & Bias](../../demo/autocomplete-features-filters-and-bias/index.html) - Shows filter and bias options
-
-* [Autocomplete Features - Events](../../demo/autocomplete-features-events/index.html) - Event handling examples
-
-* [Places Search - No Map](../../demo/places-seach-no-map-built-in-list/index.html) - Category search with built-in places list (no map)
-
-* [Leaflet Integration](../../demo/integration-with-leaflet/index.html) - Interactive map with address search and markers
-
-* [Leaflet with Custom Places UI](../../demo/places-search-leaflet-custom-list/index.html) - Interactive map with category search and custom places list implementation
-
-* [Leaflet with Built-in Places List](../../demo/places-search-leaflet-built-in-list/index.html) - Interactive map with category search and built-in places list functionality
-
-* [MapLibre GL Integration](../../demo/integration-with-maplibre-gl/index.html) - Vector map with reverse geocoding on click

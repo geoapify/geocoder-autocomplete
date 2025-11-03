@@ -17,6 +17,8 @@ body {
   left: 10px;
   width: 400px;
   z-index: 1002;
+
+  pointer-events: none;
 }
 
 .autocomplete-container {

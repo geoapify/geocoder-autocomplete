@@ -5,3 +5,6 @@ tsconfig.json
 .vscode/*
 rollup-config.mjs
 postcss.config.cjs
+docs-site
+coverage
+demo

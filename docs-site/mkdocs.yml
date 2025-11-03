@@ -7,6 +7,7 @@ theme:
   favicon: assets/favicon.ico
   features:
     - content.code.copy
+    - navigation.expand
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -22,11 +23,12 @@ plugins:
 
 nav:
   - Home: index.md
-  - Installation: installation.md
   - Quick Start: quick-start.md
-  - API Reference: api-reference.md
+  - API Reference:
+      - GeocoderAutocomplete: api-reference/geocoder-autocomplete.md
+      - GeocoderAutocompleteOptions: api-reference/geocoder-autocomplete-options.md
   - Styling: styling.md
-  - Non-Verified Addresses: non-verified-addresses.md
+  - Interactive Demos: live-demos.md
 
 repo_url: https://github.com/geoapify/geocoder-autocomplete
 repo_name: GitHub

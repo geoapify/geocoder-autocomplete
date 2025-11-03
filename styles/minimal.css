@@ -6,9 +6,9 @@
 .geoapify-geocoder-autocomplete-container {
     display: flex;
     flex-direction: column;
-    flex-direction: column;
     align-items: stretch;
     position: relative;
+    pointer-events: all;
 }
 
 .geoapify-autocomplete-input {

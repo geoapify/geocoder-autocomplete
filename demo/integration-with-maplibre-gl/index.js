@@ -33,10 +33,7 @@ function switchMapTheme(themeName) {
     map.setStyle(newStyle);
     
     // Re-add controls and event listeners after style change
-    map.once('style.load', () => {
-        // Re-add navigation control
-        map.addControl(new maplibregl.NavigationControl({ position: "bottom-right" }));
-        
+    map.once('style.load', () => {        
         // Re-add click event listener
         map.on("click", function (e) {
             const lat = e.lngLat.lat;
@@ -56,7 +53,7 @@ function switchMapTheme(themeName) {
     });
 }
 
-// Add zoom and rotation controls to bottom-right corner
+// Re-add navigation control
 map.addControl(new maplibregl.NavigationControl({ position: "bottom-right" }));
 
 // check the available autocomplete options on the https://www.npmjs.com/package/@geoapify/geocoder-autocomplete

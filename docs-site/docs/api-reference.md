@@ -1,36 +1,62 @@
-## Documentation
 
-Below, you'll find `@geoapify/geocoder-autocomplete`'s detailed documentation, usage examples, advanced features, and more. You'll find the information you need to seamlessly integrate address autocomplete and enhance your web-based geolocation services and user experiences.
-### Creation
+## `GeocoderAutocompleteOptions`
 
-| Option | Type | Description |
-| ------ | ------ | ------ |
-| constructor | *GeocoderAutocomplete(<HTMLElement> el, <String> geoapifyApiKey, <GeocoderAutocompleteOptions> options?)* | *GeocoderAutocomplete(document.getElementById('autocomplete'), 'sdf45dfg68879fhsdgs346dfhdj', { lang: 'it' }*
 
-### GeocoderAutocompleteOptions
-| Option | Type | Description |
-| ------ | ------ | ------ |
-| type | `country`, `state`, `city`, `postcode`, `street`, `amenity` | Type of the location |
-| lang | LanguageCode | Results language |
-| limit | number | The maximal number of returned suggestions |
-| placeholder | string | An input field placeholder |
-| debounceDelay | number | A delay between user input and the API call to prevent unnecessary calls. The default value is 100ms. |
-| skipIcons | boolean | Don't add icons to suggestions |
-| addDetails | boolean | Call Place Details API on selection change to get the place details. For example, opening hours or boundary |
-| skipSelectionOnArrowKey | boolean | Don't choose the location with the arrow keys |
-| filter | FilterOptions | Filter places by country, boundary, circle, place |
-| bias | BiasOptions | Prefer places by country, boundary, circle, location |
-| allowNonVerifiedHouseNumber | boolean | Allow the addition of house numbers that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. | 
-| allowNonVerifiedStreet | boolean | Allow the addition of streets that are not verified by the Geocoding API or missing in the database. Check the *"Working with non-verified values"* section for details. |
-| addCategorySearch | boolean | Enable category search functionality. When enabled, the autocomplete will show category suggestions alongside address results, allowing users to search for places by category (e.g., restaurants, hotels). |
-| showPlacesList | boolean | Enable built-in places list functionality. When a category is selected, displays a list of places within that category showing name, address, and opening hours. Requires `addCategorySearch` to be enabled. |
-| hidePlacesListAfterSelect | boolean | Automatically hide the places list after a place is selected. Defaults to `false`. |
-| enablePlacesLazyLoading | boolean | Enable lazy loading for places list. When enabled, more places will be loaded as the user scrolls down. Defaults to `false`. |
-| placesLimit | number | The maximal number of places to fetch per request. Default is 20. |
-| placesFilter | `{ [key: string]: ByCircleOptions \| ByRectOptions \| string }` | Filter options specifically for Places API requests. Supports `circle` (ByCircleOptions), `rect` (ByRectOptions), `place` (string), and `geometry` (string) filters. Separate from the geocoder `filter` option. |
-| placesBias | `{ [key: string]: ByCircleOptions \| ByRectOptions \| ByProximityOptions }` | Bias options specifically for Places API requests. Supports `circle` (ByCircleOptions), `rect` (ByRectOptions), and `proximity` (ByProximityOptions) bias. Separate from the geocoder `bias` option. |
-| placesApiUrl | string | Custom URL for the Places API. Defaults to Geoapify Places API if not specified. |
-| ipGeolocationUrl | string | Custom URL for IP geolocation service. Used for location-based bias when no explicit location is provided. |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### Category
 
@@ -42,10 +68,6 @@ interface Category {
   label: string;    // Display label for the category (e.g., 'Hotels')
 }
 ```
-
-#### LanguageCode
-2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code: `ab`, `aa`, `af`, `ak`, `sq`, `am`, `ar`, `an`, `hy`, `as`, `av`, `ae`, `ay`, `az`, `bm`, `ba`, `eu`, `be`, `bn`, `bh`, `bi`, `bs`, `br`, `bg`, `my`, `ca`, `ch`, `ce`, `ny`, `zh`, `cv`, `kw`, `co`, `cr`, `hr`, `cs`, `da`, `dv`, `nl`, `en`, `eo`, `et`, `ee`, `fo`, `fj`, `fi`, `fr`, `ff`, `gl`, `ka`, `de`, `el`, `gn`, `gu`, `ht`, `ha`, `he`, `hz`, `hi`, `ho`, `hu`, `ia`, `id`, `ie`, `ga`, `ig`, `ik`, `io`, `is`, `it`, `iu`, `ja`, `jv`, `kl`, `kn`, `kr`, `ks`, `kk`, `km`, `ki`, `rw`, `ky`, `kv`, `kg`, `ko`, `ku`, `kj`, `la`, `lb`, `lg`, `li`, `ln`, `lo`, `lt`, `lu`, `lv`, `gv`, `mk`, `mg`, `ms`, `ml`, `mt`, `mi`, `mr`, `mh`, `mn`, `na`, `nv`, `nb`, `nd`, `ne`, `ng`, `nn`, `no`, `ii`, `nr`, `oc`, `oj`, `cu`, `om`, `or`, `os`, `pa`, `pi`, `fa`, `pl`, `ps`, `pt`, `qu`, `rm`, `rn`, `ro`, `ru`, `sa`, `sc`, `sd`, `se`, `sm`, `sg`, `sr`, `gd`, `sn`, `si`, `sk`, `sl`, `so`, `st`, `es`, `su`, `sw`, `ss`, `sv`, `ta`, `te`, `tg`, `th`, `ti`, `bo`, `tk`, `tl`, `tn`, `to`, `tr`, `ts`, `tt`, `tw`, `ty`, `ug`, `uk`, `ur`, `uz`, `ve`, `vi`, `vo`, `wa`, `cy`, `wo`, `fy`, `xh`, `yi`, `yo`, `za`.
-
 #### FilterOptions
 The Geocoder Autocomplete allows specify the following types of filters:
 
