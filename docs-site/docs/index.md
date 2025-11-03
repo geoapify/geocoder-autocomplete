@@ -41,5 +41,5 @@ By integrating both APIs, the library supports intelligent **address search**, *
 * [**Geoapify Geocoding & Autocomplete API Documentation**](https://apidocs.geoapify.com/docs/geocoding/) – Detailed API descriptions, parameters, and response formats.
 * [**API Playground**](https://apidocs.geoapify.com/playground/geocoding/#autocomplete) – Try the autocomplete interactively and experiment with API parameters.
 * [**JSFiddle Demos**](live-demos/#jsfiddle-demos) – Live examples showing how to integrate the autocomplete with maps and forms.
-* [**Local Demo Collection**](live-demos/#local-demo-collection) – Run ready-made demo projects locally to explore advanced integrations.
+* [**Live Demo Collection**](live-demos/#live-demo-collection) – Run ready-made demo projects to explore advanced integrations.
 

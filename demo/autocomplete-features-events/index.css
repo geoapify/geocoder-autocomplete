@@ -1,5 +1,5 @@
 /* Layout */
-.container { max-width: 980px; margin: 40px auto; padding: 0 16px; }
+.container { max-width: 900px; margin: 40px auto; padding: 0 16px; }
 .row { display: flex; gap: 16px; align-items: flex-start; }
 .col { flex: 1; }
 .panel { border: 1px solid #e6ecf5; border-radius: 10px; padding: 12px; margin: 12px 0; background: #fff; box-shadow: 0 4px 12px rgba(16,24,40,.03); }
