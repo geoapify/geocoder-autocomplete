@@ -39,6 +39,8 @@
 /* Dark theme */
 body.theme-minimal-dark .dev-info-panel, body.theme-round-borders-dark .dev-info-panel { background:#1e2633; border-color:#334155; }
 body.theme-minimal-dark .dev-info-title, body.theme-round-borders-dark .dev-info-title { color:#9ec5ff; }
+body.theme-minimal-dark .dev-kv, body.theme-round-borders-dark .dev-kv { color:#94a3b8; }
+body.theme-minimal-dark .dev-kv strong, body.theme-round-borders-dark .dev-kv strong { color:#cbd5e1; }
 
 /* Theme selector styling */
 .theme-selector {
