@@ -8,3 +8,5 @@ postcss.config.cjs
 docs-site
 coverage
 demo
+tests
+jest.config.js
