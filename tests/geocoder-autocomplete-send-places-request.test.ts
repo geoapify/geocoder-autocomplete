@@ -338,4 +338,169 @@ describe('sendPlacesRequest - Bias and Filter Parameters', () => {
             expect(lastCall).toContain(`filter=circle:${SF_LON},${SF_LAT},3000`);
         });
     });
+
+    describe('Missing Public Methods Tests', () => {
+        beforeEach(() => {
+            fetchMock.resetMocks();
+            autocomplete = new GeocoderAutocomplete(container, API_KEY, options);
+        });
+
+        it('should send places request using sendPlacesRequest()', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+
+            // First select a category
+            autocomplete.selectCategory('catering.cafe');
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Clear mocks to test sendPlacesRequest directly
+            fetchMock.resetMocks();
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+
+            // Send places request directly
+            await autocomplete.sendPlacesRequest();
+
+            const lastCall = fetchMock.mock.calls[1][0] as string;
+            expect(lastCall).toContain('categories=catering.cafe');
+            expect(lastCall).toContain('apiKey=YOUR_API_KEY');
+        });
+
+        it('should clear category using clearCategory()', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+
+            // Select a category first
+            autocomplete.selectCategory('catering.cafe');
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            expect(autocomplete.getCategory()).toBeTruthy();
+            expect(autocomplete.getValue()).toBe('catering.cafe');
+
+            // Clear the category
+            await autocomplete.clearCategory();
+
+            expect(autocomplete.getCategory()).toBeNull();
+            // Note: clearCategory() clears the category mode but doesn't clear the input value
+            // The input value remains until user manually clears it or types new text
+        });
+
+        it('should set places filter by rect using setPlacesFilterByRect()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            autocomplete.setPlacesFilterByRect({
+                lon1: -122.43,
+                lat1: 37.76,
+                lon2: -122.41,
+                lat2: 37.78
+            });
+
+            await autocomplete.selectCategory('catering.cafe');
+
+            const lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain('filter=rect:-122.43,37.76,-122.41,37.78');
+        });
+
+        it('should set places filter by place using setPlacesFilterByPlace()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            const placeId = '51cf84e2ac62d23440597454a3c04a614440f00102f901cf03a60700000000c00208';
+            autocomplete.setPlacesFilterByPlace(placeId);
+
+            await autocomplete.selectCategory('catering.cafe');
+
+            const lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain(`filter=place:${placeId}`);
+        });
+
+        it('should set places filter by geometry using setPlacesFilterByGeometry()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            const geometry = 'polygon((10.0 20.0, 15.0 20.0, 15.0 25.0, 10.0 25.0, 10.0 20.0))';
+            autocomplete.setPlacesFilterByGeometry(geometry);
+
+            await autocomplete.selectCategory('catering.cafe');
+
+            const lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain(`filter=geometry:${geometry}`);
+        });
+
+        it('should clear all places filters using clearPlacesFilters()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            // Set filter
+            autocomplete.setPlacesFilterByCircle({ lon: SF_LON, lat: SF_LAT, radiusMeters: 3000 });
+            await autocomplete.selectCategory('catering.cafe');
+
+            let lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain('filter=circle');
+
+            // Clear filters
+            fetchMock.resetMocks();
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            
+            autocomplete.clearPlacesFilters();
+            autocomplete.setPlacesBiasByProximity({ lon: SF_LON, lat: SF_LAT });
+            await autocomplete.resendPlacesRequestForMore(false);
+
+            lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).not.toContain('filter=circle');
+        });
+
+        it('should set places bias by circle using setPlacesBiasByCircle()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            autocomplete.setPlacesBiasByCircle({
+                lon: SF_LON,
+                lat: SF_LAT,
+                radiusMeters: 5000
+            });
+
+            await autocomplete.selectCategory('catering.cafe');
+
+            const lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain(`bias=circle:${SF_LON},${SF_LAT},5000`);
+        });
+
+        it('should set places bias by rect using setPlacesBiasByRect()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            autocomplete.setPlacesBiasByRect({
+                lon1: -122.43,
+                lat1: 37.76,
+                lon2: -122.41,
+                lat2: 37.78
+            });
+
+            await autocomplete.selectCategory('catering.cafe');
+
+            const lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain('bias=rect:-122.43,37.76,-122.41,37.78');
+        });
+
+        it('should clear all places bias using clearPlacesBias()', async () => {
+            mockPlacesApi(mockPlacesApiResponse);
+
+            // Set bias
+            autocomplete.setPlacesBiasByProximity({ lon: SF_LON, lat: SF_LAT });
+            await autocomplete.selectCategory('catering.cafe');
+
+            let lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain('bias=proximity:-122.4194');
+
+            // Clear bias
+            fetchMock.resetMocks();
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            
+            autocomplete.clearPlacesBias();
+            await autocomplete.resendPlacesRequestForMore(false);
+
+            lastCall = fetchMock.mock.calls[1][0] as string;
+            expect(lastCall).not.toContain('bias=proximity:-122.4194');
+            // Should fallback to IP geolocation
+            expect(lastCall).toContain(`bias=proximity:${YV_LON},${YV_LAT}`);
+        });
+    });
 });

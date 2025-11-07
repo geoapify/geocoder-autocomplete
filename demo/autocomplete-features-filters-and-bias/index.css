@@ -83,3 +83,8 @@ body.theme-minimal-dark .theme-selector:hover, body.theme-round-borders-dark .th
 
 /* Dark theme cards */
 body.theme-minimal-dark .panel, body.theme-round-borders-dark .panel { background:#242424; border-color:#3a3a3a; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+body.theme-minimal-dark .row label, body.theme-round-borders-dark .row label { color:#94a3b8; }
+body.theme-minimal-dark .chip, body.theme-round-borders-dark .chip { background:#1e2633; border-color:#334155; color:#94a3b8; }
+body.theme-minimal-dark .dev-kv, body.theme-round-borders-dark .dev-kv { color:#94a3b8; }
+body.theme-minimal-dark .dev-kv strong, body.theme-round-borders-dark .dev-kv strong { color:#cbd5e1; }
+body.theme-minimal-dark .dev-info-title, body.theme-round-borders-dark .dev-info-title { color:#9ec5ff; }
