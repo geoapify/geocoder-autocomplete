@@ -1,0 +1,315 @@
+/* WARNING: This API key is provided for DEMO purposes only.
+   Please sign up at https://www.geoapify.com and generate your own API key.
+   The demo key may be rotated or blocked at any moment without notice.
+*/
+const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
+
+// The Leaflet map Object - centered on Paris to match the bias
+const map = L.map('map', {zoomControl: false}).setView([48.8566, 2.3522], 16);
+
+// Retina displays require different mat tiles quality
+const isRetina = L.Browser.retina;
+
+// Map tile configurations for different themes
+const mapTiles = {
+    light: {
+        baseUrl: "https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey={apiKey}",
+        retinaUrl: "https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}@2x.png?apiKey={apiKey}",
+        attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | <a href="https://openmaptiles.org/" rel="nofollow" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" rel="nofollow" target="_blank">© OpenStreetMap</a> contributors'
+    },
+    dark: {
+        baseUrl: "https://maps.geoapify.com/v1/tile/dark-matter-brown/{z}/{x}/{y}.png?apiKey={apiKey}",
+        retinaUrl: "https://maps.geoapify.com/v1/tile/dark-matter-brown/{z}/{x}/{y}@2x.png?apiKey={apiKey}",
+        attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | <a href="https://openmaptiles.org/" rel="nofollow" target="_blank">© OpenMapTiles</a> <a href="https://www.openstreetmap.org/copyright" rel="nofollow" target="_blank">© OpenStreetMap</a> contributors'
+    }
+};
+
+let currentTileLayer;
+
+// Function to switch map theme
+function switchMapTheme(themeName) {
+    // Remove current tile layer
+    if (currentTileLayer) {
+        map.removeLayer(currentTileLayer);
+    }
+    
+    // Determine if it's a dark theme
+    const isDarkTheme = themeName.includes('dark');
+    const tileConfig = isDarkTheme ? mapTiles.dark : mapTiles.light;
+    
+    // Add new tile layer
+    currentTileLayer = L.tileLayer(isRetina ? tileConfig.retinaUrl : tileConfig.baseUrl, {
+        attribution: tileConfig.attribution,
+        apiKey: myAPIKey,
+        maxZoom: 20,
+        id: isDarkTheme ? 'dark-matter-brown' : 'osm-bright'
+    }).addTo(map);
+}
+
+// Initialize with light theme
+switchMapTheme('minimal');
+
+// add a zoom control to bottom-right corner
+L.control.zoom({
+    position: 'bottomright'
+}).addTo(map);
+
+// Create autocomplete with category search and built-in places list enabled
+const autocompleteInput = new autocomplete.GeocoderAutocomplete(
+                        document.getElementById("autocomplete"), 
+                        myAPIKey, 
+                        { 
+                            placeholder: "Search for places or categories...",
+                            addCategorySearch: true,
+                            showPlacesList: true,  // Built-in places list instead of custom UI
+                            limit: 8
+                        });
+
+// --- Places request progress indicator (non-invasive) ---
+(function initPlacesProgress() {
+    const container = document.querySelector('#autocomplete');
+    if (!container) return;
+
+    // Create indicator element once
+    const indicator = document.createElement('div');
+    indicator.className = 'places-loading-indicator hidden';
+    indicator.setAttribute('role', 'status');
+    indicator.setAttribute('aria-live', 'polite');
+
+    const spinner = document.createElement('div');
+    spinner.className = 'places-loading-spinner';
+    const label = document.createElement('span');
+    label.textContent = 'Loading places…';
+
+    indicator.appendChild(spinner);
+    indicator.appendChild(label);
+    container.appendChild(indicator);
+
+    const show = () => indicator.classList.remove('hidden');
+    const hide = () => indicator.classList.add('hidden');
+
+    // Attach separate listeners to avoid touching existing ones
+    autocompleteInput.on('places_request_start', () => {
+        show();
+    });
+
+    autocompleteInput.on('places_request_end', () => {
+        hide();
+    });
+})();
+
+
+function extendRectByPercent(rect, percent) {
+  const minLon = Math.min(rect.lon1, rect.lon2);
+  const maxLon = Math.max(rect.lon1, rect.lon2);
+  const minLat = Math.min(rect.lat1, rect.lat2);
+  const maxLat = Math.max(rect.lat1, rect.lat2);
+
+  const width = maxLon - minLon;
+  const height = maxLat - minLat;
+
+  const lonPad = width * percent;
+  const latPad = height * percent;
+
+  let lon1 = minLon - lonPad;
+  let lon2 = maxLon + lonPad;
+  let lat1 = minLat - latPad;
+  let lat2 = maxLat + latPad;
+
+  // Clamp to valid ranges
+  lon1 = Math.max(-180, lon1);
+  lon2 = Math.min(180, lon2);
+  lat1 = Math.max(-90, lat1);
+  lat2 = Math.min(90, lat2);
+
+  return { lon1, lat1, lon2, lat2 };
+}
+
+// Add bias based on map view for better results
+function updateBiasAndFilters() {
+    const center = map.getCenter();
+
+    autocompleteInput.addBiasByProximity({
+      lon: center.lng,
+      lat: center.lat,
+    });
+
+    const mapBounds = map.getBounds();
+    const rect = {
+      lat1: mapBounds.getSouthWest().lat,
+      lon1: mapBounds.getSouthWest().lng,
+      lat2: mapBounds.getNorthEast().lat,
+      lon2: mapBounds.getNorthEast().lng,
+    };
+    
+    autocompleteInput.setPlacesBiasByRect(rect);
+    autocompleteInput.setPlacesFilterByRect(extendRectByPercent(rect, 0.2));   
+}
+
+// Set initial bias
+updateBiasAndFilters();
+
+function anyMarkerVisible() {
+  const bounds = map.getBounds();
+  return placesMarkers.some(m => bounds.contains(m.getLatLng()));
+}
+
+let mapMoveTimeout;
+map.on('moveend', () => {
+  if (isProgrammaticMove) return;
+
+  updateBiasAndFilters();
+
+  // Only when a category is active
+  if (!currentCategoryObj) return;
+
+  // no search on small zoom levels
+  if (map.getZoom() < 14) return;
+
+  // Decide append vs replace
+  const hasVisible = anyMarkerVisible();
+
+  // Requery only when moved significantly
+  const currentCenter = map.getCenter();
+  const distance = lastQueryCenter ? currentCenter.distanceTo(lastQueryCenter) : Infinity;
+  if (distance <= 500) return;
+
+  clearTimeout(mapMoveTimeout);
+  mapMoveTimeout = setTimeout(() => {
+    lastQueryCenter = map.getCenter();
+    autocompleteInput.resendPlacesRequestForMore(hasVisible /* append? */);
+  }, 500);
+});
+
+// generate an marker icon with https://apidocs.geoapify.com/playground/icon
+const markerIcon = L.icon({
+  iconUrl: `https://api.geoapify.com/v1/icon/?type=awesome&color=%232ea2ff&size=large&scaleFactor=2&apiKey=${myAPIKey}`,
+  iconSize: [38, 56], // size of the icon
+  iconAnchor: [19, 51], // point of the icon which will correspond to marker's location
+  popupAnchor: [0, -60] // point from which the popup should open relative to the iconAnchor
+});
+
+let marker;
+let placesMarkers = [];
+let currentPlaces = [];
+let currentCategoryObj = null; // Track current selected category object for requerying
+let lastQueryCenter = null; // Track the center of the last places query
+let isProgrammaticMove = false; // Flag to prevent requerying when moving map programmatically
+
+function clearPlacesMarkers() {
+    placesMarkers.forEach(m => m.remove());
+    placesMarkers = [];
+}
+
+// Handle regular address selection
+autocompleteInput.on('select', (location) => {
+    // Add marker with the selected location
+    if (marker) {
+        marker.remove();
+    }
+    
+    clearPlacesMarkers();
+    
+    if (location) {
+        marker = L.marker([location.properties.lat, location.properties.lon], {
+            icon: markerIcon
+        }).addTo(map);
+      
+        map.panTo([location.properties.lat, location.properties.lon]);
+    }
+});
+
+// Handle places results (when category is selected) - now with map integration
+autocompleteInput.on('places', (places) => {
+    clearPlacesMarkers();
+    currentPlaces = places; // Store for later use
+    
+    // Store current category object and map center
+    const category = autocompleteInput.getCategory();
+    if (category) {
+        currentCategoryObj = category; // Store the full category object with label
+        lastQueryCenter = map.getCenter(); // Store the center when places are loaded
+    }
+    
+    console.log(`Found ${places.length} places`);
+    
+    // Add markers for all places (same as leaflet-category demo)
+    places.forEach((place, index) => {
+        if (place.properties.lat && place.properties.lon) {
+            const placeMarker = L.marker([place.properties.lat, place.properties.lon], {
+                icon: markerIcon
+            }).addTo(map);
+            
+            // Add popup with place information - just the name (disable autoPan to avoid recentering)
+            const name = place.properties.name || place.properties.formatted;
+            placeMarker.bindPopup(name, { autoPan: false });
+            
+            // When marker is clicked, select the place in the built-in list
+            placeMarker.on('click', () => {
+                autocompleteInput.selectPlace(index);
+            });
+            
+            placesMarkers.push(placeMarker);
+        }
+    });
+    
+});
+
+// Handle category clearing
+autocompleteInput.on('clear', (context) => {
+    if (context === 'category') {
+        clearPlacesMarkers();
+        currentCategoryObj = null; // Clear current category
+        lastQueryCenter = null; // Clear last query center
+        if (marker) {
+            marker.remove();
+            marker = null;
+        }
+    }
+});
+
+autocompleteInput.on('place_select', (place, index) => {
+    console.log('Place selected:', place.properties.name, 'at index:', index);
+    
+    // Highlight the place in the list
+    autocompleteInput.selectPlace(index);
+    
+    if (placesMarkers[index]) {
+
+        const target = [place.properties.lat, place.properties.lon];
+        const doPan = () => {
+            isProgrammaticMove = true;
+            map.panTo(target);
+            placesMarkers[index].openPopup();
+            setTimeout(() => { isProgrammaticMove = false; }, 2000);
+        };
+
+        doPan();
+    }
+});
+
+// Handle places request events for loading feedback
+autocompleteInput.on('places_request_start', (category) => {
+    console.log('Loading places for category:', category);
+});
+
+autocompleteInput.on('places_request_end', (success, data, error) => {
+    if (!success) {
+        console.error('Places request failed:', error);
+    }
+});
+
+// Wait for DOM to be ready, then override the setTheme function
+document.addEventListener('DOMContentLoaded', function() {
+    // Override the setTheme function to also switch map theme
+    const originalSetTheme = window.setTheme;
+    if (originalSetTheme) {
+        window.setTheme = function(themeName) {
+            // Call the original setTheme function
+            originalSetTheme(themeName);
+            
+            // Switch map theme
+            switchMapTheme(themeName);
+        };
+    }
+});

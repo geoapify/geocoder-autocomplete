@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://geoapify.github.io/geocoder-autocomplete/</loc>
+         <lastmod>2025-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://geoapify.github.io/geocoder-autocomplete/live-demos/</loc>
+         <lastmod>2025-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://geoapify.github.io/geocoder-autocomplete/quick-start/</loc>
+         <lastmod>2025-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://geoapify.github.io/geocoder-autocomplete/styling/</loc>
+         <lastmod>2025-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://geoapify.github.io/geocoder-autocomplete/api-reference/geocoder-autocomplete-options/</loc>
+         <lastmod>2025-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://geoapify.github.io/geocoder-autocomplete/api-reference/geocoder-autocomplete/</loc>
+         <lastmod>2025-11-11</lastmod>
+    </url>
+</urlset>

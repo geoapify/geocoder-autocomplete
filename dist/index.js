@@ -1,0 +1,1 @@
+export { GeocoderAutocomplete } from './autocomplete';

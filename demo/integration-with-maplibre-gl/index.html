@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MapLibre with Address Autocomplete and Reverse Geocoding - Geoapify</title>
+  
+  <!-- MapLibre GL CSS -->
+  <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
+  
+  <!-- Geoapify Geocoder Autocomplete CSS -->
+  <link id="geocoder-theme" rel="stylesheet" type="text/css" href="../../styles/minimal.css" />
+  
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  <div class="theme-selector">
+    <span class="theme-label">Theme:</span>
+    <select id="theme-selector" onchange="setTheme(this.value)">
+      <option value="minimal">Light</option>
+      <option value="minimal-dark">Dark</option>
+      <option value="round-borders">Light (Round)</option>
+      <option value="round-borders-dark">Dark (Round)</option>
+    </select>
+  </div>
+  
+  <!-- Map container -->
+  <div id="map"></div>
+  
+  <!-- Autocomplete container -->
+  <div class="autocomplete-panel">
+    <div id="autocomplete" class="autocomplete-container"></div>
+  </div>
+
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+  
+  <!-- Geoapify Geocoder Autocomplete JS -->
+  <script src="../../dist/index.min.js"></script>
+  
+  <script src="./index.js"></script>
+  
+  <script>
+    function setTheme(themeName) {
+        const themeLink = document.getElementById('geocoder-theme');
+        themeLink.href = `../../styles/${themeName}.css`;
+        
+        // Update body class for additional styling if needed
+        document.body.className = document.body.className.replace(/theme-\w+/g, '');
+        document.body.classList.add(`theme-${themeName}`);
+        
+        // Debug: log the current theme and body classes
+        console.log('Theme changed to:', themeName);
+        console.log('Body classes:', document.body.className);
+        console.log('Theme class added:', `theme-${themeName}`);
+        
+        // Wait for CSS to load, then apply styles
+        themeLink.onload = function() {
+            if (themeName === 'round-borders-dark') {
+                setTimeout(applyRoundDarkStyles, 100); // Small delay to ensure CSS is applied
+            }
+        };
+        
+        // Store theme preference in localStorage
+        localStorage.setItem('geocoder-theme', themeName);
+    }
+
+    function applyRoundDarkStyles() {
+        // Find all autocomplete inputs and apply styles directly
+        const inputs = document.querySelectorAll('.geoapify-autocomplete-input');
+        inputs.forEach(input => {
+            input.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            input.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+            console.log('Applied styles to input:', input);
+        });
+        
+        console.log('Applied round-dark styles to', inputs.length, 'inputs');
+    }
+
+    // Load saved theme on page load
+    function loadSavedTheme() {
+        const savedTheme = localStorage.getItem('geocoder-theme') || 'minimal';
+        document.getElementById('theme-selector').value = savedTheme;
+        setTheme(savedTheme);
+    }
+
+    // Initialize theme when page loads
+    window.addEventListener('load', loadSavedTheme);
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+import { GeocoderEventType, ItemType, Category } from "../types/external";
+export declare class Callbacks {
+    changeCallbacks: ((selectedOption: any) => void)[];
+    suggestionsChangeCallbacks: ((options: any[]) => void)[];
+    inputCallbacks: ((input: string) => void)[];
+    openCallbacks: ((opened: boolean) => void)[];
+    closeCallbacks: ((opened: boolean) => void)[];
+    requestStartCallbacks: ((query: string) => void)[];
+    requestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[];
+    placesCallbacks: ((places: GeoJSON.Feature[]) => void)[];
+    placesRequestStartCallbacks: ((category: Category) => void)[];
+    placesRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[];
+    placeDetailsRequestStartCallbacks: ((place: GeoJSON.Feature) => void)[];
+    placeDetailsRequestEndCallbacks: ((success: boolean, data?: any, error?: any) => void)[];
+    placeSelectCallbacks: ((place: GeoJSON.Feature, index: number) => void)[];
+    clearCallbacks: ((itemType: ItemType) => void)[];
+    addCallback(operation: GeocoderEventType, callback: (param: any) => void): void;
+    removeCallback(operation: GeocoderEventType, callback?: (param: any) => any): void;
+    notifyInputChange(currentValue: string): void;
+    notifyChange(feature: any): void;
+    notifySuggestions(features: any): void;
+    notifyOpened(): void;
+    notifyClosed(): void;
+    notifyRequestStart(query: string): void;
+    notifyRequestEnd(success: boolean, data?: any, error?: any): void;
+    notifyPlaces(places: GeoJSON.Feature[]): void;
+    notifyPlacesRequestStart(category: Category): void;
+    notifyPlacesRequestEnd(success: boolean, data?: any, error?: any): void;
+    notifyPlaceDetailsRequestStart(place: GeoJSON.Feature): void;
+    notifyPlaceDetailsRequestEnd(success: boolean, data?: any, error?: any): void;
+    notifyPlaceSelect(place: GeoJSON.Feature, index: number): void;
+    notifyClear(itemType: ItemType): void;
+    private getCallbacksByOperation;
+    private setCallbacksByOperation;
+}

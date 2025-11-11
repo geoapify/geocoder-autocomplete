@@ -1,0 +1,11 @@
+export { GeocoderAutocomplete } from './autocomplete';
+export type { GeocoderAutocompleteOptions } from './autocomplete';
+export type { LocationType } from './autocomplete';
+export type { SupportedLanguage } from './autocomplete';
+export type { GeoPosition } from './autocomplete';
+export type { CountyCode } from './autocomplete';
+export type { ByCountryCodeOptions } from './autocomplete';
+export type { ByCircleOptions } from './autocomplete';
+export type { ByProximityOptions } from './autocomplete';
+export type { ByRectOptions } from './autocomplete';
+export type { Category, GeocoderEventType, ItemType } from './types/external';

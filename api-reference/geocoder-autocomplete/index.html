@@ -1,0 +1,2792 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://geoapify.github.io/geocoder-autocomplete/api-reference/geocoder-autocomplete/">
+      
+      
+        <link rel="prev" href="../../quick-start/">
+      
+      
+        <link rel="next" href="../geocoder-autocomplete-options/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>GeocoderAutocomplete - Geoapify Geocoder Autocomplete</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#constructor" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Geoapify Geocoder Autocomplete" class="md-header__button md-logo" aria-label="Geoapify Geocoder Autocomplete" data-md-component="logo">
+      
+  <img src="../../assets/geoapify-white-logo-only.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Geoapify Geocoder Autocomplete
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GeocoderAutocomplete
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/geoapify/geocoder-autocomplete" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Geoapify Geocoder Autocomplete" class="md-nav__button md-logo" aria-label="Geoapify Geocoder Autocomplete" data-md-component="logo">
+      
+  <img src="../../assets/geoapify-white-logo-only.png" alt="logo">
+
+    </a>
+    Geoapify Geocoder Autocomplete
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/geoapify/geocoder-autocomplete" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GeocoderAutocomplete
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GeocoderAutocomplete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setType()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setlang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setLang()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setadddetails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setAddDetails()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setskipicons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSkipIcons()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setallownonverifiedhousenumber" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setAllowNonVerifiedHouseNumber()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setallownonverifiedstreet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setAllowNonVerifiedStreet()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setlimit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setLimit()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplaceslimit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesLimit()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setValue()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getValue()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbycountry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByCountry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbyplace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByPlace()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearfilters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearFilters()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbycountry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByCountry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbyproximity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByProximity()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearbias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearBias()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbyplace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByPlace()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbygeometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByGeometry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearplacesfilters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearPlacesFilters()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesbiasbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesBiasByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesbiasbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesBiasByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesbiasbyproximity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesBiasByProximity()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearplacesbias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearPlacesBias()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsuggestionsfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSuggestionsFilter()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setpreprocesshook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPreprocessHook()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setpostprocesshook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPostprocessHook()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsendgeocoderrequestfunc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSendGeocoderRequestFunc()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsendplacedetailsrequestfunc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSendPlaceDetailsRequestFunc()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsendplacesrequestfunc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSendPlacesRequestFunc()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isopen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        isOpen()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        close()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        open()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendgeocoderrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sendGeocoderRequest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendplacedetailsrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sendPlaceDetailsRequest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selectcategory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        selectCategory()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearcategory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearCategory()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resendplacesrequestformore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resendPlacesRequestForMore()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getcategory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getCategory()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selectplace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        selectPlace()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendplacesrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sendPlacesRequest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listening-for-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listening For Events
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Listening For Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        off()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        once()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#events-names-payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Events (names &amp; payloads)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learn-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learn more
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geocoder-autocomplete-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GeocoderAutocompleteOptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../styling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Styling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../live-demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive Demos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#settype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setType()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setlang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setLang()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setadddetails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setAddDetails()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setskipicons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSkipIcons()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setallownonverifiedhousenumber" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setAllowNonVerifiedHouseNumber()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setallownonverifiedstreet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setAllowNonVerifiedStreet()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setlimit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setLimit()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplaceslimit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesLimit()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setValue()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getValue()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbycountry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByCountry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addfilterbyplace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addFilterByPlace()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearfilters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearFilters()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbycountry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByCountry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addbiasbyproximity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        addBiasByProximity()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearbias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearBias()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbyplace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByPlace()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesfilterbygeometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesFilterByGeometry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearplacesfilters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearPlacesFilters()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesbiasbycircle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesBiasByCircle()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesbiasbyrect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesBiasByRect()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setplacesbiasbyproximity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPlacesBiasByProximity()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearplacesbias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearPlacesBias()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsuggestionsfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSuggestionsFilter()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setpreprocesshook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPreprocessHook()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setpostprocesshook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setPostprocessHook()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsendgeocoderrequestfunc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSendGeocoderRequestFunc()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsendplacedetailsrequestfunc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSendPlaceDetailsRequestFunc()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsendplacesrequestfunc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setSendPlacesRequestFunc()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isopen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        isOpen()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        close()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        open()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendgeocoderrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sendGeocoderRequest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendplacedetailsrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sendPlaceDetailsRequest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selectcategory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        selectCategory()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearcategory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clearCategory()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resendplacesrequestformore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resendPlacesRequestForMore()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getcategory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        getCategory()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selectplace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        selectPlace()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendplacesrequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sendPlacesRequest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listening-for-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listening For Events
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Listening For Events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        off()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        once()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#events-names-payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Events (names &amp; payloads)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learn-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learn more
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>GeocoderAutocomplete</h1>
+
+<p>This page documents the <code>@geoapify/geocoder-autocomplete</code> library — including setup, configuration, and advanced features.
+Use it to integrate <strong>address and place autocomplete</strong> into your web applications to enhance <strong>location entry, validation, and user experience</strong>.</p>
+<h2 id="constructor">Constructor</h2>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kr">constructor</span><span class="p">(</span><span class="nx">container</span><span class="o">:</span><span class="w"> </span><span class="kt">HTMLElement</span><span class="p">,</span><span class="w"> </span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">            </span><span class="nx">apiKey</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">            </span><span class="nx">options?</span><span class="o">:</span><span class="w"> </span><span class="kt">GeocoderAutocompleteOptions</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Creates a new <strong>GeocoderAutocomplete</strong> instance and attaches the autocomplete input to a specified container element.</p>
+<p>Here are the parameters you can pass to the constructor:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>container</code></td>
+<td><code>HTMLElement</code></td>
+<td>The HTML element (usually a <code>&lt;div&gt;</code>) where the autocomplete input will be rendered. Must have <code>position: relative</code> or <code>position: absolute</code>.</td>
+</tr>
+<tr>
+<td><code>apiKey</code></td>
+<td><code>string</code></td>
+<td>Your <strong>Geoapify API key</strong>, required for all API requests.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><a href="../geocoder-autocomplete-options/"><code>GeocoderAutocompleteOptions</code></a> <em>(optional)</em></td>
+<td>A configuration object that controls autocomplete behavior, such as search filters, language, and category search.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>options</code> parameter lets you customize nearly every aspect of the autocomplete’s functionality — including filters, result limits, biasing rules, and category search.
+See the full list of available options in the <a href="../geocoder-autocomplete-options/">GeocoderAutocompleteOptions documentation</a>.</p>
+<p>Here’s a basic example of how to initialize the autocomplete field:</p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">GeocoderAutocomplete</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@geoapify/geocoder-autocomplete&#39;</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">container</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;autocomplete&#39;</span><span class="p">);</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">autocomplete</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">GeocoderAutocomplete</span><span class="p">(</span><span class="nx">container</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;YOUR_API_KEY&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nx">placeholder</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Enter address...&#39;</span><span class="p">,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nx">lang</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;en&#39;</span><span class="p">,</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nx">limit</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>This creates a fully functional address autocomplete field inside the given container.
+As the user types, it retrieves address suggestions in real time from the <a href="https://www.geoapify.com/address-autocomplete/">Geoapify Address Autocomplete API</a>.</p>
+<h2 id="methods">Methods</h2>
+<p>The <code>GeocoderAutocomplete</code> class provides a comprehensive set of public methods that let you configure, control, and extend the behavior of the autocomplete component at runtime.  </p>
+<p>You can use these methods to:
+- Update filters, bias, or search parameters dynamically;
+- Change appearance and behavior (for example, language, type, icons);
+- Programmatically open, close, or query the dropdown;
+- Integrate custom request logic or hooks;
+- Work with the Places and Category modes.</p>
+<p>Each method listed below includes its signature, purpose, and (in the full reference) a usage example.  </p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Signature</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#settype"><code>setType</code></a></td>
+<td><code>setType(type: 'country' \| 'state' \| 'city' \| 'postcode' \| 'street' \| 'amenity' \| null): void</code></td>
+<td>Restrict result type (granularity).</td>
+</tr>
+<tr>
+<td><a href="#setlang"><code>setLang</code></a></td>
+<td><code>setLang(lang: SupportedLanguage \| null): void</code></td>
+<td>Set language of results.</td>
+</tr>
+<tr>
+<td><a href="#setadddetails"><code>setAddDetails</code></a></td>
+<td><code>setAddDetails(addDetails: boolean): void</code></td>
+<td>Toggle fetching extra geometry/details.</td>
+</tr>
+<tr>
+<td><a href="#setskipicons"><code>setSkipIcons</code></a></td>
+<td><code>setSkipIcons(skipIcons: boolean): void</code></td>
+<td>Show/hide icons in the dropdown.</td>
+</tr>
+<tr>
+<td><a href="#setallownonverifiedhousenumber"><code>setAllowNonVerifiedHouseNumber</code></a></td>
+<td><code>setAllowNonVerifiedHouseNumber(value: boolean): void</code></td>
+<td>Include non-verified house numbers.</td>
+</tr>
+<tr>
+<td><a href="#setallownonverifiedstreet"><code>setAllowNonVerifiedStreet</code></a></td>
+<td><code>setAllowNonVerifiedStreet(value: boolean): void</code></td>
+<td>Include non-verified streets.</td>
+</tr>
+<tr>
+<td><a href="#setlimit"><code>setLimit</code></a></td>
+<td><code>setLimit(limit: number): void</code></td>
+<td>Max suggestions per query.</td>
+</tr>
+<tr>
+<td><a href="#setplaceslimit"><code>setPlacesLimit</code></a></td>
+<td><code>setPlacesLimit(limit: number): void</code></td>
+<td>Page size for Places results.</td>
+</tr>
+<tr>
+<td><a href="#setvalue"><code>setValue</code></a></td>
+<td><code>setValue(value: string): void</code></td>
+<td>Programmatically set input value.</td>
+</tr>
+<tr>
+<td><a href="#getvalue"><code>getValue</code></a></td>
+<td><code>getValue(): string</code></td>
+<td>Read current input value.</td>
+</tr>
+<tr>
+<td><a href="#addfilterbycountry"><code>addFilterByCountry</code></a></td>
+<td><code>addFilterByCountry(codes: ByCountryCodeOptions): void</code></td>
+<td>Hard-filter by country list.</td>
+</tr>
+<tr>
+<td><a href="#addfilterbycircle"><code>addFilterByCircle</code></a></td>
+<td><code>addFilterByCircle(opts: ByCircleOptions): void</code></td>
+<td>Hard-filter by circle area.</td>
+</tr>
+<tr>
+<td><a href="#addfilterbyrect"><code>addFilterByRect</code></a></td>
+<td><code>addFilterByRect(opts: ByRectOptions): void</code></td>
+<td>Hard-filter by rectangle.</td>
+</tr>
+<tr>
+<td><a href="#addfilterbyplace"><code>addFilterByPlace</code></a></td>
+<td><code>addFilterByPlace(place: string): void</code></td>
+<td>Hard-filter by place/geometry id.</td>
+</tr>
+<tr>
+<td><a href="#clearfilters"><code>clearFilters</code></a></td>
+<td><code>clearFilters(): void</code></td>
+<td>Remove all geocoder filters.</td>
+</tr>
+<tr>
+<td><a href="#addbiasbycountry"><code>addBiasByCountry</code></a></td>
+<td><code>addBiasByCountry(codes: ByCountryCodeOptions): void</code></td>
+<td>Soft-bias by country list.</td>
+</tr>
+<tr>
+<td><a href="#addbiasbycircle"><code>addBiasByCircle</code></a></td>
+<td><code>addBiasByCircle(opts: ByCircleOptions): void</code></td>
+<td>Soft-bias by circle area.</td>
+</tr>
+<tr>
+<td><a href="#addbiasbyrect"><code>addBiasByRect</code></a></td>
+<td><code>addBiasByRect(opts: ByRectOptions): void</code></td>
+<td>Soft-bias by rectangle.</td>
+</tr>
+<tr>
+<td><a href="#addbiasbyproximity"><code>addBiasByProximity</code></a></td>
+<td><code>addBiasByProximity(p: ByProximityOptions): void</code></td>
+<td>Soft-bias to a point.</td>
+</tr>
+<tr>
+<td><a href="#clearbias"><code>clearBias</code></a></td>
+<td><code>clearBias(): void</code></td>
+<td>Remove all geocoder biases.</td>
+</tr>
+<tr>
+<td><a href="#setplacesfilterbycircle"><code>setPlacesFilterByCircle</code></a></td>
+<td><code>setPlacesFilterByCircle(opts: ByCircleOptions): void</code></td>
+<td>Places hard-filter by circle.</td>
+</tr>
+<tr>
+<td><a href="#setplacesfilterbyrect"><code>setPlacesFilterByRect</code></a></td>
+<td><code>setPlacesFilterByRect(opts: ByRectOptions): void</code></td>
+<td>Places hard-filter by rectangle.</td>
+</tr>
+<tr>
+<td><a href="#setplacesfilterbyplace"><code>setPlacesFilterByPlace</code></a></td>
+<td><code>setPlacesFilterByPlace(place: string): void</code></td>
+<td>Places hard-filter by place id.</td>
+</tr>
+<tr>
+<td><a href="#setplacesfilterbygeometry"><code>setPlacesFilterByGeometry</code></a></td>
+<td><code>setPlacesFilterByGeometry(geom: string): void</code></td>
+<td>Places hard-filter by geometry.</td>
+</tr>
+<tr>
+<td><a href="#clearplacesfilters"><code>clearPlacesFilters</code></a></td>
+<td><code>clearPlacesFilters(): void</code></td>
+<td>Clear Places filters.</td>
+</tr>
+<tr>
+<td><a href="#setplacesbiasbycircle"><code>setPlacesBiasByCircle</code></a></td>
+<td><code>setPlacesBiasByCircle(opts: ByCircleOptions): void</code></td>
+<td>Places soft-bias by circle.</td>
+</tr>
+<tr>
+<td><a href="#setplacesbiasbyrect"><code>setPlacesBiasByRect</code></a></td>
+<td><code>setPlacesBiasByRect(opts: ByRectOptions): void</code></td>
+<td>Places soft-bias by rect.</td>
+</tr>
+<tr>
+<td><a href="#setplacesbiasbyproximity"><code>setPlacesBiasByProximity</code></a></td>
+<td><code>setPlacesBiasByProximity(p: ByProximityOptions): void</code></td>
+<td>Places soft-bias to a point.</td>
+</tr>
+<tr>
+<td><a href="#clearplacesbias"><code>clearPlacesBias</code></a></td>
+<td><code>clearPlacesBias(): void</code></td>
+<td>Clear Places biases.</td>
+</tr>
+<tr>
+<td><a href="#setsuggestionsfilter"><code>setSuggestionsFilter</code></a></td>
+<td><code>setSuggestionsFilter(fn?: (items:any[])=&gt;any[] \| null): void</code></td>
+<td>Post-filter suggestion list client-side.</td>
+</tr>
+<tr>
+<td><a href="#setpreprocesshook"><code>setPreprocessHook</code></a></td>
+<td><code>setPreprocessHook(fn?: (value:string)=&gt;string \| null): void</code></td>
+<td>Transform input before request.</td>
+</tr>
+<tr>
+<td><a href="#setpostprocesshook"><code>setPostprocessHook</code></a></td>
+<td><code>setPostprocessHook(fn?: (feature:any)=&gt;string \| null): void</code></td>
+<td>Transform display text per feature.</td>
+</tr>
+<tr>
+<td><a href="#setsendgeocoderrequestfunc"><code>setSendGeocoderRequestFunc</code></a></td>
+<td><code>setSendGeocoderRequestFunc(fn?: (value:string, self)=&gt;Promise&lt;any&gt; \| null): void</code></td>
+<td>Override geocoder request.</td>
+</tr>
+<tr>
+<td><a href="#setsendplacedetailsrequestfunc"><code>setSendPlaceDetailsRequestFunc</code></a></td>
+<td><code>setSendPlaceDetailsRequestFunc(fn?: (feature:any, self)=&gt;Promise&lt;any&gt; \| null): void</code></td>
+<td>Override place-details request.</td>
+</tr>
+<tr>
+<td><a href="#setsendplacesrequestfunc"><code>setSendPlacesRequestFunc</code></a></td>
+<td><code>setSendPlacesRequestFunc(fn?: (keys:string[], offset:number, self)=&gt;Promise&lt;any&gt; \| null): void</code></td>
+<td>Override Places request (category mode).</td>
+</tr>
+<tr>
+<td><a href="#isopen"><code>isOpen</code></a></td>
+<td><code>isOpen(): boolean</code></td>
+<td>Dropdown open state.</td>
+</tr>
+<tr>
+<td><a href="#close"><code>close</code></a></td>
+<td><code>close(): void</code></td>
+<td>Close dropdown.</td>
+</tr>
+<tr>
+<td><a href="#open"><code>open</code></a></td>
+<td><code>open(): void</code></td>
+<td>Open dropdown (re-queries current input).</td>
+</tr>
+<tr>
+<td><a href="#sendgeocoderrequest"><code>sendGeocoderRequest</code></a></td>
+<td><code>sendGeocoderRequest(value:string): Promise&lt;any&gt;</code></td>
+<td>Manually trigger geocoder request.</td>
+</tr>
+<tr>
+<td><a href="#sendplacedetailsrequest"><code>sendPlaceDetailsRequest</code></a></td>
+<td><code>sendPlaceDetailsRequest(feature:any): Promise&lt;any&gt;</code></td>
+<td>Manually fetch details for a feature.</td>
+</tr>
+<tr>
+<td><a href="#selectcategory"><code>selectCategory</code></a></td>
+<td><code>selectCategory(category: Category \| string \| string[] \| null): Promise&lt;void&gt;</code></td>
+<td>Activate a category (category mode).</td>
+</tr>
+<tr>
+<td><a href="#clearcategory"><code>clearCategory</code></a></td>
+<td><code>clearCategory(): Promise&lt;void&gt;</code></td>
+<td>Exit category mode &amp; reset list.</td>
+</tr>
+<tr>
+<td><a href="#resendplacesrequestformore"><code>resendPlacesRequestForMore</code></a></td>
+<td><code>resendPlacesRequestForMore(append?: boolean): Promise&lt;void&gt;</code></td>
+<td>Fetch next page for Places list.</td>
+</tr>
+<tr>
+<td><a href="#getcategory"><code>getCategory</code></a></td>
+<td><code>getCategory(): Category \| null</code></td>
+<td>Current category (if any).</td>
+</tr>
+<tr>
+<td><a href="#selectplace"><code>selectPlace</code></a></td>
+<td><code>selectPlace(index: number \| null): void</code></td>
+<td>Select/clear a place in built-in list.</td>
+</tr>
+<tr>
+<td><a href="#sendplacesrequest"><code>sendPlacesRequest</code></a></td>
+<td><code>sendPlacesRequest(): Promise&lt;void&gt;</code></td>
+<td>Load Places for current category.</td>
+</tr>
+</tbody>
+</table>
+<p>Here’s the detailed version of method descriptions:</p>
+<h3 id="settype">setType()</h3>
+<p>Signature: <code>setType(type: 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | null)</code></p>
+<p>Restricts autocomplete results to a <strong>specific level of the address hierarchy</strong>.<br />
+Use this when your application only needs a particular type of result (for example, cities or postcodes).</p>
+<p><strong>Type:</strong> <code>'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | null</code></p>
+<p><strong>Example:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setType</span><span class="p">(</span><span class="s1">&#39;city&#39;</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p>This limits suggestions to <strong>city names only</strong>, making it ideal for region or country selectors.</p>
+<h3 id="setlang">setLang()</h3>
+<p>Signature: <code>setLang(lang: SupportedLanguage | null)</code></p>
+<p>Defines the <strong>language of returned suggestions</strong>.
+Set this to localize addresses or display place names in a user’s preferred language.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#lang"><code>SupportedLanguage</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setLang</span><span class="p">(</span><span class="s1">&#39;fr&#39;</span><span class="p">);</span><span class="w"> </span><span class="c1">// show results in French</span>
+</span></code></pre></div>
+<p>If a translation isn’t available, results default to English.</p>
+<h3 id="setadddetails">setAddDetails()</h3>
+<p>Signature: <code>setAddDetails(addDetails: boolean)</code></p>
+<p>Enables or disables fetching <strong>additional place details</strong> such as geometry or administrative boundaries.
+When <code>true</code>, it performs a secondary lookup via the <a href="https://www.geoapify.com/place-details-api/">Geoapify Place Details API</a>.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setAddDetails</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Use this when your app needs <strong>polygon or shape data</strong> for selected features (for example, city boundaries or building footprints).</p>
+<h3 id="setskipicons">setSkipIcons()</h3>
+<p>Signature: <code>setSkipIcons(skipIcons: boolean)</code></p>
+<p>Toggles whether icons are shown in the dropdown list.
+Disabling icons can simplify or speed up rendering, especially in minimal UI designs.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setSkipIcons</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Useful for clean text-only autocomplete fields where visual icons are unnecessary.</p>
+<h3 id="setallownonverifiedhousenumber">setAllowNonVerifiedHouseNumber()</h3>
+<p>Signature: <code>setAllowNonVerifiedHouseNumber(value: boolean)</code></p>
+<p>Allows the autocomplete to include <strong>non-verified house numbers</strong> in results.
+This is useful for areas with newly constructed buildings or incomplete datasets.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setAllowNonVerifiedHouseNumber</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<p>When enabled, non-verified parts appear in results with a <code>"non-verified"</code> class, so you can visually highlight them.</p>
+<h3 id="setallownonverifiedstreet">setAllowNonVerifiedStreet()</h3>
+<p>Signature: <code>setAllowNonVerifiedStreet(value: boolean)</code></p>
+<p>Includes <strong>non-verified street names</strong> in autocomplete results.
+Ideal for emerging neighborhoods or developing regions where street data is still being updated.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setAllowNonVerifiedStreet</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Non-verified streets are marked for UI distinction and transparency.</p>
+<h3 id="setlimit">setLimit()</h3>
+<p>Signature: <code>setLimit(limit: number)</code></p>
+<p>Specifies the <strong>maximum number of autocomplete suggestions</strong> returned per query.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setLimit</span><span class="p">(</span><span class="mf">10</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Default is <code>5</code>.
+Increase this if you want to show more options, but note that large limits may increase API response size.</p>
+<h3 id="setplaceslimit">setPlacesLimit()</h3>
+<p>Signature: <code>setPlacesLimit(limit: number)</code></p>
+<p>Sets the <strong>page size</strong> for the <strong>Places API</strong> results when category search is enabled.
+This controls how many places are fetched per request in the built-in or custom list.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesLimit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span>
+</span></code></pre></div>
+<p>A smaller limit improves response speed, while a larger one provides a broader result set.</p>
+<p>Here’s the detailed section for those methods, following the same structure and style as before:</p>
+<h3 id="setvalue">setValue()</h3>
+<p>Signature: <code>setValue(value: string)</code></p>
+<p>Sets the value of the autocomplete input programmatically.<br />
+This can be used to prefill the field or update it based on user interaction elsewhere in your app.</p>
+<p><strong>Example:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setValue</span><span class="p">(</span><span class="s1">&#39;New York, USA&#39;</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p>This displays “New York, USA” in the autocomplete field without triggering a new search request.</p>
+<h3 id="getvalue">getValue()</h3>
+<p>Signature: <code>getValue()</code></p>
+<p>Returns the current value of the autocomplete input.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">currentValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">getValue</span><span class="p">();</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">currentValue</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Useful for retrieving user input before form submission or integrating with external components.</p>
+<h3 id="addfilterbycountry">addFilterByCountry()</h3>
+<p>Signature: <code>addFilterByCountry(codes: ByCountryCodeOptions)</code></p>
+<p>Applies a <strong>hard filter</strong> limiting results to one or more specific countries.
+Only addresses within the listed countries will appear in autocomplete suggestions.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#bycountrycodeoptions"><code>ByCountryCodeOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addFilterByCountry</span><span class="p">([</span><span class="s1">&#39;us&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ca&#39;</span><span class="p">]);</span><span class="w"> </span><span class="c1">// United States &amp; Canada only</span>
+</span></code></pre></div>
+<p>This is equivalent to setting a <code>filter</code> option at initialization but can be changed dynamically.</p>
+<h3 id="addfilterbycircle">addFilterByCircle()</h3>
+<p>Signature: <code>addFilterByCircle(opts: ByCircleOptions)</code></p>
+<p>Restricts autocomplete results to a <strong>circular area</strong>.
+Useful for location-based search scenarios such as “addresses within 5 km of city center”.</p>
+<p><strong>Type:</strong> <a href="/geocoderautocompleteoptions/#bycircleoptions"><code>ByCircleOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addFilterByCircle</span><span class="p">({</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nx">lon</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">74.006</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">40.7128</span><span class="p">,</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nx">radiusMeters</span><span class="o">:</span><span class="w"> </span><span class="mf">5000</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Only results within this 5 km radius around New York City will be displayed.</p>
+<h3 id="addfilterbyrect">addFilterByRect()</h3>
+<p>Signature: <code>addFilterByRect(opts: ByRectOptions)</code></p>
+<p>Filters results to a <strong>rectangular bounding box</strong>, defined by two corner coordinates.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#byrectoptions"><code>ByRectOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addFilterByRect</span><span class="p">({</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nx">lon1</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">124.48</span><span class="p">,</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nx">lat1</span><span class="o">:</span><span class="w"> </span><span class="mf">32.53</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nx">lon2</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">114.13</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nx">lat2</span><span class="o">:</span><span class="w"> </span><span class="mf">42.01</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>This example restricts search results to the boundaries of <strong>California, USA</strong>.</p>
+<h3 id="addfilterbyplace">addFilterByPlace()</h3>
+<p>Signature: <code>addFilterByPlace(place: string)</code></p>
+<p>Restricts results to a specific <strong>place or region</strong> identified by its Geoapify Place ID or geometry ID.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addFilterByPlace</span><span class="p">(</span><span class="s1">&#39;51b4c20ae4b0324e12a4b92esdf4eghkhjl&#39;</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Use this when you need to limit searches to an administrative or custom-defined area.</p>
+<h3 id="clearfilters">clearFilters()</h3>
+<p>Signature: <code>clearFilters()</code></p>
+<p>Removes all active <strong>geocoder filters</strong>, restoring global search scope.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">clearFilters</span><span class="p">();</span>
+</span></code></pre></div>
+<p>After calling this method, results will no longer be restricted by country, circle, or bounding box.</p>
+<h3 id="addbiasbycountry">addBiasByCountry()</h3>
+<p>Signature: <code>addBiasByCountry(codes: ByCountryCodeOptions)</code></p>
+<p>Adds a <strong>soft bias</strong> to prioritize results from certain countries, without excluding others.
+This is helpful for improving relevance in multi-country applications.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addBiasByCountry</span><span class="p">([</span><span class="s1">&#39;us&#39;</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>Results from the United States will be ranked higher but not exclusively shown.</p>
+<h3 id="addbiasbycircle">addBiasByCircle()</h3>
+<p>Signature: <code>addBiasByCircle(opts: ByCircleOptions)</code></p>
+<p>Biases results toward a <strong>specific circular area</strong>, prioritizing addresses inside or near it.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addBiasByCircle</span><span class="p">({</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nx">lon</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">74.006</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">40.7128</span><span class="p">,</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="nx">radiusMeters</span><span class="o">:</span><span class="w"> </span><span class="mf">10000</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Results within or near this 10 km area around NYC appear higher in suggestions.</p>
+<h3 id="addbiasbyrect">addBiasByRect()</h3>
+<p>Signature: <code>addBiasByRect(opts: ByRectOptions)</code></p>
+<p>Adds a <strong>soft geographic bias</strong> toward a rectangular region.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addBiasByRect</span><span class="p">({</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nx">lon1</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">124.48</span><span class="p">,</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nx">lat1</span><span class="o">:</span><span class="w"> </span><span class="mf">32.53</span><span class="p">,</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nx">lon2</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">114.13</span><span class="p">,</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="nx">lat2</span><span class="o">:</span><span class="w"> </span><span class="mf">42.01</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Addresses within California will appear first, but results from nearby areas can still appear.</p>
+<h3 id="addbiasbyproximity">addBiasByProximity()</h3>
+<p>Signature: <code>addBiasByProximity(p: ByProximityOptions)</code></p>
+<p>Prioritizes results <strong>closest to a specific point</strong>.
+Commonly used to rank addresses near the user's current location or map center.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#byproximityoptions"><code>ByProximityOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">addBiasByProximity</span><span class="p">({</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nx">lon</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">122.4194</span><span class="p">,</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">37.7749</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>In this example, results near <strong>San Francisco</strong> are shown first.</p>
+<h3 id="clearbias">clearBias()</h3>
+<p>Signature: <code>clearBias()</code></p>
+<p>Removes all currently applied <strong>geocoder biases</strong>, restoring neutral ranking for all autocomplete results.</p>
+<p><strong>Example:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">clearBias</span><span class="p">();</span>
+</span></code></pre></div></p>
+<p>After calling this method, the autocomplete will stop prioritizing results near any previously set areas or countries.</p>
+<h3 id="setplacesfilterbycircle">setPlacesFilterByCircle()</h3>
+<p>Signature: <code>setPlacesFilterByCircle(opts: ByCircleOptions)</code></p>
+<p>Applies a <strong>hard filter</strong> for Places API results within a circular area.
+Useful for showing POIs (e.g., restaurants or hotels) inside a certain radius around a point.</p>
+<p><strong>Type:</strong> <a href="/geocoderautocompleteoptions/#bycircleoptions"><code>ByCircleOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesFilterByCircle</span><span class="p">({</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nx">lon</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">74.006</span><span class="p">,</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">40.7128</span><span class="p">,</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nx">radiusMeters</span><span class="o">:</span><span class="w"> </span><span class="mf">5000</span><span class="w"> </span><span class="c1">// 5 km around New York City</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Only places located inside the specified circle are returned.</p>
+<h3 id="setplacesfilterbyrect">setPlacesFilterByRect()</h3>
+<p>Signature: <code>setPlacesFilterByRect(opts: ByRectOptions)</code></p>
+<p>Applies a <strong>rectangular bounding box filter</strong> for Places API searches.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#byrectoptions"><code>ByRectOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesFilterByRect</span><span class="p">({</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nx">lon1</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">118.67</span><span class="p">,</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="nx">lat1</span><span class="o">:</span><span class="w"> </span><span class="mf">33.70</span><span class="p">,</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="nx">lon2</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">117.66</span><span class="p">,</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">  </span><span class="nx">lat2</span><span class="o">:</span><span class="w"> </span><span class="mf">34.33</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>This restricts the search to the <strong>Los Angeles metropolitan area</strong>.</p>
+<h3 id="setplacesfilterbyplace">setPlacesFilterByPlace()</h3>
+<p>Signature: <code>setPlacesFilterByPlace(place: string)</code></p>
+<p>Filters Places results by a <strong>specific Geoapify Place ID or region identifier</strong>.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesFilterByPlace</span><span class="p">(</span><span class="s1">&#39;51b4c20ae4b0324e12a4b92esdf4eghkhjl&#39;</span><span class="p">);</span>
+</span></code></pre></div>
+<p>This limits results to POIs located within that predefined place or region.</p>
+<h3 id="setplacesfilterbygeometry">setPlacesFilterByGeometry()</h3>
+<p>Signature: <code>setPlacesFilterByGeometry(geom: string)</code></p>
+<p>Restricts Places API searches to a <strong>custom geometry</strong> (polygon, multipolygon, or geometry string).
+Useful for complex areas like city boundaries or administrative zones.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesFilterByGeometry</span><span class="p">(</span><span class="s1">&#39;POLYGON((-74.0 40.7, -73.9 40.7, -73.9 40.8, -74.0 40.8, -74.0 40.7))&#39;</span><span class="p">);</span>
+</span></code></pre></div>
+<p>This example limits results to a small region of New York City.</p>
+<h3 id="clearplacesfilters">clearPlacesFilters()</h3>
+<p>Signature: <code>clearPlacesFilters()</code></p>
+<p>Removes all active <strong>Places filters</strong>, returning the search scope to global.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">clearPlacesFilters</span><span class="p">();</span>
+</span></code></pre></div>
+<p>This restores full access to all POIs regardless of area.</p>
+<h3 id="setplacesbiasbycircle">setPlacesBiasByCircle()</h3>
+<p>Signature: <code>setPlacesBiasByCircle(opts: ByCircleOptions)</code></p>
+<p>Adds a <strong>soft bias</strong> to prioritize Places API results within or near a circular area.</p>
+<p><strong>Type:</strong> <a href="/geocoderautocompleteoptions/#bycircleoptions"><code>ByCircleOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesBiasByCircle</span><span class="p">({</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="nx">lon</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">74.006</span><span class="p">,</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">40.7128</span><span class="p">,</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span><span class="nx">radiusMeters</span><span class="o">:</span><span class="w"> </span><span class="mf">5000</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Places inside this 5 km radius are ranked higher in the list but not exclusively returned.</p>
+<h3 id="setplacesbiasbyrect">setPlacesBiasByRect()</h3>
+<p>Signature: <code>setPlacesBiasByRect(opts: ByRectOptions)</code></p>
+<p>Adds a <strong>soft bias</strong> toward POIs within a rectangular region.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#byrectoptions"><code>ByRectOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesBiasByRect</span><span class="p">({</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nx">lon1</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">118.67</span><span class="p">,</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="nx">lat1</span><span class="o">:</span><span class="w"> </span><span class="mf">33.70</span><span class="p">,</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">  </span><span class="nx">lon2</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">117.66</span><span class="p">,</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">  </span><span class="nx">lat2</span><span class="o">:</span><span class="w"> </span><span class="mf">34.33</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Results from this region (Los Angeles area) are ranked higher, but global POIs may still appear.</p>
+<h3 id="setplacesbiasbyproximity">setPlacesBiasByProximity()</h3>
+<p>Signature: <code>setPlacesBiasByProximity(p: ByProximityOptions)</code></p>
+<p>Prioritizes Places API results near a <strong>specific coordinate point</strong>, typically the user’s location or map center.</p>
+<p><strong>Type:</strong> <a href="../api-reference/geocoderautocompleteoptions/#byproximityoptions"><code>ByProximityOptions</code></a></p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPlacesBiasByProximity</span><span class="p">({</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span><span class="nx">lon</span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">122.4194</span><span class="p">,</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">37.7749</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>This prioritizes results near <strong>San Francisco</strong>.</p>
+<h3 id="clearplacesbias">clearPlacesBias()</h3>
+<p>Signature: <code>clearPlacesBias()</code></p>
+<p>Removes all <strong>Places API biases</strong>, restoring neutral result ranking.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">clearPlacesBias</span><span class="p">();</span>
+</span></code></pre></div>
+<p>After calling this, Places results will no longer be influenced by location or proximity preferences.</p>
+<h3 id="setsuggestionsfilter">setSuggestionsFilter()</h3>
+<p>Signature: <code>setSuggestionsFilter(fn?: (items: any[]) =&gt; any[] | null)</code></p>
+<p>Defines a <strong>client-side filter function</strong> that post-processes suggestion results before they are displayed.<br />
+This is useful for removing or reordering results dynamically, without modifying the server response.</p>
+<p><strong>Parameters:</strong><br />
+- <code>fn</code>: A function that takes an array of suggestion items and returns a filtered or modified array.<br />
+- Pass <code>null</code> or omit to remove the filter.</p>
+<p><strong>Example:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setSuggestionsFilter</span><span class="p">((</span><span class="nx">items</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="nx">items</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">item</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">item</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">country</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;Germany&#39;</span><span class="p">)</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">);</span>
+</span></code></pre></div></p>
+<p>This will only display address suggestions located in Germany.</p>
+<h3 id="setpreprocesshook">setPreprocessHook()</h3>
+<p>Signature: <code>setPreprocessHook(fn?: (value: string) =&gt; string | null)</code></p>
+<p>Allows you to <strong>transform user input before sending a request</strong> to the Geoapify API.
+Useful for sanitizing, normalizing, or adjusting values before autocomplete processing.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>fn</code>: A function that receives the input string and returns a transformed version.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPreprocessHook</span><span class="p">((</span><span class="nx">value</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s+/g</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39; &#39;</span><span class="p">));</span>
+</span></code></pre></div>
+<p>This example removes extra spaces from user input before querying the API.</p>
+<h3 id="setpostprocesshook">setPostprocessHook()</h3>
+<p>Signature: <code>setPostprocessHook(fn?: (feature: any) =&gt; string | null)</code></p>
+<p>Lets you <strong>transform or format how suggestions appear</strong> in the dropdown list after they are fetched.
+You can modify label text, append custom info, or apply your own formatting logic.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>fn</code>: A function that takes each feature (GeoJSON object) and returns the display string.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setPostprocessHook</span><span class="p">((</span><span class="nx">feature</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="sb">`</span><span class="si">${</span><span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">address_line1</span><span class="si">}</span><span class="sb"> (</span><span class="si">${</span><span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">country</span><span class="si">}</span><span class="sb">)`</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>This adds the country name next to each suggestion.</p>
+<h3 id="setsendgeocoderrequestfunc">setSendGeocoderRequestFunc()</h3>
+<p>Signature: <code>setSendGeocoderRequestFunc(fn?: (value: string, self) =&gt; Promise&lt;any&gt; | null)</code></p>
+<p>Overrides the <strong>default geocoder request</strong>.
+You can define your own logic for fetching suggestions — for example, to use a caching layer, a proxy, or a custom API endpoint.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>fn</code>: A function that receives the search text and the autocomplete instance, and returns a <code>Promise</code> resolving to a Geoapify-style response.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setSendGeocoderRequestFunc</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">self</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`/proxy/geocode?q=</span><span class="si">${</span><span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>This example replaces the direct API call with a proxied request.</p>
+<h3 id="setsendplacedetailsrequestfunc">setSendPlaceDetailsRequestFunc()</h3>
+<p>Signature: <code>setSendPlaceDetailsRequestFunc(fn?: (feature: any, self) =&gt; Promise&lt;any&gt; | null)</code></p>
+<p>Overrides how <strong>place details</strong> are fetched after a user selects a result.
+By default, Geoapify fetches extended metadata for OSM-based places — you can change or disable that.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>fn</code>: A function that takes the selected feature and returns a Promise with enriched or custom details.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setSendPlaceDetailsRequestFunc</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">feature</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span><span class="c1">// Return custom details or skip</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">feature</span><span class="p">,</span><span class="w"> </span><span class="nx">customInfo</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Pre-fetched locally&#39;</span><span class="w"> </span><span class="p">};</span>
+</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="p">});</span>
+</span></code></pre></div>
+<h3 id="setsendplacesrequestfunc">setSendPlacesRequestFunc()</h3>
+<p>Signature: <code>setSendPlacesRequestFunc(fn?: (keys: string[], offset: number, self) =&gt; Promise&lt;any&gt; | null)</code></p>
+<p>Overrides <strong>Places API category search requests</strong> — used when category search is enabled (<code>addCategorySearch: true</code>).
+You can modify or fully replace the request logic to use a different data source or add caching.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>fn</code>: A function that takes category keys, pagination offset, and the autocomplete instance. Must return a Promise resolving to Geoapify Places-style results.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">setSendPlacesRequestFunc</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">keys</span><span class="p">,</span><span class="w"> </span><span class="nx">offset</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="sb">`/places-api?category=</span><span class="si">${</span><span class="nx">keys</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">&amp;offset=</span><span class="si">${</span><span class="nx">offset</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">    </span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="p">});</span>
+</span></code></pre></div>
+<p><strong>Note:</strong> If category mode is disabled (<code>addCategorySearch: false</code>), this function will not run.</p>
+<h3 id="isopen">isOpen()</h3>
+<p>Signature: <code>isOpen()</code></p>
+<p>Returns whether the dropdown list with suggestions is currently open.</p>
+<p><strong>Returns:</strong><br />
+- <code>boolean</code> — <code>true</code> if the dropdown is visible, <code>false</code> otherwise.</p>
+<p><strong>Example:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">isOpen</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Dropdown is open&#39;</span><span class="p">);</span>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h3 id="close">close()</h3>
+<p>Signature: <code>close()</code></p>
+<p>Closes the currently open suggestions or places dropdown.
+Useful when you want to hide the list manually (e.g., after user interaction outside the component).</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="open">open()</h3>
+<p>Signature: <code>open()</code></p>
+<p>Reopens the dropdown list for the current input value, effectively <strong>re-triggering</strong> a request for suggestions if necessary.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">open</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="sendgeocoderrequest">sendGeocoderRequest()</h3>
+<p>Signature: <code>sendGeocoderRequest(value: string): Promise&lt;any&gt;</code></p>
+<p>Sends a <strong>manual geocoder API request</strong> with the provided value.
+Normally, the autocomplete handles this automatically on user input, but this method is useful for custom workflows or testing.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>value</code>: The query string to search for.</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li><code>Promise&lt;any&gt;</code> resolving to a Geoapify Geocoder API response.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">sendGeocoderRequest</span><span class="p">(</span><span class="s1">&#39;Berlin, Germany&#39;</span><span class="p">)</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">  </span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">));</span>
+</span></code></pre></div>
+<h3 id="sendplacedetailsrequest">sendPlaceDetailsRequest()</h3>
+<p>Signature: <code>sendPlaceDetailsRequest(feature: any): Promise&lt;any&gt;</code></p>
+<p>Fetches <strong>additional place details</strong> for a selected feature (address or POI).
+By default, only OSM-based features support extended details.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>feature</code>: The GeoJSON feature object returned from the autocomplete.</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li><code>Promise&lt;any&gt;</code> resolving to a feature with additional details.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">sendPlaceDetailsRequest</span><span class="p">(</span><span class="nx">selectedFeature</span><span class="p">)</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">  </span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">details</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">details</span><span class="p">.</span><span class="nx">properties</span><span class="p">));</span>
+</span></code></pre></div>
+<h3 id="selectcategory">selectCategory()</h3>
+<p>Signature: <code>selectCategory(category: Category | string | string[] | null): Promise&lt;void&gt;</code></p>
+<p>Activates a <strong>Places category search mode</strong>.
+You can pass a category key (or multiple keys) — such as <code>"restaurant"</code> or <code>"park"</code> — to load nearby results using the Places API.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>category</code>: The category key(s) or a full <code>Category</code> object.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">await</span><span class="w"> </span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">selectCategory</span><span class="p">(</span><span class="s1">&#39;restaurant&#39;</span><span class="p">);</span>
+</span></code></pre></div>
+<p><strong>Note:</strong>
+Category mode must be enabled via <code>addCategorySearch: true</code>.</p>
+<h3 id="clearcategory">clearCategory()</h3>
+<p>Signature: <code>clearCategory(): Promise&lt;void&gt;</code></p>
+<p>Clears the current category selection and exits category mode.
+This resets the input and the places list.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="k">await</span><span class="w"> </span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">clearCategory</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="resendplacesrequestformore">resendPlacesRequestForMore()</h3>
+<p>Signature: <code>resendPlacesRequestForMore(append?: boolean): Promise&lt;void&gt;</code></p>
+<p>Fetches the <strong>next page of Places results</strong> for the currently selected category.
+If <code>append</code> is true, new results are added to the existing list.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>append</code> (optional): Whether to append results instead of replacing them.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="k">await</span><span class="w"> </span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">resendPlacesRequestForMore</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="getcategory">getCategory()</h3>
+<p>Signature: <code>getCategory(): Category | null</code></p>
+<p>Returns the currently active category (if any).
+Useful to check which category mode is active at runtime.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">current</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">getCategory</span><span class="p">();</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">current</span><span class="o">?</span><span class="p">.</span><span class="nx">label</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="selectplace">selectPlace()</h3>
+<p>Signature: <code>selectPlace(index: number | null): void</code></p>
+<p>Programmatically selects or clears a <strong>place</strong> from the built-in Places list.
+This only works when the built-in list (<code>showPlacesList: true</code>) is active.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>index</code>: The numeric index of the place to select, or <code>null</code> to clear.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">selectPlace</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// Select first place in list</span>
+</span></code></pre></div>
+<h3 id="sendplacesrequest">sendPlacesRequest()</h3>
+<p>Signature: <code>sendPlacesRequest(): Promise&lt;void&gt;</code></p>
+<p>Triggers a <strong>Places API request</strong> for the currently active category and filters.
+This is the main method used internally for category search, but you can call it directly to reload results.</p>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="k">await</span><span class="w"> </span><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">sendPlacesRequest</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="listening-for-events">Listening For Events</h2>
+<p>The <code>GeocoderAutocomplete</code> component emits various <strong>lifecycle and interaction events</strong> — for example, when a request starts, suggestions are received, or a user selects a result.</p>
+<p>You can use the following methods to <strong>subscribe</strong>, <strong>unsubscribe</strong>, or <strong>listen once</strong> to these events:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#on"><code>on</code></a></td>
+<td><code>on(event: GeocoderEventType, cb: (payload:any)=&gt;void): void</code></td>
+<td>Subscribe to an event.</td>
+</tr>
+<tr>
+<td><a href="#off"><code>off</code></a></td>
+<td><code>off(event: GeocoderEventType, cb?: (payload:any)=&gt;any): void</code></td>
+<td>Unsubscribe from an event (optionally for a specific callback).</td>
+</tr>
+<tr>
+<td><a href="#once"><code>once</code></a></td>
+<td><code>once(event: GeocoderEventType, cb: (payload:any)=&gt;any): void</code></td>
+<td>Subscribe to an event for a single invocation (auto-unsubscribed after first trigger).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="on"><code>on()</code></h3>
+<p>Registers an <strong>event listener</strong> that will be called whenever the specified event is triggered.<br />
+You can use this to respond to input changes, new suggestions, place selections, or request status updates.</p>
+<p><strong>Parameters:</strong><br />
+- <code>event</code>: The name of the event (a value of <code>GeocoderEventType</code>).<br />
+- <code>cb</code>: Callback function that receives event-specific data.</p>
+<p><strong>Example:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">feature</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-48-2"><a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User selected:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">formatted</span><span class="p">);</span>
+</span><span id="__span-48-3"><a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="p">});</span>
+</span><span id="__span-48-4"><a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a>
+</span><span id="__span-48-5"><a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;requestStart&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-48-6"><a id="__codelineno-48-6" name="__codelineno-48-6" href="#__codelineno-48-6"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Searching for:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">query</span><span class="p">);</span>
+</span><span id="__span-48-7"><a id="__codelineno-48-7" name="__codelineno-48-7" href="#__codelineno-48-7"></a><span class="p">});</span>
+</span></code></pre></div></p>
+<p>Common event names include:</p>
+<ul>
+<li><code>requestStart</code> — when a geocoder request is initiated.</li>
+<li><code>requestEnd</code> — when results are received or an error occurs.</li>
+<li><code>suggestions</code> — when new autocomplete suggestions are available.</li>
+<li><code>select</code> — when the user selects a result.</li>
+<li><code>clear</code> — when the input or category is cleared.</li>
+<li><code>opened</code> / <code>closed</code> — when the dropdown opens or closes.</li>
+<li><code>placesRequestStart</code> / <code>placesRequestEnd</code> — for category search requests.</li>
+</ul>
+<h3 id="off"><code>off()</code></h3>
+<p>Removes a previously registered event listener.
+If no callback is provided, <strong>all listeners for that event</strong> are removed.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>event</code>: The event name.</li>
+<li><code>cb</code> (optional): The specific callback function to remove.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">onSelect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">f</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Selected:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">f</span><span class="p">);</span>
+</span><span id="__span-49-2"><a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">onSelect</span><span class="p">);</span>
+</span><span id="__span-49-3"><a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>
+</span><span id="__span-49-4"><a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a><span class="c1">// Later, stop listening</span>
+</span><span id="__span-49-5"><a id="__codelineno-49-5" name="__codelineno-49-5" href="#__codelineno-49-5"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">onSelect</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="once"><code>once()</code></h3>
+<p>Registers a <strong>one-time listener</strong> that is automatically unsubscribed after being triggered once.
+Useful for initialization or one-time actions such as analytics tracking or setup confirmation.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>event</code>: The event name.</li>
+<li><code>cb</code>: The callback function to execute once.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">once</span><span class="p">(</span><span class="s1">&#39;opened&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-50-2"><a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Dropdown opened for the first time!&#39;</span><span class="p">);</span>
+</span><span id="__span-50-3"><a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>These event hooks make it easy to <strong>connect the autocomplete to your app logic</strong>, such as updating a map marker, validating user input, or displaying request status.</p>
+<h3 id="events-names-payloads">Events (names &amp; payloads)</h3>
+<p>Here’s a reference list of all <strong>supported event names</strong>, their payloads, and when they are fired.<br />
+These events let you respond to user actions, geocoder lifecycle stages, and category-based place searches.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Payload</th>
+<th>Fired when…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input</code></td>
+<td><code>string</code> (current input)</td>
+<td>User types in the autocomplete field.</td>
+</tr>
+<tr>
+<td><code>requestStart</code></td>
+<td><code>string</code> (query)</td>
+<td>Geocoder request is about to be sent.</td>
+</tr>
+<tr>
+<td><code>requestEnd</code></td>
+<td><code>{ ok: boolean, data?: any, error?: any }</code></td>
+<td>Geocoder response is received or failed.</td>
+</tr>
+<tr>
+<td><code>suggestions</code></td>
+<td><code>GeoJSON.Feature[]</code></td>
+<td>New autocomplete suggestions are available.</td>
+</tr>
+<tr>
+<td><code>select</code></td>
+<td><code>GeoJSON.Feature \| null</code></td>
+<td>User selects a suggestion or clears the selection.</td>
+</tr>
+<tr>
+<td><code>change</code></td>
+<td><code>GeoJSON.Feature \| null</code></td>
+<td>Final value changes (after fetching details if <code>addDetails: true</code>).</td>
+</tr>
+<tr>
+<td><code>placeDetailsRequestStart</code></td>
+<td><code>GeoJSON.Feature</code></td>
+<td>Place Details request initiated.</td>
+</tr>
+<tr>
+<td><code>placeDetailsRequestEnd</code></td>
+<td><code>{ ok: boolean, data?: GeoJSON.Feature, error?: any }</code></td>
+<td>Place Details request completed.</td>
+</tr>
+<tr>
+<td><code>opened</code></td>
+<td><code>void</code></td>
+<td>Dropdown is rendered (opened).</td>
+</tr>
+<tr>
+<td><code>closed</code></td>
+<td><code>void</code></td>
+<td>Dropdown is closed.</td>
+</tr>
+<tr>
+<td><code>clear</code></td>
+<td><code>'address' \| 'category'</code></td>
+<td>Address or category field cleared.</td>
+</tr>
+<tr>
+<td><code>placesRequestStart</code></td>
+<td><code>Category</code></td>
+<td>Places API request started (in category search mode).</td>
+</tr>
+<tr>
+<td><code>placesRequestEnd</code></td>
+<td><code>{ ok: boolean, data?: any, error?: any }</code></td>
+<td>Places API response received.</td>
+</tr>
+<tr>
+<td><code>places</code></td>
+<td><code>GeoJSON.Feature[]</code></td>
+<td>Places list updated (in category mode).</td>
+</tr>
+<tr>
+<td><code>placeSelect</code></td>
+<td><code>{ place: GeoJSON.Feature, index: number }</code></td>
+<td>Place selected from the built-in list.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example: Listening to request and selection events</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;requestStart&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">query</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-51-2"><a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Request started for:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">query</span><span class="p">);</span>
+</span><span id="__span-51-3"><a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a><span class="p">});</span>
+</span><span id="__span-51-4"><a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a>
+</span><span id="__span-51-5"><a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;requestEnd&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">result</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-51-6"><a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Got results:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">features</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+</span><span id="__span-51-7"><a id="__codelineno-51-7" name="__codelineno-51-7" href="#__codelineno-51-7"></a><span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;Request failed:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+</span><span id="__span-51-8"><a id="__codelineno-51-8" name="__codelineno-51-8" href="#__codelineno-51-8"></a><span class="p">});</span>
+</span><span id="__span-51-9"><a id="__codelineno-51-9" name="__codelineno-51-9" href="#__codelineno-51-9"></a>
+</span><span id="__span-51-10"><a id="__codelineno-51-10" name="__codelineno-51-10" href="#__codelineno-51-10"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">feature</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-51-11"><a id="__codelineno-51-11" name="__codelineno-51-11" href="#__codelineno-51-11"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">feature</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-51-12"><a id="__codelineno-51-12" name="__codelineno-51-12" href="#__codelineno-51-12"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Selected:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">formatted</span><span class="p">);</span>
+</span><span id="__span-51-13"><a id="__codelineno-51-13" name="__codelineno-51-13" href="#__codelineno-51-13"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-51-14"><a id="__codelineno-51-14" name="__codelineno-51-14" href="#__codelineno-51-14"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Selection cleared&#39;</span><span class="p">);</span>
+</span><span id="__span-51-15"><a id="__codelineno-51-15" name="__codelineno-51-15" href="#__codelineno-51-15"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-51-16"><a id="__codelineno-51-16" name="__codelineno-51-16" href="#__codelineno-51-16"></a><span class="p">});</span>
+</span></code></pre></div>
+<p><strong>Example: Handling Places API and category mode events</strong></p>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;placesRequestStart&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">category</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-52-2"><a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Loading places for:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">category</span><span class="p">.</span><span class="nx">label</span><span class="p">);</span>
+</span><span id="__span-52-3"><a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a><span class="p">});</span>
+</span><span id="__span-52-4"><a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>
+</span><span id="__span-52-5"><a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;placesRequestEnd&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-52-6"><a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Places loaded:&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">features</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+</span><span id="__span-52-7"><a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a><span class="p">});</span>
+</span><span id="__span-52-8"><a id="__codelineno-52-8" name="__codelineno-52-8" href="#__codelineno-52-8"></a>
+</span><span id="__span-52-9"><a id="__codelineno-52-9" name="__codelineno-52-9" href="#__codelineno-52-9"></a><span class="nx">autocomplete</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;placeSelect&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">place</span><span class="p">,</span><span class="w"> </span><span class="nx">index</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-52-10"><a id="__codelineno-52-10" name="__codelineno-52-10" href="#__codelineno-52-10"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Selected place #</span><span class="si">${</span><span class="nx">index</span><span class="si">}</span><span class="sb">:`</span><span class="p">,</span><span class="w"> </span><span class="nx">place</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span id="__span-52-11"><a id="__codelineno-52-11" name="__codelineno-52-11" href="#__codelineno-52-11"></a><span class="p">});</span>
+</span></code></pre></div>
+<blockquote>
+<p><strong>Note:</strong>
+Event names correspond to internal callbacks such as <code>notifyRequestStart</code>, <code>notifySuggestions</code>, and <code>notifyChange</code>, exposed through the <code>on()</code>, <code>off()</code>, and <code>once()</code> methods.
+Payloads match the Geoapify API responses and GeoJSON feature structures used throughout the autocomplete and Places APIs.</p>
+</blockquote>
+<h2 id="learn-more">Learn more</h2>
+<ul>
+<li>Explore available configuration parameters in the <a href="../geocoder-autocomplete-options/">GeocoderAutocompleteOptions reference</a>.</li>
+<li>Check the <a href="../../quick-start/">Quick Start guide</a> to see how to set up your first autocomplete field.</li>
+<li>Try live examples in the <a href="../../live-demos/">Interactive Demos</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/geoapify" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "navigation.expand"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>

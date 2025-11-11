@@ -1,0 +1,53 @@
+import { GeocoderAutocompleteOptions } from "../autocomplete";
+export interface PlacesListCallbacks {
+    onPlaceSelect: (place: GeoJSON.Feature, index: number) => void;
+    onLoadMore: (offset: number) => Promise<any>;
+    onPlacesUpdate: (allPlaces: GeoJSON.Feature[]) => void;
+}
+export declare class PlacesListManager {
+    private container;
+    private options;
+    private callbacks;
+    private placesListElement;
+    private titleBar;
+    private scrollContainer;
+    private statusBar;
+    private loadMoreElement;
+    private currentOffset;
+    private currentCategory;
+    private currentCategoryLabel;
+    private isLoadingMorePlaces;
+    private hasMorePlaces;
+    private places;
+    private scrollListener;
+    private selectedPlaceIndex;
+    constructor(container: HTMLElement, options: GeocoderAutocompleteOptions, callbacks: PlacesListCallbacks);
+    setCurrentOffset(offset: number): void;
+    getCurrentOffset(): number;
+    setCategory(category: string[], categoryLabel: string): void;
+    showPlacesList(placesToRender: GeoJSON.Feature[], isLoadMore?: boolean): void;
+    filterDuplicatePlaces(newPlaces: GeoJSON.Feature[]): GeoJSON.Feature[];
+    setPlaces(places: GeoJSON.Feature[], append?: boolean): void;
+    getPlaces(): GeoJSON.Feature[];
+    clearPlacesList(): void;
+    isPlacesListVisible(): boolean;
+    private clearPlacesItems;
+    resetCategory(): void;
+    selectPlace(index: number): void;
+    clearSelection(): void;
+    private createPlacesElements;
+    private renderPlaces;
+    private showList;
+    private showEmptyState;
+    private resetPaginationState;
+    private updateTitleBar;
+    private updateStatusBar;
+    private updateStatusBarState;
+    private createPlaceItem;
+    private extractPlaceData;
+    private selectPlaceFromList;
+    private loadMorePlaces;
+    private setupScrollDetection;
+    private removeScrollListener;
+    private onScrollHandler;
+}

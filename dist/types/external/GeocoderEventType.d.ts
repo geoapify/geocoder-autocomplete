@@ -1,0 +1,1 @@
+export type GeocoderEventType = 'select' | 'suggestions' | 'input' | 'close' | 'open' | 'request_start' | 'request_end' | 'places' | 'places_request_start' | 'places_request_end' | 'place_details_request_start' | 'place_details_request_end' | 'place_select' | 'clear';

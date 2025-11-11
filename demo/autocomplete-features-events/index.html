@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events Demo — Full GeocoderAutocomplete Event Showcase</title>
+  <link rel="stylesheet" href="./index.css">
+  <script type="text/javascript" src="../../dist/index.min.js"></script>
+  <link id="geocoder-theme" rel="stylesheet" type="text/css" href="../../styles/minimal.css">
+</head>
+<body>
+  <div class="theme-selector">
+    <span class="theme-label">Theme:</span>
+    <select id="theme-selector" onchange="setTheme(this.value)">
+      <option value="minimal">Light</option>
+      <option value="minimal-dark">Dark</option>
+      <option value="round-borders">Light (Round)</option>
+      <option value="round-borders-dark">Dark (Round)</option>
+    </select>
+  </div>
+
+  <div class="container">
+    <h1>Events Demo — Full GeocoderAutocomplete Event Showcase</h1>
+    <p class="hint">Toggle event listeners to see what the component emits. Logs update in real time with event name, timestamp, and a compact payload.</p>
+
+    <div class="panel">
+      <h3>1. Autocomplete</h3>
+      <div id="ac" class="autocomplete-container"></div>
+      <div class="hint" style="margin-top:6px;">Tip: Category mode is enabled to show Places-related events as well.</div>
+    </div>
+
+    <div class="panel">
+      <h3>2. Options</h3>
+      <div class="hint">Options overview:</div>
+      <ul class="hint" style="margin:6px 0 10px 18px;">
+        <li><code>debounceDelay?: number</code> — controls how long to wait after typing before sending a request.</li>
+        <li><code>addDetails?: boolean</code> — calls the Place Details API to fetch place geometry and extra attributes.</li>
+        <li><code>addCategorySearch?: boolean</code> — enables searching places by categories (e.g., restaurants, parks).</li>
+      </ul>
+      <div class="row" style="margin-top:8px; gap:18px; align-items:center;">
+        <label>debounceDelay (ms)
+          <input id="opt-debounce" type="number" min="0" step="50" value="250" style="width:120px;">
+        </label>
+        <label><input id="opt-details" type="checkbox"> addDetails</label>
+        <label><input id="opt-categories" type="checkbox" checked> addCategorySearch</label>
+        <button id="apply-options">Apply Options</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>3. Events</h3>
+      <div class="event-grid" id="event-grid"></div>
+      <div style="margin-top:10px; display:flex; gap:8px;">
+        <button id="select-all">Enable All</button>
+        <button id="deselect-all">Disable All</button>
+        <button id="clear-log">Clear Log</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Console</h3>
+      <div id="console" class="console" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script>
+    /* WARNING: This API key is provided for DEMO purposes only.
+       Please sign up at https://www.geoapify.com and generate your own API key.
+       The demo key may be rotated or blocked at any moment without notice.
+    */
+    const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
+
+    function setTheme(themeName) {
+      const themeLink = document.getElementById('geocoder-theme');
+      themeLink.href = `../../styles/${themeName}.css`;
+      document.body.className = document.body.className.replace(/theme-\w+/g, '');
+      document.body.classList.add(`theme-${themeName}`);
+      localStorage.setItem('geocoder-theme', themeName);
+    }
+    window.addEventListener('load', () => {
+      const savedTheme = localStorage.getItem('geocoder-theme') || 'minimal';
+      document.getElementById('theme-selector').value = savedTheme;
+      setTheme(savedTheme);
+    });
+
+    // Initialize component (factory)
+    let ac;
+    function initAutocomplete(options) {
+      const el = document.getElementById('ac');
+      el.innerHTML = '';
+      ac = new autocomplete.GeocoderAutocomplete(el, myAPIKey, {
+        skipIcons: false,
+        placeholder: 'Type to search addresses or categories…',
+        showPlacesList: true,
+        enablePlacesLazyLoading: true,
+        limit: 8,
+        hidePlacesListAfterSelect: true,
+        ...options
+      });
+    }
+    // Default options
+    initAutocomplete({ addCategorySearch: true, debounceDelay: 250 });
+
+    // Event list
+    const EVENTS = [
+      { key: 'select', label: 'select' },
+      { key: 'suggestions', label: 'suggestions' },
+      { key: 'input', label: 'input' },
+      { key: 'close', label: 'close' },
+      { key: 'open', label: 'open' },
+      { key: 'request_start', label: 'request_start' },
+      { key: 'request_end', label: 'request_end' },
+      { key: 'places', label: 'places' },
+      { key: 'places_request_start', label: 'places_request_start' },
+      { key: 'places_request_end', label: 'places_request_end' },
+      { key: 'place_details_request_start', label: 'place_details_request_start' },
+      { key: 'place_details_request_end', label: 'place_details_request_end' },
+      { key: 'place_select', label: 'place_select' },
+      { key: 'clear', label: 'clear' }
+    ];
+
+    // Render checkboxes
+    const grid = document.getElementById('event-grid');
+    EVENTS.forEach(e => {
+      const id = `evt-${e.key}`;
+      const wrap = document.createElement('label');
+      wrap.style.display = 'flex';
+      wrap.style.gap = '8px';
+      wrap.style.alignItems = 'center';
+      wrap.innerHTML = `<input type="checkbox" id="${id}" checked> <span>${e.label}</span>`;
+      grid.appendChild(wrap);
+    });
+
+    // Logging
+    const consoleEl = document.getElementById('console');
+    function nowTs() {
+      const d = new Date();
+      const pad = (n, s=2) => String(n).padStart(s,'0');
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(),3)}`;
+    }
+    function showLine(name, payload) {
+      const line = document.createElement('div');
+      line.className = 'line';
+      const ts = document.createElement('span'); ts.className = 'ts'; ts.textContent = nowTs();
+      const evt = document.createElement('span'); evt.className = 'evt'; evt.textContent = name;
+      const pl = document.createElement('span'); pl.className = 'payload'; pl.textContent = payload;
+      line.appendChild(ts); line.appendChild(evt); line.appendChild(pl);
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+    function fmt(obj) {
+      try {
+        const text = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+        return text.length > 800 ? text.slice(0, 800) + '…' : text;
+      } catch(_) { return String(obj); }
+    }
+
+    // Handlers
+    const handlers = {
+      input: (text) => showLine('input', fmt({ text })),
+      request_start: (q) => showLine('request_start', fmt({ query: q })),
+      request_end: (success, data, error) => {
+        const cnt = Array.isArray(data) ? data.length : (data && data.features) ? data.features.length : 0;
+        showLine('request_end', fmt({ success, suggestions: cnt, error: error && !error.canceled ? String(error) : undefined }));
+      },
+      suggestions: (items) => showLine('suggestions', fmt({ count: Array.isArray(items) ? items.length : 0 })),
+      select: (feature) => {
+        const p = feature && feature.properties || {};
+        showLine('select', fmt({ formatted: p.formatted, lat: p.lat, lon: p.lon }));
+      },
+      open: () => showLine('open', ''),
+      close: () => showLine('close', ''),
+      clear: (context) => showLine('clear', fmt({ context })),
+      place_details_request_start: (feature) => {
+        const p = feature && feature.properties || {};
+        showLine('place_details_request_start', fmt({ name: p.name || p.formatted }));
+      },
+      place_details_request_end: (success, feature, error) => {
+        const p = feature && feature.properties || {};
+        showLine('place_details_request_end', fmt({ success, name: p.name || p.formatted, error: error && !error.canceled ? String(error) : undefined }));
+      },
+      places_request_start: (categoryKeys) => showLine('places_request_start', fmt({ categories: categoryKeys })),
+      places_request_end: (success, data, error) => {
+        const cnt = Array.isArray(data) ? data.length : (data && data.features) ? data.features.length : 0;
+        showLine('places_request_end', fmt({ success, places: cnt, error: error && !error.canceled ? String(error) : undefined }));
+      },
+      places: (places) => showLine('places', fmt({ count: Array.isArray(places) ? places.length : 0 })),
+      place_select: (place, index) => {
+        const p = place && place.properties || {};
+        showLine('place_select', fmt({ index, name: p.name || p.formatted, lat: p.lat, lon: p.lon }));
+      }
+    };
+
+    // Subscribe / unsubscribe
+    function subscribe(evt) {
+      if (!handlers[evt]) return;
+      ac.on(evt, handlers[evt]);
+    }
+    function unsubscribe(evt) {
+      if (!handlers[evt]) return;
+      try { ac.off(evt, handlers[evt]); } catch(_) {}
+    }
+
+    // Wire checkboxes
+    EVENTS.forEach(e => {
+      const cb = document.getElementById(`evt-${e.key}`);
+      if (!cb) return;
+      // default subscribe
+      subscribe(e.key);
+      cb.addEventListener('change', () => {
+        if (cb.checked) subscribe(e.key); else unsubscribe(e.key);
+      });
+    });
+
+    function reapplySubscriptions() {
+      EVENTS.forEach(e => {
+        const cb = document.getElementById(`evt-${e.key}`);
+        if (!cb) return;
+        if (cb.checked) subscribe(e.key);
+      });
+    }
+
+    // Bulk actions
+    document.getElementById('select-all').addEventListener('click', () => {
+      EVENTS.forEach(e => {
+        const cb = document.getElementById(`evt-${e.key}`); if (!cb) return;
+        if (!cb.checked) { cb.checked = true; subscribe(e.key); }
+      });
+    });
+    document.getElementById('deselect-all').addEventListener('click', () => {
+      EVENTS.forEach(e => {
+        const cb = document.getElementById(`evt-${e.key}`); if (!cb) return;
+        if (cb.checked) { cb.checked = false; unsubscribe(e.key); }
+      });
+    });
+    document.getElementById('clear-log').addEventListener('click', () => { consoleEl.innerHTML = ''; });
+
+    // Options handling
+    document.getElementById('apply-options').addEventListener('click', () => {
+      const debounce = parseInt(document.getElementById('opt-debounce').value, 10);
+      const addDetails = document.getElementById('opt-details').checked;
+      const addCategorySearch = document.getElementById('opt-categories').checked;
+      initAutocomplete({
+        debounceDelay: Number.isFinite(debounce) ? debounce : undefined,
+        addDetails,
+        addCategorySearch
+      });
+      reapplySubscriptions();
+      showLine('options_applied', JSON.stringify({ debounceDelay: debounce, addDetails, addCategorySearch }));
+    });
+  </script>
+</body>
+</html>
