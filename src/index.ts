@@ -9,4 +9,4 @@ export type {ByCircleOptions} from './autocomplete';
 export type {ByProximityOptions} from './autocomplete';
 export type {ByRectOptions} from './autocomplete';
 
-export type {Category, GeocoderEventType} from './types/external';
+export type {Category, GeocoderEventType, ItemType} from './types/external';
