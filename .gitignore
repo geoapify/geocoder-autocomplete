@@ -6,3 +6,4 @@ node_modules
 /docs-site/site/
 coverage
 .DS_Store
+config.bat

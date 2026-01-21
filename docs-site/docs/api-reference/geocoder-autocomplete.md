@@ -997,18 +997,18 @@ These events let you respond to user actions, geocoder lifecycle stages, and cat
 |---|---|---|
 | `input` | `string` (current input) | User types in the autocomplete field. |
 | `request_start` | `string` (query) | Geocoder request is about to be sent. |
-| `request_end` | `{ ok: boolean, data?: any, error?: any }` | Geocoder response is received or failed. |
+| `request_end` | `(success: boolean, data?: any, error?: any)` | Geocoder response is received or failed. |
 | `suggestions` | `GeoJSON.Feature[]` | New autocomplete suggestions are available. |
 | `select` | `GeoJSON.Feature \| null` | User selects a suggestion or clears the selection. |
 | `place_details_request_start` | `GeoJSON.Feature` | Place Details request initiated. |
-| `place_details_request_end` | `{ ok: boolean, data?: GeoJSON.Feature, error?: any }` | Place Details request completed. |
-| `open` | `void` | Dropdown is rendered (opened). |
-| `close` | `void` | Dropdown is closed. |
+| `place_details_request_end` | `(success: boolean, data?: GeoJSON.Feature, error?: any)` | Place Details request completed. |
+| `open` | `boolean` (`true`) | Dropdown is rendered (opened). |
+| `close` | `boolean` (`false`) | Dropdown is closed. |
 | `clear` | `'address' \| 'category'` | Address or category field cleared. |
 | `places_request_start` | `Category` | Places API request started (in category search mode). |
-| `places_request_end` | `{ ok: boolean, data?: any, error?: any }` | Places API response received. |
+| `places_request_end` | `(success: boolean, data?: any, error?: any)` | Places API response received. |
 | `places` | `GeoJSON.Feature[]` | Places list updated (in category mode). |
-| `place_select` | `{ place: GeoJSON.Feature, index: number }` | Place selected from the built-in list. |
+| `place_select` | `(place: GeoJSON.Feature, index: number)` | Place selected from the built-in list. |
 
 
 **Example: Listening to request and selection events**
@@ -1018,9 +1018,9 @@ autocomplete.on('request_start', (query) => {
   console.log('Request started for:', query);
 });
 
-autocomplete.on('request_end', (result) => {
-  if (result.ok) console.log('Got results:', result.data.features.length);
-  else console.error('Request failed:', result.error);
+autocomplete.on('request_end', (success, data, error) => {
+  if (success) console.log('Got results:', data.features.length);
+  else console.error('Request failed:', error);
 });
 
 autocomplete.on('select', (feature) => {
@@ -1039,11 +1039,11 @@ autocomplete.on('places_request_start', (category) => {
   console.log('Loading places for:', category.label);
 });
 
-autocomplete.on('places_request_end', (res) => {
-  if (res.ok) console.log('Places loaded:', res.data.features.length);
+autocomplete.on('places_request_end', (success, data, error) => {
+  if (success) console.log('Places loaded:', data.features.length);
 });
 
-autocomplete.on('place_select', ({ place, index }) => {
+autocomplete.on('place_select', (place, index) => {
   console.log(`Selected place #${index}:`, place.properties.name);
 });
 ```
