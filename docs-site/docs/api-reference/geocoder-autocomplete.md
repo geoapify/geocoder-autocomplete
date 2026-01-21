@@ -933,20 +933,20 @@ autocomplete.on('select', (feature) => {
   console.log('User selected:', feature.properties.formatted);
 });
 
-autocomplete.on('requestStart', (query) => {
+autocomplete.on('request_start', (query) => {
   console.log('Searching for:', query);
 });
 ```
 
 Common event names include:
 
-* `requestStart` — when a geocoder request is initiated.
-* `requestEnd` — when results are received or an error occurs.
+* `request_start` — when a geocoder request is initiated.
+* `request_end` — when results are received or an error occurs.
 * `suggestions` — when new autocomplete suggestions are available.
 * `select` — when the user selects a result.
 * `clear` — when the input or category is cleared.
-* `opened` / `closed` — when the dropdown opens or closes.
-* `placesRequestStart` / `placesRequestEnd` — for category search requests.
+* `open` / `close` — when the dropdown opens or closes.
+* `places_request_start` / `places_request_end` — for category search requests.
 
 ### `off()`
 
@@ -981,7 +981,7 @@ Useful for initialization or one-time actions such as analytics tracking or setu
 **Example:**
 
 ```javascript
-autocomplete.once('opened', () => {
+autocomplete.once('open', () => {
   console.log('Dropdown opened for the first time!');
 });
 ```
@@ -996,30 +996,29 @@ These events let you respond to user actions, geocoder lifecycle stages, and cat
 | Event | Payload | Fired when… |
 |---|---|---|
 | `input` | `string` (current input) | User types in the autocomplete field. |
-| `requestStart` | `string` (query) | Geocoder request is about to be sent. |
-| `requestEnd` | `{ ok: boolean, data?: any, error?: any }` | Geocoder response is received or failed. |
+| `request_start` | `string` (query) | Geocoder request is about to be sent. |
+| `request_end` | `{ ok: boolean, data?: any, error?: any }` | Geocoder response is received or failed. |
 | `suggestions` | `GeoJSON.Feature[]` | New autocomplete suggestions are available. |
 | `select` | `GeoJSON.Feature \| null` | User selects a suggestion or clears the selection. |
-| `change` | `GeoJSON.Feature \| null` | Final value changes (after fetching details if `addDetails: true`). |
-| `placeDetailsRequestStart` | `GeoJSON.Feature` | Place Details request initiated. |
-| `placeDetailsRequestEnd` | `{ ok: boolean, data?: GeoJSON.Feature, error?: any }` | Place Details request completed. |
-| `opened` | `void` | Dropdown is rendered (opened). |
-| `closed` | `void` | Dropdown is closed. |
+| `place_details_request_start` | `GeoJSON.Feature` | Place Details request initiated. |
+| `place_details_request_end` | `{ ok: boolean, data?: GeoJSON.Feature, error?: any }` | Place Details request completed. |
+| `open` | `void` | Dropdown is rendered (opened). |
+| `close` | `void` | Dropdown is closed. |
 | `clear` | `'address' \| 'category'` | Address or category field cleared. |
-| `placesRequestStart` | `Category` | Places API request started (in category search mode). |
-| `placesRequestEnd` | `{ ok: boolean, data?: any, error?: any }` | Places API response received. |
+| `places_request_start` | `Category` | Places API request started (in category search mode). |
+| `places_request_end` | `{ ok: boolean, data?: any, error?: any }` | Places API response received. |
 | `places` | `GeoJSON.Feature[]` | Places list updated (in category mode). |
-| `placeSelect` | `{ place: GeoJSON.Feature, index: number }` | Place selected from the built-in list. |
+| `place_select` | `{ place: GeoJSON.Feature, index: number }` | Place selected from the built-in list. |
 
 
 **Example: Listening to request and selection events**
 
 ```javascript
-autocomplete.on('requestStart', (query) => {
+autocomplete.on('request_start', (query) => {
   console.log('Request started for:', query);
 });
 
-autocomplete.on('requestEnd', (result) => {
+autocomplete.on('request_end', (result) => {
   if (result.ok) console.log('Got results:', result.data.features.length);
   else console.error('Request failed:', result.error);
 });
@@ -1036,15 +1035,15 @@ autocomplete.on('select', (feature) => {
 **Example: Handling Places API and category mode events**
 
 ```javascript
-autocomplete.on('placesRequestStart', (category) => {
+autocomplete.on('places_request_start', (category) => {
   console.log('Loading places for:', category.label);
 });
 
-autocomplete.on('placesRequestEnd', (res) => {
+autocomplete.on('places_request_end', (res) => {
   if (res.ok) console.log('Places loaded:', res.data.features.length);
 });
 
-autocomplete.on('placeSelect', ({ place, index }) => {
+autocomplete.on('place_select', ({ place, index }) => {
   console.log(`Selected place #${index}:`, place.properties.name);
 });
 ```
