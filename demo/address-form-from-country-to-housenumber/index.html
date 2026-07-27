@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Structured Address — Country → Postcode → City → Street → House No.</title>
+  <link rel="stylesheet" href="./index.css">
+  <script type="text/javascript" src="../../dist/index.min.js"></script>
+  <link id="geocoder-theme" rel="stylesheet" type="text/css" href="../../styles/minimal.css">
+</head>
+<body>
+
+<div class="theme-selector">
+  <span class="theme-label">Theme:</span>
+  <select id="theme-selector" onchange="setTheme(this.value)">
+    <option value="minimal">Light</option>
+    <option value="minimal-dark">Dark</option>
+    <option value="round-borders">Light (Round)</option>
+    <option value="round-borders-dark">Dark (Round)</option>
+  </select>
+</div>
+
+<div class="address-collection-container">
+  <h1>Structured Address — Country → Postcode → City → Street → House No.</h1>
+  <p class="helper-text">Select a country first, then enter postcode, choose city and street, add house number, and check the address. Language is chosen automatically per country.</p>
+
+  <div class="address-row">
+    <div class="address-field-with-label">
+      <label for="country-select">Country</label><br>
+      <select id="country-select" class="geoapify-autocomplete-input">
+        <option value="us">United States (US)</option>
+        <option value="gb">United Kingdom (GB)</option>
+        <option value="de" selected>Germany (DE)</option>
+        <option value="fr">France (FR)</option>
+        <option value="es">Spain (ES)</option>
+        <option value="it">Italy (IT)</option>
+        <option value="nl">Netherlands (NL)</option>
+        <option value="be">Belgium (BE)</option>
+        <option value="pl">Poland (PL)</option>
+        <option value="cz">Czechia (CZ)</option>
+        <option value="sk">Slovakia (SK)</option>
+        <option value="se">Sweden (SE)</option>
+        <option value="no">Norway (NO)</option>
+        <option value="fi">Finland (FI)</option>
+        <option value="dk">Denmark (DK)</option>
+        <option value="pt">Portugal (PT)</option>
+        <option value="ie">Ireland (IE)</option>
+        <option value="ca">Canada (CA)</option>
+        <option value="au">Australia (AU)</option>
+        <option value="nz">New Zealand (NZ)</option>
+      </select>
+    </div>
+    <div class="address-field-with-label">
+      <label for="postcode">Postcode</label><br>
+      <div id="postcode" class="address-field autocomplete-container"></div>
+    </div>
+  </div>
+
+  <div class="address-row">
+    <div class="address-field-with-label main-part">
+      <label for="city">City</label><br>
+      <div id="city" class="address-field autocomplete-container"></div>
+    </div>
+    <div class="address-field-with-label main-part">
+      <label for="street">Street</label><br>
+      <div id="street" class="address-field autocomplete-container"></div>
+    </div>
+  </div>
+
+  <div class="address-row">
+    <div class="address-field-with-label">
+      <label for="housenumber">House number</label><br>
+      <input id="housenumber" class="geoapify-autocomplete-input small-input"/>
+    </div>
+  </div>
+
+  <div id="message" class="message-container"></div>
+  <div class="button-container"><button onclick="checkAddress()">Verify address</button></div>
+  <div id="dev-panel" class="dev-info-panel" hidden>
+    <div class="dev-info-title">Developer info</div>
+    <div id="dev-meta" class="dev-kv"></div>
+    <pre id="dev-json" class="dev-code"></pre>
+  </div>
+</div>
+
+<script>
+  /* WARNING: This API key is provided for DEMO purposes only.
+     Please sign up at https://www.geoapify.com and generate your own API key.
+     The demo key may be rotated or blocked at any moment without notice.
+  */
+  const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
+
+  function setTheme(themeName) {
+    const themeLink = document.getElementById('geocoder-theme');
+    themeLink.href = `../../styles/${themeName}.css`;
+    document.body.className = document.body.className.replace(/theme-\w+/g, '');
+    document.body.classList.add(`theme-${themeName}`);
+    localStorage.setItem('geocoder-theme', themeName);
+  }
+  window.addEventListener('load', () => {
+    const savedTheme = localStorage.getItem('geocoder-theme') || 'minimal';
+    document.getElementById('theme-selector').value = savedTheme;
+    setTheme(savedTheme);
+  });
+
+  // Country is selected by user; language is chosen automatically
+  function langForCountry(code) {
+    const map = {
+      us: 'en', gb: 'en', ie: 'en', ca: 'en', au: 'en', nz: 'en',
+      de: 'de', at: 'de', ch: 'de',
+      fr: 'fr',
+      es: 'es',
+      it: 'it',
+      nl: 'nl', be: 'nl',
+      pl: 'pl', cz: 'cs', sk: 'sk',
+      se: 'sv', no: 'no', fi: 'fi', dk: 'da',
+      pt: 'pt'
+    };
+    return map[code] || 'en';
+  }
+  let country = document.getElementById('country-select').value;
+  let lang = langForCountry(country);
+
+  let postcodeData;
+  let cityData;
+  let streetData;
+
+  const postcodeInput = new autocomplete.GeocoderAutocomplete(
+    document.getElementById("postcode"),
+    myAPIKey, {
+      lang: lang,
+      type: "postcode",
+      skipDetails: true,
+      placeholder: " ",
+      skipIcons: true
+    }
+  );
+
+  const cityInput = new autocomplete.GeocoderAutocomplete(
+    document.getElementById("city"),
+    myAPIKey, {
+      lang: lang,
+      type: "city",
+      skipDetails: true,
+      skipIcons: true,
+      placeholder: " "
+    }
+  );
+
+  const streetInput = new autocomplete.GeocoderAutocomplete(
+    document.getElementById("street"),
+    myAPIKey, {
+      lang: lang,
+      type: "street",
+      skipDetails: true,
+      skipIcons: true,
+      placeholder: " "
+    }
+  );
+
+  // Apply initial country filter
+  postcodeInput.addFilterByCountry([country]);
+  cityInput.addFilterByCountry([country]);
+  streetInput.addFilterByCountry([country]);
+
+  postcodeInput.setPostprocessHook((feature) => {
+    // show only postcode in the dropdown
+    return feature.properties.postcode;
+  });
+
+  postcodeInput.on('select', (postcode) => {
+    postcodeData = postcode;
+
+    // When a specific postcode is selected, the input can be filled automatically for many countries.
+    if (postcode && !cityData && postcode.properties.city) {
+      cityInput.setValue(postcode.properties.city);
+    }
+
+    updateFilters();
+  });
+
+  // Handle country change
+  document.getElementById('country-select').addEventListener('change', (e) => {
+    country = e.target.value;
+    lang = langForCountry(country);
+
+    // Update language for inputs
+    postcodeInput.setLang && postcodeInput.setLang(lang);
+    cityInput.setLang && cityInput.setLang(lang);
+    streetInput.setLang && streetInput.setLang(lang);
+
+    // Clear selections
+    postcodeData = undefined; cityData = undefined; streetData = undefined;
+    postcodeInput.setValue(''); cityInput.setValue(''); streetInput.setValue('');
+
+    // Reset filters
+    postcodeInput.clearFilters && postcodeInput.clearFilters();
+    cityInput.clearFilters && cityInput.clearFilters();
+    streetInput.clearFilters && streetInput.clearFilters();
+    postcodeInput.addFilterByCountry([country]);
+    cityInput.addFilterByCountry([country]);
+    streetInput.addFilterByCountry([country]);
+
+    // Update dependent filters to initial state
+    updateFilters();
+  });
+
+  cityInput.on('select', (city) => {
+    cityData = city;
+
+    if (city) {
+      cityInput.setValue(city.properties.city || '');
+    }
+
+    if (city && city.properties.postcode) {
+      postcodeInput.setValue(city.properties.postcode);
+    }
+
+    updateFilters();
+  });
+
+  streetInput.on('select', (street) => {
+    streetData = street;
+    if (street) {
+      streetInput.setValue(street.properties.street);
+    }
+
+    if (street && !postcodeData && street.properties.postcode) {
+      postcodeInput.setValue(street.properties.postcode);
+    }
+
+    if (street && !cityData && street.properties.city) {
+      cityInput.setValue(street.properties.city);
+    }
+  });
+
+  function updateFilters() {
+    // update city filters
+    if (postcodeData) {
+      cityInput.addFilterByPlace(postcodeData.properties.place_id);
+    } else {
+      // set original filters
+      cityInput.clearFilters();
+      cityInput.addFilterByCountry([country]);
+    }
+
+    // update street filters
+    if (postcodeData) {
+      streetInput.addFilterByPlace(postcodeData.properties.place_id);
+    } else if (cityData) {
+      streetInput.addFilterByPlace(cityData.properties.place_id);
+    } else {
+      // set original filters
+      streetInput.clearFilters();
+      streetInput.addFilterByCountry([country]);
+    }
+  }
+
+  function checkAddress() {
+    const postcode = postcodeInput.getValue();
+    const city = cityInput.getValue();
+    const street = streetInput.getValue();
+    const housenumber = document.getElementById("housenumber").value;
+
+    const message = document.getElementById("message");
+    message.textContent = "";
+
+    if (!postcode || !city || !street || !housenumber) {
+      highlightEmpty();
+      message.textContent = "Please fill in the required fields and check your address again.";
+      return;
+    }
+
+    // Check the address with Geoapify Geocoding API
+    // You may use it for internal information only. Please note that house numbers might be missing for new buildings and non-mapped buildings. So consider that most addresses with verified streets and cities are correct.
+    const url = `https://api.geoapify.com/v1/geocode/search?housenumber=${encodeURIComponent(housenumber)}&street=${encodeURIComponent(street)}&postcode=${encodeURIComponent(postcode)}&city=${encodeURIComponent(city)}&filter=countrycode:${country}&lang=${lang}&apiKey=${myAPIKey}`;
+    const maskedUrl = url.replace(/(apiKey=)[^&]+/i, '$1YOUR_API_KEY');
+    fetch(url)
+      .then(result => result.json()).then((result) => {
+        let features = result.features || [];
+
+        // To find a confidence level that works for you, try experimenting with different levels
+        const confidenceLevelToAccept = 0.25;
+        features = features.filter(feature => feature.properties.rank.confidence >= confidenceLevelToAccept);
+
+        const parts = [];
+
+        if (features.length) {
+          const foundAddress = features[0];
+          const p = foundAddress.properties || {};
+          const rank = p.rank || {};
+
+          const level = (function() {
+            if (rank.confidence === 1) return 'building';
+            if (rank.confidence_street_level === 1 && rank.confidence_building_level === 0) return 'street_only';
+            if (rank.confidence_street_level === 1 && (rank.confidence_building_level || 0) > 0) return 'street_with_doubts';
+            return 'partial';
+          })();
+
+          let headline = '';
+          if (level === 'building') headline = 'Verified to building level';
+          else if (level === 'street_only') headline = 'Verified to street level (no building)';
+          else if (level === 'street_with_doubts') headline = "Street-level ok, building position uncertain";
+          else headline = 'Partial match';
+
+          message.innerHTML = `
+            <div><strong>${headline}</strong></div>
+            <div><strong>Address:</strong> ${p.formatted || ''}</div>
+            <div style="font-size:12px;color:#6b7a90;">Automatic checks assist your users. They still review and confirm.</div>
+          `;
+
+          // Developer info
+          const devPanel = document.getElementById('dev-panel');
+          const devMeta = document.getElementById('dev-meta');
+          const devJson = document.getElementById('dev-json');
+          devPanel.hidden = false;
+          const meta = [
+            `<strong>URL:</strong> ${maskedUrl}`,
+            `<strong>Confidence:</strong> ${rank.confidence ?? 'n/a'}`,
+            `<strong>Street-level:</strong> ${rank.confidence_street_level ?? 'n/a'}`,
+            `<strong>Building-level:</strong> ${rank.confidence_building_level ?? 'n/a'}`,
+            `<strong>Coords:</strong> ${p.lat ?? '—'}, ${p.lon ?? '—'}`,
+            `<strong>Inputs:</strong> country=${country}, lang=${lang}, postcode=${postcode}, city=${city}, street=${street}, housenumber=${housenumber}`
+          ].join(' | ');
+          devMeta.innerHTML = meta;
+          const snippet = JSON.stringify(p, null, 2);
+          devJson.textContent = snippet.length > 8000 ? snippet.slice(0,8000) + '\n…' : snippet;
+        } else {
+          message.innerHTML = '<div><strong>No match</strong></div><div>We cannot find your address. Please check if you provided the correct address.</div>';
+          const devPanel = document.getElementById('dev-panel');
+          const devMeta = document.getElementById('dev-meta');
+          const devJson = document.getElementById('dev-json');
+          devPanel.hidden = false;
+          devMeta.innerHTML = `<strong>URL:</strong> ${maskedUrl} | <strong>Result:</strong> 0 features`;
+          devJson.textContent = JSON.stringify(result, null, 2);
+        }
+      });
+  }
+
+  function highlightEmpty() {
+    const toHightlight = [];
+
+    if (!postcodeInput.getValue()){
+      toHightlight.push(postcodeInput.inputElement);
+    }
+    if (!cityInput.getValue()){
+      toHightlight.push(cityInput.inputElement);
+    }
+    if (!streetInput.getValue()){
+      toHightlight.push(streetInput.inputElement);
+    }
+    if (!document.getElementById("housenumber").value){
+      toHightlight.push(document.getElementById("housenumber"));
+    }
+
+    toHightlight.forEach(element => element.classList.add("warning-input"));
+    setTimeout(() => {
+      toHightlight.forEach(element => element.classList.remove("warning-input"));
+    }, 3000);
+  }
+</script>
+
+</body>
+</html>

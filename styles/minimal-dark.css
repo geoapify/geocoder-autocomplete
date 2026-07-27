@@ -1,0 +1,432 @@
+.geoapify-input-wrapper {
+    position: relative;
+    flex: 0 0 auto;    
+}
+
+.geoapify-geocoder-autocomplete-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    pointer-events: all;
+}
+
+.geoapify-autocomplete-input {
+    padding: 0 31px 0 7px;
+    width: calc(100% - 40px);
+
+    outline: none;
+
+    line-height: 36px;
+    height: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: #2a2a2a;
+    color: #ffffff;
+
+    font-size: 14px;
+}
+
+.geoapify-autocomplete-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.geoapify-autocomplete-items {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: none;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+
+.geoapify-autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.geoapify-autocomplete-items div:hover {
+    background-color: #3a3a3a;
+}
+
+.geoapify-autocomplete-items .active {
+    background-color: #3a3a3a;
+}
+
+.geoapify-autocomplete-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.geoapify-autocomplete-item .icon {
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+    color: #aaa;
+    flex: 0 0 40px;
+}
+
+.geoapify-autocomplete-item .icon.emoji {
+    color: unset;
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+.geoapify-close-button {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    height: 100%;
+    display: none;
+    align-items: center;
+}
+
+.geoapify-close-button.visible {
+    display: flex;
+}
+
+.geoapify-close-button {
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+}
+
+.geoapify-close-button:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.geoapify-autocomplete-items .secondary-part {
+    margin-left: 10px;
+    font-size: small;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.geoapify-autocomplete-items .main-part .non-verified {
+    color: #ff8080;
+}
+
+.geoapify-places-list {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: #2a2a2a;
+    color: #ffffff;
+    display: none;
+    margin-top: 5px;
+}
+
+.geoapify-places-list.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* Title Bar */
+.geoapify-places-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: #333333;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.geoapify-places-title-icon {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.geoapify-places-title-icon svg {
+    height: 14px;
+    width: 14px;
+}
+
+.geoapify-places-title-label {
+    font-weight: 500;
+    margin-left: auto;
+}
+
+/* Scroll Container */
+.geoapify-places-scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    max-height: 100%;
+}
+
+/* Custom scrollbar for webkit browsers */
+.geoapify-places-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.geoapify-places-scroll-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+}
+
+.geoapify-places-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 3px;
+}
+
+.geoapify-places-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Place Items */
+.geoapify-places-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background-color 0.15s ease;
+    min-width: 0; /* Allow flex item to shrink below content size */
+}
+
+.geoapify-places-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.geoapify-places-item.active {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.geoapify-places-item:last-child {
+    border-bottom: none;
+}
+
+.geoapify-places-text-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0; /* Allow text to shrink */
+}
+
+.geoapify-places-main-part {
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.geoapify-places-secondary-part {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.geoapify-places-hours-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 150px;
+}
+
+.geoapify-places-clock-icon {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.geoapify-places-clock-icon svg {
+    height: 14px;
+    width: 14px;
+}
+
+.geoapify-places-hours-text {
+    white-space: nowrap;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Status Bar */
+.geoapify-places-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 32px;
+    padding: 0 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    background: #2d2d2d;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.geoapify-places-status-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.geoapify-places-status-count span {
+    display: inline-flex;
+    align-items: center;
+}
+
+.geoapify-places-status-count svg {
+    height: 14px;
+    width: 14px;
+    display: block;
+}
+
+.geoapify-places-status-selected {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.geoapify-places-load-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 29px;
+    padding: 6px 16px;
+}
+
+.geoapify-places-load-more.end {
+    padding: 6px 16px;
+}
+
+.geoapify-places-load-more-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+}
+
+.geoapify-places-load-more-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.geoapify-places-load-more-button:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.geoapify-places-load-more-button svg {
+    height: 16px;
+    width: 16px;
+}
+
+.geoapify-places-load-more-loading {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    letter-spacing: 2px;
+    animation: geoapify-dots-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes geoapify-dots-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.geoapify-places-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    min-height: 200px;
+}
+
+.geoapify-places-empty-icon {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.geoapify-places-empty-icon svg {
+    display: block;
+    height: 64px;
+    width: 64px;
+}
+
+.geoapify-places-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+    display: none;
+}
+
+.geoapify-places-loading-overlay.visible {
+    display: block;
+}
+
+.geoapify-places-loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    display: none;
+    background: rgba(42, 46, 54, 0.95);
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.geoapify-places-loading-indicator.visible {
+    display: block;
+}
+
+.geoapify-places-loading-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.geoapify-places-loading-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    display: inline-block;
+    animation: geoapify-places-loading-bounce 1.4s infinite ease-in-out both;
+}
+
+.geoapify-places-loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.geoapify-places-loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes geoapify-places-loading-bounce {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}

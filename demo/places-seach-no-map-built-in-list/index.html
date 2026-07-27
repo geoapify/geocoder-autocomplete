@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Address Form with Places - Geoapify</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div class="theme-selector">
+        <span class="theme-label">Theme:</span>
+        <select id="theme-selector" onchange="setTheme(this.value)">
+            <option value="minimal">Light</option>
+            <option value="minimal-dark">Dark</option>
+            <option value="round-borders">Light (Round)</option>
+            <option value="round-borders-dark">Dark (Round)</option>
+        </select>
+    </div>
+
+    <div class="address-collection-container">
+        <div class="sample-header">
+            <h1>Address Autocomplete with Places Search — Built-in List</h1>
+            <p class="message-container">Search places or categories and select a result. The panel below shows the
+                selected place’s name, formatted address, coordinates, and categories.</p>
+        </div>
+        <!-- Places search section - moved to top -->
+        <div class="address-row">
+            <div class="address-field-with-label main-part">
+                <label for="places">Search places and categories:</label><br>
+                <div style="display:flex; align-items:center; gap:10px; margin:6px 0 4px;">
+                    <input type="checkbox" id="close-on-select" />
+                    <label for="close-on-select" style="font-size:12px;color:#425569;">Exit category mode after selecting a place</label>
+                </div>
+                <div class="info-block">
+                    <strong>Tip:</strong> This input supports category search. Try categories like <em>Schools</em>,
+                    <em>Libraries</em>, <em>Cafes</em>, <em>Restaurants</em>, <em>Pharmacies</em>,
+                    <em>Supermarkets</em>, <em>Parks</em>, <em>Hospitals</em>, <em>Gas stations</em>, or <em>ATMs</em>.
+                    <br>
+                    When no bias or filter is set, the API may use your IP location to roughly bias results for relevance.
+                </div>
+                <div id="places" class="address-field autocomplete-container"></div>
+            </div>
+        </div>
+
+        <div class="address-row">
+            <div class="address-field-with-label main-part">
+                <label>Selected Place:</label><br>
+                <div id="result" class="message-container" aria-live="polite">Select a place or category to see details here.</div>
+                <div id="result-extra" class="message-container" style="font-size:12px;color:#6b7a90;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../../dist/index.min.js"></script>
+    <link id="geocoder-theme" rel="stylesheet" type="text/css" href="../../styles/minimal.css">
+
+    <script>
+        /* WARNING: This API key is provided for DEMO purposes only.
+        Please sign up at https://www.geoapify.com and generate your own API key.
+        The demo key may be rotated or blocked at any moment without notice.
+        */
+        const myAPIKey = "52f7bd50de994836b609fbfc6f082700";
+
+        // Structured address inputs removed for a simpler, places-focused demo
+
+        // Places input with built-in places list functionality
+        const placesInput = new autocomplete.GeocoderAutocomplete(
+            document.getElementById("places"),
+            myAPIKey, {
+            placeholder: "Search places or categories...",
+            addCategorySearch: true,
+            showPlacesList: true,
+            enablePlacesLazyLoading: true,
+            limit: 8,
+            skipIcons: false
+        });
+
+        const resultEl = document.getElementById('result');
+        const resultExtraEl = document.getElementById('result-extra');
+
+        placesInput.on('places', (places) => {
+            console.log(`Found ${places.length} places`);
+        });
+
+        // Handle individual place selection from places list
+        placesInput.on('place_select', (place, index) => {
+            showPlace(place);
+            const exitCategory = document.getElementById('close-on-select')?.checked;
+            if (exitCategory) {
+                placesInput.clearCategory();
+                const formatted = place?.properties?.formatted || place?.properties?.address_line1 || '';
+                if (formatted) {
+                    placesInput.setValue(formatted);
+                }
+            }
+        });
+
+        // Handle regular select event for places (when selecting from dropdown)
+        placesInput.on('select', (place) => {
+            if (place && place.properties) {
+                showPlace(place);
+            }
+        });
+
+        function showPlace(place) {
+            if (!place || !place.properties) return;
+            const p = place.properties;
+            const formatted = p.formatted || [p.address_line1, p.address_line2].filter(Boolean).join(', ');
+            const coords = (p.lat != null && p.lon != null) ? `${p.lat.toFixed ? p.lat.toFixed(6) : p.lat}, ${p.lon.toFixed ? p.lon.toFixed(6) : p.lon}` : '—';
+            const cats = p.categories ? (Array.isArray(p.categories) ? p.categories.join(', ') : String(p.categories)) : (p.category || '');
+            resultEl.innerHTML = `
+          <strong>${place.properties.address_line1}</strong><br>
+          ${place.properties.address_line2 || ''}<br>
+          <span style="font-size:12px;color:#6b7a90;">Coords: ${coords}${cats ? ` • Categories: ${cats}` : ''}</span>
+        `;
+            resultExtraEl.textContent = p.website ? `Website: ${p.website}` : '';
+        }
+
+        // Handle category clearing for places
+        placesInput.on('clear', (context) => {
+            if (context !== 'category') {
+                resultEl.innerHTML = 'none';
+                resultExtraEl.textContent = '';
+            }
+        });
+
+        // Loading spinner functionality
+        function showSpinner(container) {
+            let spinner = container.querySelector('.loading-spinner');
+            if (!spinner) {
+                spinner = document.createElement('div');
+                spinner.className = 'loading-spinner';
+                container.appendChild(spinner);
+            }
+            spinner.style.display = 'block';
+        }
+
+        function hideSpinner(container) {
+            const spinner = container.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Add spinner events to all autocomplete inputs
+        function addSpinnerEvents(autocompleteInput, containerClass) {
+            const container = document.querySelector(containerClass);
+
+            // Show spinner when request starts
+            autocompleteInput.on('request_start', (query) => {
+                console.log('Request started for:', query);
+                showSpinner(container);
+            });
+
+            // Hide spinner when request ends (success or failure)
+            autocompleteInput.on('request_end', (success, data, error) => {
+                console.log('Request ended:', success ? 'Success' : 'Failed', success ? data : error);
+                hideSpinner(container);
+
+                // Optional: Show error message for failed requests
+                if (!success && error && !error.canceled) {
+                    console.warn('Geocoding request failed:', error);
+                }
+            });
+
+            // Add places-specific loading events
+            autocompleteInput.on('places_request_start', (category) => {
+                console.log('Loading places for category:', category);
+                showSpinner(container);
+            });
+
+            autocompleteInput.on('places_request_end', (success, data, error) => {
+                console.log('Places request ended:', success ? 'Success' : 'Failed', success ? data : error);
+                hideSpinner(container);
+
+                if (!success && error && !error.canceled) {
+                    console.warn('Geocoding request failed:', error);
+                }
+            });
+        }
+
+        // Apply spinner events to all autocomplete inputs including places
+        addSpinnerEvents(placesInput, '.geoapify-input-wrapper');
+
+        function setTheme(themeName) {
+            const themeLink = document.getElementById('geocoder-theme');
+            themeLink.href = `../../styles/${themeName}.css`;
+
+            // Update body class for additional styling if needed
+            document.body.className = document.body.className.replace(/theme-\w+/g, '');
+            document.body.classList.add(`theme-${themeName}`);
+
+            // Store theme preference in localStorage
+            localStorage.setItem('geocoder-theme', themeName);
+        }
+
+        // Load saved theme on page load
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('geocoder-theme') || 'minimal';
+            document.getElementById('theme-selector').value = savedTheme;
+            setTheme(savedTheme);
+        }
+
+        // Initialize theme when page loads
+        window.addEventListener('load', loadSavedTheme);
+
+        // Address verification and structured fields removed in this simplified demo
+
+    </script>
+</body>
+
+</html>
