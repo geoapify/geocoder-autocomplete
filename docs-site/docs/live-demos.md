@@ -1,7 +1,9 @@
+# Interactive demos
+
 Explore how the **Geoapify Geocoder Autocomplete** works in real-world scenarios.
 You can try it directly in the online playground or experiment with live examples that demonstrate integration with maps, address forms, and custom geocoding logic.
 
-### API Playground
+## API Playground
 
 Test the autocomplete behavior interactively in the Geoapify Playground.
 Experiment with different parameters such as input text, bias options, country filters, and language to see how the suggestions adapt in real time.
@@ -10,29 +12,29 @@ Experiment with different parameters such as input text, bias options, country f
 
 ---
 
-### JSFiddle Demos
+## JSFiddle Demos
 
-#### Address Autocomplete with Maps
+### Address Autocomplete with Maps
 
 Live examples showing how to integrate the autocomplete field with map libraries:
 
 * [Address Field + Leaflet Map](https://jsfiddle.net/Geoapify/jsgw53z8/)
 * [Address Field + MapLibre GL Map](https://jsfiddle.net/Geoapify/sf3hp2a6/)
 
-#### Address Form Examples
+### Address Form Examples
 
 Simple address form demos showcasing how to implement address search and autocomplete for user input:
 
 * [Address Form 1](https://jsfiddle.net/Geoapify/t0eg541k/)
 * [Address Form 2](https://jsfiddle.net/Geoapify/stgek5wf/)
 
-#### Shipping and Delivery Example
+### Shipping and Delivery Example
 
-Demonstrates how to retrieve precise address details for delivery and logistics:
+Demonstrates a workflow for reviewing address details for delivery and logistics:
 
 * [Getting Precise Location for Shipping](https://jsfiddle.net/Geoapify/g9xhcye0/)
 
-#### Custom Geocoding Example
+### Custom Geocoding Example
 
 Demonstrates how to configure a custom geocoding function to return countries, states, cities, and counties using Geoapify’s Address Autocomplete API:
 
@@ -40,11 +42,11 @@ Demonstrates how to configure a custom geocoding function to return countries, s
 
 ---
 
-### Live Demo Collection
+## Live Demo Collection
 
 A full set of ready-to-run demo projects is available in the repository. These examples show how to use the autocomplete in various contexts, from simple forms to complex map integrations.
 
-| Preview | Description |  |  |
+| Preview | Description | Demo | Source |
 |---|---|---|---|
 | [![One Field](assets/code_samples/address-collection-address-input-location-verifivation.png)](https://geoapify.github.io/geocoder-autocomplete/demo/address-form-one-field/index.html) | One Field Address Form — Single-field input with autocomplete | [Open](https://geoapify.github.io/geocoder-autocomplete/demo/address-form-one-field/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/master/demo/address-form-one-field) |
 | [![Multi-field](assets/code_samples/address-collection-standard-structured-address-form.png)](https://geoapify.github.io/geocoder-autocomplete/demo/address-form-from-country-to-housenumber/index.html) | Multi-field Address Form — Step-by-step input from country to house number | [Open](https://geoapify.github.io/geocoder-autocomplete/demo/address-form-from-country-to-housenumber/index.html) | [Source](https://github.com/geoapify/geocoder-autocomplete/tree/master/demo/address-form-from-country-to-housenumber) |

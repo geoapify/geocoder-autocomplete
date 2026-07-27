@@ -338,6 +338,22 @@ describe('Category Search and Places List', () => {
             expect(labelElement?.textContent).toBe('Food & Dining Places');
         });
 
+        it('should render category labels as text', async () => {
+            const unsafeLabel = '<img src=x onerror="alert(1)">Food';
+            const response = JSON.parse(JSON.stringify(mockGeocoderResponseWithCategories));
+            response.query.categories[0].label = unsafeLabel;
+            fetchMock.mockResponseOnce(JSON.stringify(response));
+
+            inputText(container, 'caf');
+            await wait(WAIT_TIME);
+
+            const categoryItem = getCategoryDropdownItem(container, 0);
+            const labelElement = categoryItem?.querySelector('.main-part');
+
+            expect(categoryItem?.querySelector('img')).toBeNull();
+            expect(labelElement?.textContent).toBe(unsafeLabel);
+        });
+
         it('should navigate dropdown with arrow down key and populate input with category', async () => {
             fetchMock.mockResponseOnce(JSON.stringify(mockGeocoderResponseWithCategories));
 
@@ -525,6 +541,74 @@ describe('Category Search and Places List', () => {
             expect(fetchMock).toHaveBeenLastCalledWith(
                 expect.stringContaining('offset=8')
             );
+        });
+
+        it('should allow another page after a full load-more response', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            await autocomplete.selectCategory('catering.cafe');
+
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponsePage2);
+            clickLoadMoreButton(container);
+            await wait(WAIT_TIME);
+
+            const thirdPage = {
+                type: "FeatureCollection",
+                features: [{
+                    ...mockPlacesApiResponse.features[0],
+                    properties: {
+                        ...mockPlacesApiResponse.features[0].properties,
+                        name: 'Third-page cafe',
+                        place_id: 'third-page-place-id'
+                    }
+                }]
+            };
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(thirdPage);
+            clickLoadMoreButton(container);
+            await wait(WAIT_TIME);
+
+            expect(fetchMock).toHaveBeenLastCalledWith(
+                expect.stringContaining('offset=16')
+            );
+            expect(getPlacesListItems(container)?.length).toBe(17);
+        });
+
+        it('should restore the Load More button after a failed request', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            await autocomplete.selectCategory('catering.cafe');
+
+            mockIpInfo(mockIpInfoResponse);
+            fetchMock.mockRejectOnce(new Error('offline'));
+            clickLoadMoreButton(container);
+            await wait(WAIT_TIME);
+
+            expect(getLoadMoreButton(container)).toBeTruthy();
+            consoleSpy.mockRestore();
+        });
+
+        it('should hide the Load More button when scrolling away from the bottom', async () => {
+            mockIpInfo(mockIpInfoResponse);
+            mockPlacesApi(mockPlacesApiResponse);
+            await autocomplete.selectCategory('catering.cafe');
+
+            scrollPlacesToBottom(container);
+            expect(getLoadMoreButton(container)).toBeTruthy();
+
+            const scrollContainer = container.querySelector(
+                '.geoapify-places-scroll-container'
+            ) as HTMLElement;
+            Object.defineProperties(scrollContainer, {
+                scrollHeight: { configurable: true, value: 100 },
+                clientHeight: { configurable: true, value: 20 }
+            });
+            scrollContainer.scrollTop = 0;
+            scrollContainer.dispatchEvent(new Event('scroll'));
+
+            expect(getLoadMoreButton(container)).toBeNull();
         });
 
         it('should hide "Load More" button when no more places available', async () => {

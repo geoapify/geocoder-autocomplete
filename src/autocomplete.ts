@@ -35,10 +35,14 @@ export class GeocoderAutocomplete {
     private currentCategories: Category[] = [];
 
     /* Active request promise reject function. To be able to cancel the promise when a new request comes */
-    private currentPromiseReject: any;
+    private currentPromiseReject?: (reason?: any) => void;
+    private geocoderRequestVersion = 0;
+    private geocoderRequestPending = false;
 
     /* Active place details request promise reject function */
-    private currentPlaceDetailsPromiseReject: any;
+    private currentPlaceDetailsPromiseReject?: (reason?: any) => void;
+    private placeDetailsRequestVersion = 0;
+    private placeDetailsRequestPending = false;
 
     /* We set timeout before sending a request to avoid unnecessary calls */
     private currentTimeout: number;
@@ -59,9 +63,16 @@ export class GeocoderAutocomplete {
     private ipGeolocationUrl = "https://api.geoapify.com/v1/ipinfo";
 
     private readonly categoryManager: CategoryManager;
-    private currentPlacesPromiseReject?: any;
+    private placesRequestVersion = 0;
+    private placesRequestPending = false;
     private lastEscKeyTime?: number;
     private readonly DOUBLE_ESC_THRESHOLD = 500; // 500ms window for double-Esc
+    private destroyed = false;
+
+    private readonly inputEventListener = (event: Event) => this.onUserInput(event);
+    private readonly keydownEventListener = (event: KeyboardEvent) => this.onUserKeyPress(event);
+    private readonly documentClickListener = (event: MouseEvent) => this.onDocumentClick(event);
+    private readonly clearButtonClickListener = (event: MouseEvent) => this.clearFieldAndNotify(event);
 
     private options: GeocoderAutocompleteOptions = {
         limit: 5,
@@ -125,7 +136,7 @@ export class GeocoderAutocomplete {
         this.placesListManager = new PlacesListManager(this.componentWrapper, this.options, placesCallbacks);
     }
 
-    public setType(type: 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | null) {
+    public setType(type: LocationType | null) {
         this.options.type = type;
     }
 
@@ -152,11 +163,13 @@ export class GeocoderAutocomplete {
     public setCountryCodes(codes: CountyCode[]) {
         console.warn("WARNING! Obsolete function called. Function setCountryCodes() has been deprecated, please use the new addFilterByCountry() function instead!");
         this.options.countryCodes = codes;
+        this.addFilterByCountry(codes);
     }
 
     public setPosition(position: GeoPosition) {
         console.warn("WARNING! Obsolete function called. Function setPosition() has been deprecated, please use the new addBiasByProximity() function instead!");
         this.options.position = position;
+        this.addBiasByProximity(position);
     }
 
     public setLimit(limit: number) {
@@ -266,15 +279,15 @@ export class GeocoderAutocomplete {
         this.placesListManager.setCurrentOffset(0);
     }
 
-    public on(operation: GeocoderEventType, callback: (param: any) => void) {
+    public on(operation: GeocoderEventType, callback: (...params: any[]) => any) {
         this.callbacks.addCallback(operation, callback);
     }
 
-    public off(operation: GeocoderEventType, callback?: (param: any) => any) {
+    public off(operation: GeocoderEventType, callback?: (...params: any[]) => any) {
         this.callbacks.removeCallback(operation, callback);
     }
 
-    public once(operation: GeocoderEventType, callback: (param: any) => any) {
+    public once(operation: GeocoderEventType, callback: (...params: any[]) => any) {
         this.on(operation, callback);
 
         const current = this;
@@ -294,7 +307,7 @@ export class GeocoderAutocomplete {
         this.preprocessHook = CalculationHelper.returnIfFunction(preprocessHookFunc);
     }
 
-    public setPostprocessHook(postprocessHookFunc?: ((value: string) => string) | null) {
+    public setPostprocessHook(postprocessHookFunc?: ((feature: any) => string) | null) {
         this.postprocessHook = CalculationHelper.returnIfFunction(postprocessHookFunc);
     }
 
@@ -331,28 +344,50 @@ export class GeocoderAutocomplete {
         }
     }
 
-    private sendGeocoderRequestOrAlt(currentValue: string): Promise<any> {
-        if (this.sendGeocoderRequestAlt) {
-            return this.sendGeocoderRequestAlt(currentValue, this);
-        } else {
-            return this.sendGeocoderRequest(currentValue);
+    private validateFeatureCollectionResponse(data: any, responseName: string): any {
+        if (!data || !Array.isArray(data.features)) {
+            throw new Error(`Invalid ${responseName} response: expected a features array`);
         }
 
+        return data;
+    }
+
+    private async sendGeocoderRequestOrAlt(currentValue: string): Promise<any> {
+        let data;
+        if (this.sendGeocoderRequestAlt) {
+            data = await this.sendGeocoderRequestAlt(currentValue, this);
+        } else {
+            data = await this.sendGeocoderRequest(currentValue);
+        }
+
+        return this.validateFeatureCollectionResponse(data, "geocoder");
     }
 
     public sendGeocoderRequest(value: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.currentPromiseReject = reject;
+            const rejectRequest = reject;
+            this.currentPromiseReject = rejectRequest;
 
             let url = CalculationHelper.generateUrl(value, this.geocoderUrl, this.apiKey, this.options);
 
             fetch(url)
-                .then((response) => {
-                    if (response.ok) {
-                        response.json().then(data => resolve(data));
-                    } else {
-                        response.json().then(data => reject(data));
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw data;
                     }
+                    return this.validateFeatureCollectionResponse(data, "geocoder");
+                })
+                .then(data => {
+                    if (this.currentPromiseReject === rejectRequest) {
+                        this.currentPromiseReject = null;
+                    }
+                    resolve(data);
+                }, error => {
+                    if (this.currentPromiseReject === rejectRequest) {
+                        this.currentPromiseReject = null;
+                    }
+                    reject(error);
                 });
         });
     }
@@ -366,22 +401,29 @@ export class GeocoderAutocomplete {
                 return;
             }
 
-            this.currentPlaceDetailsPromiseReject = reject;
+            const rejectRequest = reject;
+            this.currentPlaceDetailsPromiseReject = rejectRequest;
             let url = CalculationHelper.generatePlacesUrl(this.placeDetailsUrl, feature.properties.place_id, this.apiKey, this.options);
 
             fetch(url)
-                .then((response) => {
-                    if (response.ok) {
-                        response.json().then(data => {
-                            if (!data.features.length) {
-                                resolve(feature);
-                            }
-
-                            resolve(data.features[0]);
-                        });
-                    } else {
-                        response.json().then(data => reject(data));
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw data;
                     }
+                    const featureCollection = this.validateFeatureCollectionResponse(data, "place details");
+                    return featureCollection.features.length ? featureCollection.features[0] : feature;
+                })
+                .then(detailsFeature => {
+                    if (this.currentPlaceDetailsPromiseReject === rejectRequest) {
+                        this.currentPlaceDetailsPromiseReject = null;
+                    }
+                    resolve(detailsFeature);
+                }, error => {
+                    if (this.currentPlaceDetailsPromiseReject === rejectRequest) {
+                        this.currentPlaceDetailsPromiseReject = null;
+                    }
+                    reject(error);
                 });
         });
     }
@@ -424,7 +466,7 @@ export class GeocoderAutocomplete {
             return;
         }
 
-        this.callbacks.notifyPlacesRequestStart(categoryObj);
+        const requestVersion = this.startPlacesRequest(categoryObj);
 
         if (!appendPlaces) {
             this.placesListManager.setCurrentOffset(0);   
@@ -438,15 +480,25 @@ export class GeocoderAutocomplete {
                 bias,
                 filter,
                 this.placesListManager.getCurrentOffset(), this.options.placesLimit);
+
+            if (requestVersion !== this.placesRequestVersion) {
+                return;
+            }
             
             const places = data.features || [];
 
             this.placesListManager.setPlaces(places, appendPlaces);
             this.placesListManager.setCurrentOffset(this.placesListManager.getCurrentOffset() + this.options.placesLimit);
+            this.placesRequestPending = false;
             this.callbacks.notifyPlacesRequestEnd(true, data);
         } catch (error) {
+            if (requestVersion !== this.placesRequestVersion) {
+                return;
+            }
+            this.placesRequestPending = false;
             this.callbacks.notifyPlacesRequestEnd(false, null, error);
             console.error('Places API request failed:', error);
+            throw error;
         }
     }
 
@@ -487,7 +539,7 @@ export class GeocoderAutocomplete {
             return;
         }
 
-        this.callbacks.notifyPlacesRequestStart(categoryObj);
+        const requestVersion = this.startPlacesRequest(categoryObj);
         let data;
 
         try {
@@ -496,18 +548,27 @@ export class GeocoderAutocomplete {
             const filter = Object.keys(this.options.placesFilter).length ? this.options.placesFilter : PlacesApiHelper.convertGeocoderFilterToPlacesApiFilter(this.options.filter);
 
 
-            data = await this.sendPlacesRequestOrAlt(this.categoryManager.getCategory().keys,
+            data = await this.sendPlacesRequestOrAlt(categoryObj.keys,
                 bias,
                 filter,
                 0,
                 this.options.placesLimit);
 
-            const places = data.features;
+            if (requestVersion !== this.placesRequestVersion) {
+                return;
+            }
+
+            const places = data.features || [];
 
             this.placesListManager.setPlaces(places);
             this.placesListManager.setCurrentOffset(this.placesListManager.getCurrentOffset() + this.options.placesLimit);
+            this.placesRequestPending = false;
             this.callbacks.notifyPlacesRequestEnd(true, data);
         } catch (error) {
+            if (requestVersion !== this.placesRequestVersion) {
+                return;
+            }
+            this.placesRequestPending = false;
             this.callbacks.notifyPlacesRequestEnd(false, null, error);
             console.error('Places API request failed:', error);
         }
@@ -545,16 +606,26 @@ export class GeocoderAutocomplete {
                 currentValue = this.preprocessHook(currentValue);
             }
 
+            const requestVersion = this.geocoderRequestVersion;
+            this.geocoderRequestPending = true;
             this.callbacks.notifyRequestStart(currentValue);
-
-            let promise = this.sendGeocoderRequestOrAlt(currentValue);
+            const promise = Promise.resolve()
+                .then(() => this.sendGeocoderRequestOrAlt(currentValue));
 
             promise.then((data: any) => {
+                if (requestVersion !== this.geocoderRequestVersion) {
+                    return;
+                }
+                this.geocoderRequestPending = false;
                 this.callbacks.notifyRequestEnd(true, data);
                 this.onDropdownDataLoad(data, userEnteredValue, event);
             }, (err) => {
+                if (requestVersion !== this.geocoderRequestVersion) {
+                    return;
+                }
+                this.geocoderRequestPending = false;
                 this.callbacks.notifyRequestEnd(false, null, err);
-                if (!err.canceled) {
+                if (!err?.cancelled) {
                     console.log(err);
                 }
             });
@@ -605,7 +676,10 @@ export class GeocoderAutocomplete {
         itemElement.appendChild(iconElement);
 
         const textElement = DomHelper.createDropdownItemText();
-        textElement.innerHTML = `<span class="main-part">${category.label}</span>`;
+        const mainPartElement = document.createElement("span");
+        mainPartElement.classList.add("main-part");
+        mainPartElement.textContent = category.label;
+        textElement.appendChild(mainPartElement);
         itemElement.appendChild(textElement);
 
         itemElement.addEventListener("click", (e) => {
@@ -628,9 +702,9 @@ export class GeocoderAutocomplete {
 
         if (CalculationHelper.returnIfFunction(this.postprocessHook)) {
             const value = this.postprocessHook(feature);
-            textElement.innerHTML = DomHelper.getStyledAddressSingleValue(value, userEnteredValue);
+            textElement.appendChild(DomHelper.getStyledAddressSingleValue(value, userEnteredValue));
         } else {
-            textElement.innerHTML = DomHelper.getStyledAddress(feature.properties, userEnteredValue);
+            textElement.appendChild(DomHelper.getStyledAddress(feature.properties, userEnteredValue));
         }
 
         itemElement.appendChild(textElement);
@@ -673,26 +747,31 @@ export class GeocoderAutocomplete {
     }
 
     private cancelPreviousRequest() {
+        this.geocoderRequestVersion++;
+        const cancellationError = { cancelled: true };
+        if (this.geocoderRequestPending) {
+            this.geocoderRequestPending = false;
+            this.callbacks.notifyRequestEnd(false, null, cancellationError);
+        }
         if (this.currentPromiseReject) {
-            this.currentPromiseReject({
-                canceled: true
-            });
+            this.currentPromiseReject(cancellationError);
             this.currentPromiseReject = null;
         }
     }
 
     private addEventListeners() {
-        this.inputElement.addEventListener('input', this.onUserInput.bind(this), false);
-        this.inputElement.addEventListener('keydown', this.onUserKeyPress.bind(this), false);
+        this.inputElement.addEventListener('input', this.inputEventListener, false);
+        this.inputElement.addEventListener('keydown', this.keydownEventListener, false);
+        document.addEventListener("click", this.documentClickListener);
+    }
 
-        document.addEventListener("click", (event) => {
-            if (event.target !== this.inputElement) {
-                this.closeDropDownList();
-            } else if (!this.autocompleteItemsElement) {
-                // open dropdown list again
-                this.openDropdownAgain();
-            }
-        });
+    private onDocumentClick(event: MouseEvent): void {
+        if (event.target !== this.inputElement) {
+            this.closeDropDownList();
+        } else if (!this.autocompleteItemsElement) {
+            // open dropdown list again
+            this.openDropdownAgain();
+        }
     }
 
     private showClearButton() {
@@ -846,7 +925,6 @@ export class GeocoderAutocomplete {
         this.cancelPreviousRequest();
 
         this.cancelPreviousTimeout();
-        this.cancelCurrentPlacesRequest();
         this.closeDropDownList();
 
         if (this.isCategoryModeEnabled() && this.categoryManager.isCategoryModeActive()) {
@@ -868,24 +946,33 @@ export class GeocoderAutocomplete {
 
     private notifyValueSelected(feature: any) {
         this.cancelPreviousPlaceDetailsRequest();
+        const requestVersion = this.placeDetailsRequestVersion;
 
         if (this.noNeedToRequestPlaceDetails(feature)) {
             this.callbacks.notifyChange(feature);
         } else {
+            this.placeDetailsRequestPending = true;
             this.callbacks.notifyPlaceDetailsRequestStart(feature);
 
-            let promise = this.sendPlaceDetailsRequestOrAlt(feature);
+            const promise = Promise.resolve()
+                .then(() => this.sendPlaceDetailsRequestOrAlt(feature));
 
             promise.then((detailesFeature: any) => {
+                if (requestVersion !== this.placeDetailsRequestVersion) {
+                    return;
+                }
+                this.placeDetailsRequestPending = false;
                 this.callbacks.notifyPlaceDetailsRequestEnd(true, detailesFeature);
                 this.callbacks.notifyChange(detailesFeature);
-                this.currentPlaceDetailsPromiseReject = null;
             }, (err) => {
-                if (!err.canceled) {
+                if (requestVersion !== this.placeDetailsRequestVersion) {
+                    return;
+                }
+                this.placeDetailsRequestPending = false;
+                if (!err?.cancelled) {
                     console.log(err);
                     this.callbacks.notifyPlaceDetailsRequestEnd(false, null, err);
                     this.callbacks.notifyChange(feature);
-                    this.currentPlaceDetailsPromiseReject = null;
                 }
             });
         }
@@ -904,19 +991,31 @@ export class GeocoderAutocomplete {
     }
 
     private cancelPreviousPlaceDetailsRequest() {
+        this.placeDetailsRequestVersion++;
+        const cancellationError = { cancelled: true };
+        if (this.placeDetailsRequestPending) {
+            this.placeDetailsRequestPending = false;
+            this.callbacks.notifyPlaceDetailsRequestEnd(false, null, cancellationError);
+        }
         if (this.currentPlaceDetailsPromiseReject) {
-            this.currentPlaceDetailsPromiseReject({
-                canceled: true
-            });
+            this.currentPlaceDetailsPromiseReject(cancellationError);
             this.currentPlaceDetailsPromiseReject = null;
         }
     }
 
     private cancelCurrentPlacesRequest() {
-        if (this.currentPlacesPromiseReject) {
-            this.currentPlacesPromiseReject({ canceled: true });
-            this.currentPlacesPromiseReject = null;
+        this.placesRequestVersion++;
+        if (this.placesRequestPending) {
+            this.placesRequestPending = false;
+            this.callbacks.notifyPlacesRequestEnd(false, null, { cancelled: true });
         }
+    }
+
+    private startPlacesRequest(category: Category): number {
+        this.cancelCurrentPlacesRequest();
+        this.placesRequestPending = true;
+        this.callbacks.notifyPlacesRequestStart(category);
+        return this.placesRequestVersion;
     }
 
     private openDropdownAgain() {
@@ -946,8 +1045,30 @@ export class GeocoderAutocomplete {
         this.inputClearButton = document.createElement("div");
         this.inputClearButton.classList.add("geoapify-close-button");
         DomHelper.addIcon(this.inputClearButton, 'close');
-        this.inputClearButton.addEventListener("click", this.clearFieldAndNotify.bind(this), false);
+        this.inputClearButton.addEventListener("click", this.clearButtonClickListener, false);
         this.inputWrapper.appendChild(this.inputClearButton);
+    }
+
+    public destroy(): void {
+        if (this.destroyed) {
+            return;
+        }
+
+        this.destroyed = true;
+        this.cancelPreviousTimeout();
+        this.cancelPreviousRequest();
+        this.cancelPreviousPlaceDetailsRequest();
+        this.cancelCurrentPlacesRequest();
+
+        this.inputElement.removeEventListener('input', this.inputEventListener, false);
+        this.inputElement.removeEventListener('keydown', this.keydownEventListener, false);
+        this.inputClearButton.removeEventListener('click', this.clearButtonClickListener, false);
+        document.removeEventListener('click', this.documentClickListener);
+
+        this.closeDropDownList();
+        this.placesListManager.destroy();
+        this.componentWrapper.remove();
+        this.callbacks = new Callbacks();
     }
 
     private isCategoryModeEnabled(): boolean {
@@ -957,6 +1078,7 @@ export class GeocoderAutocomplete {
     private clearCategoryAndNotify(): void {
         if (!this.isCategoryModeEnabled()) return;
 
+        this.cancelCurrentPlacesRequest();
         const wasCategoryActive = this.categoryManager.isCategoryModeActive();
         this.categoryManager.clearCategory();
         this.placesListManager.resetCategory();
@@ -973,36 +1095,39 @@ export class GeocoderAutocomplete {
         offset?: number,
         limit?: number
     ): Promise<any> {
+        let data;
         if (this.sendPlacesRequestAlt) {
-            return this.sendPlacesRequestAlt(categoryKeys, offset, this);
-        }
-
-        let url;
-        if (Object.keys(bias || {}).length === 0 && Object.keys(filter || {}).length === 0) {
-            const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options, this.ipGeolocationUrl);
-            url = PlacesApiHelper.generatePlacesUrl(
-                categoryKeys,
-                this.apiKey,
-                this.options,
-                this.placesApiUrl,
-                offset,
-                limit,
-                location ? { [BY_PROXIMITY]: location } : undefined
-            );
+            data = await this.sendPlacesRequestAlt(categoryKeys, offset, this);
         } else {
-            url = PlacesApiHelper.generatePlacesUrl(
-                categoryKeys,
-                this.apiKey,
-                this.options,
-                this.placesApiUrl,
-                offset,
-                limit,
-                bias,
-                filter
-            );
+            let url;
+            if (Object.keys(bias || {}).length === 0 && Object.keys(filter || {}).length === 0) {
+                const location = await PlacesApiHelper.getLocationForBias(this.apiKey, this.options, this.ipGeolocationUrl);
+                url = PlacesApiHelper.generatePlacesUrl(
+                    categoryKeys,
+                    this.apiKey,
+                    this.options,
+                    this.placesApiUrl,
+                    offset,
+                    limit,
+                    location ? { [BY_PROXIMITY]: location } : undefined
+                );
+            } else {
+                url = PlacesApiHelper.generatePlacesUrl(
+                    categoryKeys,
+                    this.apiKey,
+                    this.options,
+                    this.placesApiUrl,
+                    offset,
+                    limit,
+                    bias,
+                    filter
+                );
+            }
+
+            data = await PlacesApiHelper.sendPlacesRequest(url);
         }
 
-        return PlacesApiHelper.sendPlacesRequest(url);
+        return this.validateFeatureCollectionResponse(data, "Places");
     }
 
 }
@@ -1072,6 +1197,6 @@ export interface ByRectOptions {
     lat2: number;
 }
 
-export type LocationType = 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity';
+export type LocationType = 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | 'locality';
 export type SupportedLanguage = "ab" | "aa" | "af" | "ak" | "sq" | "am" | "ar" | "an" | "hy" | "as" | "av" | "ae" | "ay" | "az" | "bm" | "ba" | "eu" | "be" | "bn" | "bh" | "bi" | "bs" | "br" | "bg" | "my" | "ca" | "ch" | "ce" | "ny" | "zh" | "cv" | "kw" | "co" | "cr" | "hr" | "cs" | "da" | "dv" | "nl" | "en" | "eo" | "et" | "ee" | "fo" | "fj" | "fi" | "fr" | "ff" | "gl" | "ka" | "de" | "el" | "gn" | "gu" | "ht" | "ha" | "he" | "hz" | "hi" | "ho" | "hu" | "ia" | "id" | "ie" | "ga" | "ig" | "ik" | "io" | "is" | "it" | "iu" | "ja" | "jv" | "kl" | "kn" | "kr" | "ks" | "kk" | "km" | "ki" | "rw" | "ky" | "kv" | "kg" | "ko" | "ku" | "kj" | "la" | "lb" | "lg" | "li" | "ln" | "lo" | "lt" | "lu" | "lv" | "gv" | "mk" | "mg" | "ms" | "ml" | "mt" | "mi" | "mr" | "mh" | "mn" | "na" | "nv" | "nb" | "nd" | "ne" | "ng" | "nn" | "no" | "ii" | "nr" | "oc" | "oj" | "cu" | "om" | "or" | "os" | "pa" | "pi" | "fa" | "pl" | "ps" | "pt" | "qu" | "rm" | "rn" | "ro" | "ru" | "sa" | "sc" | "sd" | "se" | "sm" | "sg" | "sr" | "gd" | "sn" | "si" | "sk" | "sl" | "so" | "st" | "es" | "su" | "sw" | "ss" | "sv" | "ta" | "te" | "tg" | "th" | "ti" | "bo" | "tk" | "tl" | "tn" | "to" | "tr" | "ts" | "tt" | "tw" | "ty" | "ug" | "uk" | "ur" | "uz" | "ve" | "vi" | "vo" | "wa" | "cy" | "wo" | "fy" | "xh" | "yi" | "yo" | "za";
 export type CountyCode = "none" | "auto" | "ad" | "ae" | "af" | "ag" | "ai" | "al" | "am" | "an" | "ao" | "ap" | "aq" | "ar" | "as" | "at" | "au" | "aw" | "az" | "ba" | "bb" | "bd" | "be" | "bf" | "bg" | "bh" | "bi" | "bj" | "bm" | "bn" | "bo" | "br" | "bs" | "bt" | "bv" | "bw" | "by" | "bz" | "ca" | "cc" | "cd" | "cf" | "cg" | "ch" | "ci" | "ck" | "cl" | "cm" | "cn" | "co" | "cr" | "cu" | "cv" | "cx" | "cy" | "cz" | "de" | "dj" | "dk" | "dm" | "do" | "dz" | "ec" | "ee" | "eg" | "eh" | "er" | "es" | "et" | "eu" | "fi" | "fj" | "fk" | "fm" | "fo" | "fr" | "ga" | "gb" | "gd" | "ge" | "gf" | "gh" | "gi" | "gl" | "gm" | "gn" | "gp" | "gq" | "gr" | "gs" | "gt" | "gu" | "gw" | "gy" | "hk" | "hm" | "hn" | "hr" | "ht" | "hu" | "id" | "ie" | "il" | "in" | "io" | "iq" | "ir" | "is" | "it" | "jm" | "jo" | "jp" | "ke" | "kg" | "kh" | "ki" | "km" | "kn" | "kp" | "kr" | "kw" | "ky" | "kz" | "la" | "lb" | "lc" | "li" | "lk" | "lr" | "ls" | "lt" | "lu" | "lv" | "ly" | "ma" | "mc" | "md" | "me" | "mg" | "mh" | "mk" | "ml" | "mm" | "mn" | "mo" | "mp" | "mq" | "mr" | "ms" | "mt" | "mu" | "mv" | "mw" | "mx" | "my" | "mz" | "na" | "nc" | "ne" | "nf" | "ng" | "ni" | "nl" | "no" | "np" | "nr" | "nu" | "nz" | "om" | "pa" | "pe" | "pf" | "pg" | "ph" | "pk" | "pl" | "pm" | "pr" | "ps" | "pt" | "pw" | "py" | "qa" | "re" | "ro" | "rs" | "ru" | "rw" | "sa" | "sb" | "sc" | "sd" | "se" | "sg" | "sh" | "si" | "sj" | "sk" | "sl" | "sm" | "sn" | "so" | "sr" | "st" | "sv" | "sy" | "sz" | "tc" | "td" | "tf" | "tg" | "th" | "tj" | "tk" | "tm" | "tn" | "to" | "tr" | "tt" | "tv" | "tw" | "tz" | "ua" | "ug" | "um" | "us" | "uy" | "uz" | "va" | "vc" | "ve" | "vg" | "vi" | "vn" | "vu" | "wf" | "ws" | "ye" | "yt" | "za" | "zm" | "zw";

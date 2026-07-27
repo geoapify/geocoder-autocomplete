@@ -479,8 +479,6 @@ export class PlacesListManager {
             await this.callbacks.onLoadMore(
                 this.currentOffset
             );
-
-            this.updateStatusBarState('end');
         } catch (error) {
             console.error('Failed to load more places:', error);
             // Revert to button state on error
@@ -522,9 +520,20 @@ export class PlacesListManager {
             } else {
                 this.updateStatusBarState('button');
             }
-        } else if (this.statusBar?.classList.contains('button')) {
+        } else if (this.loadMoreElement?.classList.contains('button')) {
             // Hide button when scrolling away from bottom
             this.updateStatusBarState('empty');
         }
+    }
+
+    public destroy(): void {
+        this.removeScrollListener();
+        this.placesListElement?.remove();
+        this.placesListElement = null;
+        this.scrollContainer = null;
+        this.statusBar = null;
+        this.titleBar = null;
+        this.loadMoreElement = null;
+        this.resetPaginationState();
     }
 }

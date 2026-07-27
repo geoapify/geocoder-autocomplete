@@ -1,5 +1,7 @@
-This page documents the `@geoapify/geocoder-autocomplete` library — including setup, configuration, and advanced features.
-Use it to integrate **address and place autocomplete** into your web applications to enhance **location entry, validation, and user experience**.
+# GeocoderAutocomplete
+
+This page documents the `GeocoderAutocomplete` class, including setup, configuration, events, and advanced features.
+Use it to add address and place autocomplete to a web application. Applications that require a precise location should still ask the user to confirm the selected result.
 
 ## Constructor
 
@@ -15,14 +17,14 @@ Here are the parameters you can pass to the constructor:
 
 | Name        | Type                                                                              | Description                                                                                                                                 |
 | ----------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `container` | `HTMLElement`                                                                     | The HTML element (usually a `<div>`) where the autocomplete input will be rendered. Must have `position: relative` or `position: absolute`. |
+| `container` | `HTMLElement`                                                                     | The HTML element (usually a `<div>`) where the autocomplete input will be rendered. |
 | `apiKey`    | `string`                                                                          | Your **Geoapify API key**, required for all API requests.                                                                                   |
-| `options`   | [`GeocoderAutocompleteOptions`](../geocoder-autocomplete-options/) *(optional)* | A configuration object that controls autocomplete behavior, such as search filters, language, and category search.                          |
+| `options`   | [`GeocoderAutocompleteOptions`](geocoder-autocomplete-options.md) *(optional)* | A configuration object that controls autocomplete behavior, such as search filters, language, and category search.                          |
 
 The `options` parameter lets you customize nearly every aspect of the autocomplete’s functionality — including filters, result limits, biasing rules, and category search.
-See the full list of available options in the [GeocoderAutocompleteOptions documentation](../geocoder-autocomplete-options/).
+See the full list of available options in the [GeocoderAutocompleteOptions documentation](geocoder-autocomplete-options.md).
 
-Here’s a basic example of how to initialize the autocomplete field:
+Basic initialization:
 
 ```javascript
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
@@ -52,9 +54,11 @@ You can use these methods to:
 
 Each method listed below includes its signature, purpose, and (in the full reference) a usage example.  
 
+Runtime setters change subsequent requests; they do not automatically repeat the current request. Places filter and bias setters also reset pagination to offset zero. After changing one, call `sendPlacesRequest()` if the active category should reload immediately.
+
 | Method | Signature | Purpose |
 |---|---|---|
-| [`setType`](#settype) | `setType(type: 'country' \| 'state' \| 'city' \| 'postcode' \| 'street' \| 'amenity' \| null): void` | Restrict result type (granularity). |
+| [`setType`](#settype) | `setType(type: LocationType \| null): void` | Restrict result type (granularity). |
 | [`setLang`](#setlang) | `setLang(lang: SupportedLanguage \| null): void` | Set language of results. |
 | [`setAddDetails`](#setadddetails) | `setAddDetails(addDetails: boolean): void` | Toggle fetching extra geometry/details. |
 | [`setSkipIcons`](#setskipicons) | `setSkipIcons(skipIcons: boolean): void` | Show/hide icons in the dropdown. |
@@ -83,12 +87,12 @@ Each method listed below includes its signature, purpose, and (in the full refer
 | [`setPlacesBiasByRect`](#setplacesbiasbyrect) | `setPlacesBiasByRect(opts: ByRectOptions): void` | Places soft-bias by rect. |
 | [`setPlacesBiasByProximity`](#setplacesbiasbyproximity) | `setPlacesBiasByProximity(p: ByProximityOptions): void` | Places soft-bias to a point. |
 | [`clearPlacesBias`](#clearplacesbias) | `clearPlacesBias(): void` | Clear Places biases. |
-| [`setSuggestionsFilter`](#setsuggestionsfilter) | `setSuggestionsFilter(fn?: (items:any[])=>any[] \| null): void` | Post-filter suggestion list client-side. |
-| [`setPreprocessHook`](#setpreprocesshook) | `setPreprocessHook(fn?: (value:string)=>string \| null): void` | Transform input before request. |
-| [`setPostprocessHook`](#setpostprocesshook) | `setPostprocessHook(fn?: (feature:any)=>string \| null): void` | Transform display text per feature. |
-| [`setSendGeocoderRequestFunc`](#setsendgeocoderrequestfunc) | `setSendGeocoderRequestFunc(fn?: (value:string, self)=>Promise<any> \| null): void` | Override geocoder request. |
-| [`setSendPlaceDetailsRequestFunc`](#setsendplacedetailsrequestfunc) | `setSendPlaceDetailsRequestFunc(fn?: (feature:any, self)=>Promise<any> \| null): void` | Override place-details request. |
-| [`setSendPlacesRequestFunc`](#setsendplacesrequestfunc) | `setSendPlacesRequestFunc(fn?: (keys:string[], offset:number, self)=>Promise<any> \| null): void` | Override Places request (category mode). |
+| [`setSuggestionsFilter`](#setsuggestionsfilter) | `setSuggestionsFilter(fn?: ((items:any[])=>any[]) \| null): void` | Post-filter suggestion list client-side. |
+| [`setPreprocessHook`](#setpreprocesshook) | `setPreprocessHook(fn?: ((value:string)=>string) \| null): void` | Transform input before request. |
+| [`setPostprocessHook`](#setpostprocesshook) | `setPostprocessHook(fn?: ((feature:any)=>string) \| null): void` | Transform display text per feature. |
+| [`setSendGeocoderRequestFunc`](#setsendgeocoderrequestfunc) | `setSendGeocoderRequestFunc(fn?: ((value:string, self)=>Promise<any>) \| null): void` | Override geocoder request. |
+| [`setSendPlaceDetailsRequestFunc`](#setsendplacedetailsrequestfunc) | `setSendPlaceDetailsRequestFunc(fn?: ((feature:any, self)=>Promise<any>) \| null): void` | Override place-details request. |
+| [`setSendPlacesRequestFunc`](#setsendplacesrequestfunc) | `setSendPlacesRequestFunc(fn?: ((keys:string[], offset:number, self)=>Promise<any>) \| null): void` | Override Places request (category mode). |
 | [`isOpen`](#isopen) | `isOpen(): boolean` | Dropdown open state. |
 | [`close`](#close) | `close(): void` | Close dropdown. |
 | [`open`](#open) | `open(): void` | Open dropdown (re-queries current input). |
@@ -100,18 +104,17 @@ Each method listed below includes its signature, purpose, and (in the full refer
 | [`getCategory`](#getcategory) | `getCategory(): Category \| null` | Current category (if any). |
 | [`selectPlace`](#selectplace) | `selectPlace(index: number \| null): void` | Select/clear a place in built-in list. |
 | [`sendPlacesRequest`](#sendplacesrequest) | `sendPlacesRequest(): Promise<void>` | Load Places for current category. |
+| [`destroy`](#destroy) | `destroy(): void` | Remove the component and all owned event listeners. |
 
-
-Here’s the detailed version of method descriptions:
 
 ### setType()
 
-Signature: `setType(type: 'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | null)`
+Signature: `setType(type: LocationType | null)`
 
 Restricts autocomplete results to a **specific level of the address hierarchy**.  
 Use this when your application only needs a particular type of result (for example, cities or postcodes).
 
-**Type:** `'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | null`
+**Type:** `'country' | 'state' | 'city' | 'postcode' | 'street' | 'amenity' | 'locality' | null`
 
 **Example:**
 ```javascript
@@ -128,7 +131,7 @@ Signature: `setLang(lang: SupportedLanguage | null)`
 Defines the **language of returned suggestions**.
 Set this to localize addresses or display place names in a user’s preferred language.
 
-**Type:** [`SupportedLanguage`](../api-reference/geocoderautocompleteoptions/#lang)
+**Type:** [`SupportedLanguage`](geocoder-autocomplete-options.md#lang)
 
 **Example:**
 
@@ -136,7 +139,7 @@ Set this to localize addresses or display place names in a user’s preferred la
 autocomplete.setLang('fr'); // show results in French
 ```
 
-If a translation isn’t available, results default to English.
+If the requested translation is unavailable, the API may return another supported name.
 
 
 ### setAddDetails()
@@ -175,8 +178,7 @@ Useful for clean text-only autocomplete fields where visual icons are unnecessar
 
 Signature: `setAllowNonVerifiedHouseNumber(value: boolean)`
 
-Allows the autocomplete to include **non-verified house numbers** in results.
-This is useful for areas with newly constructed buildings or incomplete datasets.
+Allows the autocomplete to retain a house number typed by the user when the API matched a broader feature but did not verify that number.
 
 **Example:**
 
@@ -191,8 +193,7 @@ When enabled, non-verified parts appear in results with a `"non-verified"` class
 
 Signature: `setAllowNonVerifiedStreet(value: boolean)`
 
-Includes **non-verified street names** in autocomplete results.
-Ideal for emerging neighborhoods or developing regions where street data is still being updated.
+Allows the autocomplete to retain a street typed by the user when the API matched a broader feature but did not verify that street.
 
 **Example:**
 
@@ -234,14 +235,11 @@ autocomplete.setPlacesLimit(50);
 A smaller limit improves response speed, while a larger one provides a broader result set.
 
 
-Here’s the detailed section for those methods, following the same structure and style as before:
-
 ### setValue()
 
 Signature: `setValue(value: string)`
 
-Sets the value of the autocomplete input programmatically.  
-This can be used to prefill the field or update it based on user interaction elsewhere in your app.
+Sets the value of the autocomplete input programmatically. This method does not send a request and does not emit `input` or `select`.
 
 **Example:**
 ```javascript
@@ -273,7 +271,7 @@ Signature: `addFilterByCountry(codes: ByCountryCodeOptions)`
 Applies a **hard filter** limiting results to one or more specific countries.
 Only addresses within the listed countries will appear in autocomplete suggestions.
 
-**Type:** [`ByCountryCodeOptions`](../api-reference/geocoderautocompleteoptions/#bycountrycodeoptions)
+**Type:** [`ByCountryCodeOptions`](geocoder-autocomplete-options.md#bycountrycodeoptions)
 
 **Example:**
 
@@ -290,7 +288,7 @@ Signature: `addFilterByCircle(opts: ByCircleOptions)`
 Restricts autocomplete results to a **circular area**.
 Useful for location-based search scenarios such as “addresses within 5 km of city center”.
 
-**Type:** [`ByCircleOptions`](/geocoderautocompleteoptions/#bycircleoptions)
+**Type:** [`ByCircleOptions`](geocoder-autocomplete-options.md#bycircleoptions)
 
 **Example:**
 
@@ -310,7 +308,7 @@ Signature: `addFilterByRect(opts: ByRectOptions)`
 
 Filters results to a **rectangular bounding box**, defined by two corner coordinates.
 
-**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions/#byrectoptions)
+**Type:** [`ByRectOptions`](geocoder-autocomplete-options.md#byrectoptions)
 
 **Example:**
 
@@ -329,7 +327,7 @@ This example restricts search results to the boundaries of **California, USA**.
 
 Signature: `addFilterByPlace(place: string)`
 
-Restricts results to a specific **place or region** identified by its Geoapify Place ID or geometry ID.
+Restricts results to a specific **place or region** identified by its Geoapify Place ID.
 
 **Example:**
 
@@ -412,7 +410,7 @@ Signature: `addBiasByProximity(p: ByProximityOptions)`
 Prioritizes results **closest to a specific point**.
 Commonly used to rank addresses near the user's current location or map center.
 
-**Type:** [`ByProximityOptions`](../api-reference/geocoderautocompleteoptions/#byproximityoptions)
+**Type:** [`ByProximityOptions`](geocoder-autocomplete-options.md#byproximityoptions)
 
 **Example:**
 
@@ -445,7 +443,7 @@ Signature: `setPlacesFilterByCircle(opts: ByCircleOptions)`
 Applies a **hard filter** for Places API results within a circular area.
 Useful for showing POIs (e.g., restaurants or hotels) inside a certain radius around a point.
 
-**Type:** [`ByCircleOptions`](/geocoderautocompleteoptions/#bycircleoptions)
+**Type:** [`ByCircleOptions`](geocoder-autocomplete-options.md#bycircleoptions)
 
 **Example:**
 
@@ -465,7 +463,7 @@ Signature: `setPlacesFilterByRect(opts: ByRectOptions)`
 
 Applies a **rectangular bounding box filter** for Places API searches.
 
-**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions/#byrectoptions)
+**Type:** [`ByRectOptions`](geocoder-autocomplete-options.md#byrectoptions)
 
 **Example:**
 
@@ -498,16 +496,17 @@ This limits results to POIs located within that predefined place or region.
 
 Signature: `setPlacesFilterByGeometry(geom: string)`
 
-Restricts Places API searches to a **custom geometry** (polygon, multipolygon, or geometry string).
-Useful for complex areas like city boundaries or administrative zones.
+Restricts Places API searches to a geometry previously created by a Geoapify API, such as an isoline.
+
+Pass the Geoapify geometry ID. WKT and raw GeoJSON are not accepted by this filter.
 
 **Example:**
 
 ```javascript
-autocomplete.setPlacesFilterByGeometry('POLYGON((-74.0 40.7, -73.9 40.7, -73.9 40.8, -74.0 40.8, -74.0 40.7))');
+autocomplete.setPlacesFilterByGeometry('YOUR_ISOLINE_GEOMETRY_ID');
 ```
 
-This example limits results to a small region of New York City.
+The filter affects the next Places request. Call `sendPlacesRequest()` to reload the current category after changing it.
 
 ### clearPlacesFilters()
 
@@ -529,7 +528,7 @@ Signature: `setPlacesBiasByCircle(opts: ByCircleOptions)`
 
 Adds a **soft bias** to prioritize Places API results within or near a circular area.
 
-**Type:** [`ByCircleOptions`](/geocoderautocompleteoptions/#bycircleoptions)
+**Type:** [`ByCircleOptions`](geocoder-autocomplete-options.md#bycircleoptions)
 
 **Example:**
 
@@ -549,7 +548,7 @@ Signature: `setPlacesBiasByRect(opts: ByRectOptions)`
 
 Adds a **soft bias** toward POIs within a rectangular region.
 
-**Type:** [`ByRectOptions`](../api-reference/geocoderautocompleteoptions/#byrectoptions)
+**Type:** [`ByRectOptions`](geocoder-autocomplete-options.md#byrectoptions)
 
 **Example:**
 
@@ -570,7 +569,7 @@ Signature: `setPlacesBiasByProximity(p: ByProximityOptions)`
 
 Prioritizes Places API results near a **specific coordinate point**, typically the user’s location or map center.
 
-**Type:** [`ByProximityOptions`](../api-reference/geocoderautocompleteoptions/#byproximityoptions)
+**Type:** [`ByProximityOptions`](geocoder-autocomplete-options.md#byproximityoptions)
 
 **Example:**
 
@@ -600,7 +599,7 @@ After calling this, Places results will no longer be influenced by location or p
 
 ### setSuggestionsFilter()
 
-Signature: `setSuggestionsFilter(fn?: (items: any[]) => any[] | null)`
+Signature: `setSuggestionsFilter(fn?: ((items: any[]) => any[]) | null)`
 
 Defines a **client-side filter function** that post-processes suggestion results before they are displayed.  
 This is useful for removing or reordering results dynamically, without modifying the server response.
@@ -620,7 +619,7 @@ This will only display address suggestions located in Germany.
 
 ### setPreprocessHook()
 
-Signature: `setPreprocessHook(fn?: (value: string) => string | null)`
+Signature: `setPreprocessHook(fn?: ((value: string) => string) | null)`
 
 Allows you to **transform user input before sending a request** to the Geoapify API.
 Useful for sanitizing, normalizing, or adjusting values before autocomplete processing.
@@ -639,7 +638,7 @@ This example removes extra spaces from user input before querying the API.
 
 ### setPostprocessHook()
 
-Signature: `setPostprocessHook(fn?: (feature: any) => string | null)`
+Signature: `setPostprocessHook(fn?: ((feature: any) => string) | null)`
 
 Lets you **transform or format how suggestions appear** in the dropdown list after they are fetched.
 You can modify label text, append custom info, or apply your own formatting logic.
@@ -660,14 +659,14 @@ This adds the country name next to each suggestion.
 
 ### setSendGeocoderRequestFunc()
 
-Signature: `setSendGeocoderRequestFunc(fn?: (value: string, self) => Promise<any> | null)`
+Signature: `setSendGeocoderRequestFunc(fn?: ((value: string, self) => Promise<any>) | null)`
 
 Overrides the **default geocoder request**.
 You can define your own logic for fetching suggestions — for example, to use a caching layer, a proxy, or a custom API endpoint.
 
 **Parameters:**
 
-* `fn`: A function that receives the search text and the autocomplete instance, and returns a `Promise` resolving to a Geoapify-style response.
+* `fn`: A function that receives the search text and the autocomplete instance. It must return a Promise resolving to a GeoJSON FeatureCollection with a `features` array.
 
 **Example:**
 
@@ -682,14 +681,14 @@ This example replaces the direct API call with a proxied request.
 
 ### setSendPlaceDetailsRequestFunc()
 
-Signature: `setSendPlaceDetailsRequestFunc(fn?: (feature: any, self) => Promise<any> | null)`
+Signature: `setSendPlaceDetailsRequestFunc(fn?: ((feature: any, self) => Promise<any>) | null)`
 
 Overrides how **place details** are fetched after a user selects a result.
 By default, Geoapify fetches extended metadata for OSM-based places — you can change or disable that.
 
 **Parameters:**
 
-* `fn`: A function that takes the selected feature and returns a Promise with enriched or custom details.
+* `fn`: A function that takes the selected feature and autocomplete instance. It returns a Promise with the enriched feature used for selection.
 
 **Example:**
 
@@ -702,14 +701,14 @@ autocomplete.setSendPlaceDetailsRequestFunc(async (feature) => {
 
 ### setSendPlacesRequestFunc()
 
-Signature: `setSendPlacesRequestFunc(fn?: (keys: string[], offset: number, self) => Promise<any> | null)`
+Signature: `setSendPlacesRequestFunc(fn?: ((keys: string[], offset: number, self) => Promise<any>) | null)`
 
 Overrides **Places API category search requests** — used when category search is enabled (`addCategorySearch: true`).
 You can modify or fully replace the request logic to use a different data source or add caching.
 
 **Parameters:**
 
-* `fn`: A function that takes category keys, pagination offset, and the autocomplete instance. Must return a Promise resolving to Geoapify Places-style results.
+* `fn`: A function that takes category keys, pagination offset, and the autocomplete instance. It must return a Promise resolving to a GeoJSON FeatureCollection with a `features` array.
 
 **Example:**
 
@@ -836,7 +835,7 @@ Category mode must be enabled via `addCategorySearch: true`.
 Signature: `clearCategory(): Promise<void>`
 
 Clears the current category selection and exits category mode.
-This resets the input and the places list.
+This resets the places list. It does not change the current input value.
 
 **Example:**
 
@@ -849,18 +848,23 @@ await autocomplete.clearCategory();
 
 Signature: `resendPlacesRequestForMore(append?: boolean): Promise<void>`
 
-Fetches the **next page of Places results** for the currently selected category.
-If `append` is true, new results are added to the existing list.
+Loads Places results for the current category. With `append: true`, it requests the page at the current offset and appends unique results. With `false` or no argument, it resets the offset to zero and replaces the list.
 
 **Parameters:**
 
-* `append` (optional): Whether to append results instead of replacing them.
+* `append` (optional): Append the next page when `true`; restart at the first page when false or omitted.
 
 **Example:**
 
 ```javascript
-await autocomplete.resendPlacesRequestForMore(true);
+try {
+  await autocomplete.resendPlacesRequestForMore(true);
+} catch (error) {
+  console.error('Could not load more places', error);
+}
 ```
+
+The returned Promise rejects if the request or response validation fails. The `places` event receives the complete accumulated list after an append, not only the new page.
 
 ### getCategory()
 
@@ -880,8 +884,8 @@ console.log(current?.label);
 
 Signature: `selectPlace(index: number | null): void`
 
-Programmatically selects or clears a **place** from the built-in Places list.
-This only works when the built-in list (`showPlacesList: true`) is active.
+Programmatically highlights or clears a place in the built-in Places list.
+This only works when the built-in list (`showPlacesList: true`) is active. It does not emit `place_select`; that event represents a user click.
 
 **Parameters:**
 
@@ -897,14 +901,25 @@ autocomplete.selectPlace(0); // Select first place in list
 
 Signature: `sendPlacesRequest(): Promise<void>`
 
-Triggers a **Places API request** for the currently active category and filters.
-This is the main method used internally for category search, but you can call it directly to reload results.
+Triggers a first-page Places API request for the currently active category and filters, replacing the current list. Use it to reload results after changing a Places filter or bias.
 
 **Example:**
 
 ```javascript
 await autocomplete.sendPlacesRequest();
 ```
+
+### destroy()
+
+Signature: `destroy(): void`
+
+Cancels active request lifecycles, removes the component from the DOM, and unregisters its input, clear-button, document, and Places scroll listeners. Active lifecycle end events are emitted with `(false, null, { cancelled: true })` before callbacks are cleared. Calling `destroy()` more than once is safe.
+
+```javascript
+autocomplete.destroy();
+```
+
+Call `destroy()` from your framework's unmount or cleanup hook. See [Lifecycle and errors](../lifecycle-and-errors.md#cleanup).
 
 ## Listening For Events
 
@@ -914,9 +929,9 @@ You can use the following methods to **subscribe**, **unsubscribe**, or **listen
 
 | Function | Signature | Purpose |
 |-----------|------------|----------|
-| [`on`](#on) | `on(event: GeocoderEventType, cb: (payload:any)=>void): void` | Subscribe to an event. |
-| [`off`](#off) | `off(event: GeocoderEventType, cb?: (payload:any)=>any): void` | Unsubscribe from an event (optionally for a specific callback). |
-| [`once`](#once) | `once(event: GeocoderEventType, cb: (payload:any)=>any): void` | Subscribe to an event for a single invocation (auto-unsubscribed after first trigger). |
+| [`on`](#on) | `on(event: GeocoderEventType, cb: (...params:any[])=>any): void` | Subscribe to an event. |
+| [`off`](#off) | `off(event: GeocoderEventType, cb?: (...params:any[])=>any): void` | Unsubscribe from an event (optionally for a specific callback). |
+| [`once`](#once) | `once(event: GeocoderEventType, cb: (...params:any[])=>any): void` | Subscribe to an event for a single invocation (auto-unsubscribed after first trigger). |
 
 ### `on()`
 
@@ -933,20 +948,20 @@ autocomplete.on('select', (feature) => {
   console.log('User selected:', feature.properties.formatted);
 });
 
-autocomplete.on('requestStart', (query) => {
+autocomplete.on('request_start', (query) => {
   console.log('Searching for:', query);
 });
 ```
 
 Common event names include:
 
-* `requestStart` — when a geocoder request is initiated.
-* `requestEnd` — when results are received or an error occurs.
+* `request_start` — when a geocoder request is initiated.
+* `request_end` — when results are received, fail, or are cancelled.
 * `suggestions` — when new autocomplete suggestions are available.
 * `select` — when the user selects a result.
 * `clear` — when the input or category is cleared.
-* `opened` / `closed` — when the dropdown opens or closes.
-* `placesRequestStart` / `placesRequestEnd` — for category search requests.
+* `open` / `close` — when the dropdown opens or closes.
+* `places_request_start` / `places_request_end` — for category search requests.
 
 ### `off()`
 
@@ -981,7 +996,7 @@ Useful for initialization or one-time actions such as analytics tracking or setu
 **Example:**
 
 ```javascript
-autocomplete.once('opened', () => {
+autocomplete.once('open', () => {
   console.log('Dropdown opened for the first time!');
 });
 ```
@@ -990,38 +1005,38 @@ These event hooks make it easy to **connect the autocomplete to your app logic**
 
 ### Events (names & payloads)
 
-Here’s a reference list of all **supported event names**, their payloads, and when they are fired.  
+The following table lists all supported event names, payloads, and trigger conditions.
 These events let you respond to user actions, geocoder lifecycle stages, and category-based place searches.
 
 | Event | Payload | Fired when… |
 |---|---|---|
 | `input` | `string` (current input) | User types in the autocomplete field. |
-| `requestStart` | `string` (query) | Geocoder request is about to be sent. |
-| `requestEnd` | `{ ok: boolean, data?: any, error?: any }` | Geocoder response is received or failed. |
+| `request_start` | `string` (query) | Geocoder request is about to be sent. |
+| `request_end` | `(success: boolean, data?: any, error?: any)` | Geocoder response succeeds, fails, or is cancelled. |
 | `suggestions` | `GeoJSON.Feature[]` | New autocomplete suggestions are available. |
 | `select` | `GeoJSON.Feature \| null` | User selects a suggestion or clears the selection. |
-| `change` | `GeoJSON.Feature \| null` | Final value changes (after fetching details if `addDetails: true`). |
-| `placeDetailsRequestStart` | `GeoJSON.Feature` | Place Details request initiated. |
-| `placeDetailsRequestEnd` | `{ ok: boolean, data?: GeoJSON.Feature, error?: any }` | Place Details request completed. |
-| `opened` | `void` | Dropdown is rendered (opened). |
-| `closed` | `void` | Dropdown is closed. |
+| `place_details_request_start` | `GeoJSON.Feature` | Place Details request initiated. |
+| `place_details_request_end` | `(success: boolean, data?: GeoJSON.Feature, error?: any)` | Place Details request succeeds, fails, or is cancelled. |
+| `open` | `true` | Dropdown is rendered. |
+| `close` | `false` | Dropdown is closed. |
 | `clear` | `'address' \| 'category'` | Address or category field cleared. |
-| `placesRequestStart` | `Category` | Places API request started (in category search mode). |
-| `placesRequestEnd` | `{ ok: boolean, data?: any, error?: any }` | Places API response received. |
+| `places_request_start` | `Category` | Places API request started (in category search mode). |
+| `places_request_end` | `(success: boolean, data?: any, error?: any)` | Places response succeeds, fails, or is cancelled. |
 | `places` | `GeoJSON.Feature[]` | Places list updated (in category mode). |
-| `placeSelect` | `{ place: GeoJSON.Feature, index: number }` | Place selected from the built-in list. |
+| `place_select` | `(place: GeoJSON.Feature, index: number)` | Place selected from the built-in list. |
 
 
 **Example: Listening to request and selection events**
 
 ```javascript
-autocomplete.on('requestStart', (query) => {
+autocomplete.on('request_start', (query) => {
   console.log('Request started for:', query);
 });
 
-autocomplete.on('requestEnd', (result) => {
-  if (result.ok) console.log('Got results:', result.data.features.length);
-  else console.error('Request failed:', result.error);
+autocomplete.on('request_end', (success, data, error) => {
+  if (success) console.log('Got results:', data.features.length);
+  else if (error?.cancelled) console.log('Request cancelled');
+  else console.error('Request failed:', error);
 });
 
 autocomplete.on('select', (feature) => {
@@ -1036,26 +1051,28 @@ autocomplete.on('select', (feature) => {
 **Example: Handling Places API and category mode events**
 
 ```javascript
-autocomplete.on('placesRequestStart', (category) => {
+autocomplete.on('places_request_start', (category) => {
   console.log('Loading places for:', category.label);
 });
 
-autocomplete.on('placesRequestEnd', (res) => {
-  if (res.ok) console.log('Places loaded:', res.data.features.length);
+autocomplete.on('places_request_end', (success, data, error) => {
+  if (success) console.log('Places loaded:', data.features.length);
+  else if (!error?.cancelled) console.error('Places failed:', error);
 });
 
-autocomplete.on('placeSelect', ({ place, index }) => {
+autocomplete.on('place_select', (place, index) => {
   console.log(`Selected place #${index}:`, place.properties.name);
 });
 ```
 
 > **Note:**
-> Event names correspond to internal callbacks such as `notifyRequestStart`, `notifySuggestions`, and `notifyChange`, exposed through the `on()`, `off()`, and `once()` methods.
-> Payloads match the Geoapify API responses and GeoJSON feature structures used throughout the autocomplete and Places APIs.
+> Every request lifecycle that emits a start event emits one matching end event. A superseded or destroyed request ends with `(false, null, { cancelled: true })`. Treat cancellation as expected control flow rather than a request failure.
+>
+> After paginated Places results are appended, `places` contains the full accumulated, de-duplicated list.
 
 
 ## Learn more
 
-* Explore available configuration parameters in the [GeocoderAutocompleteOptions reference](../geocoder-autocomplete-options/).
-* Check the [Quick Start guide](../../quick-start/) to see how to set up your first autocomplete field.
-* Try live examples in the [Interactive Demos](../../live-demos/).
+* Explore available configuration parameters in the [GeocoderAutocompleteOptions reference](geocoder-autocomplete-options.md).
+* Check the [Quick Start guide](../quick-start.md) to see how to set up your first autocomplete field.
+* Try live examples in the [Interactive Demos](../live-demos.md).

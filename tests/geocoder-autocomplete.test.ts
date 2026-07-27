@@ -544,6 +544,11 @@ describe('GeocoderAutocomplete', () => {
         autocomplete.setCountryCodes(['ae']);
 
         expect(warnSpy).toHaveBeenCalledWith('WARNING! Obsolete function called. Function setCountryCodes() has been deprecated, please use the new addFilterByCountry() function instead!');
+        await inputValueAndExpectTheRequest(
+            container,
+            `${APP_URL}?text=123&apiKey=XXXXX&limit=5&filter=countrycode:ae`
+        );
+        warnSpy.mockRestore();
     });
     it('setPosition should log warning', async () => {
         const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -554,10 +559,17 @@ describe('GeocoderAutocomplete', () => {
         });
 
         expect(warnSpy).toHaveBeenCalledWith('WARNING! Obsolete function called. Function setPosition() has been deprecated, please use the new addBiasByProximity() function instead!');
+        await inputValueAndExpectTheRequest(
+            container,
+            `${APP_URL}?text=123&apiKey=XXXXX&limit=5&bias=proximity:0,0`
+        );
+        warnSpy.mockRestore();
     });
     it('setType should work properly', async () => {
         autocomplete.setType('postcode');
         await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&type=postcode&limit=5`);
+        autocomplete.setType('locality');
+        await inputValueAndExpectTheRequest(container, `${APP_URL}?text=123&apiKey=XXXXX&type=locality&limit=5`);
         autocomplete.setType(null);
     });
     it('setLang should work properly', async () => {

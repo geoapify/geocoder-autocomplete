@@ -117,23 +117,66 @@ export class DomHelper {
         element.appendChild(svgElement);
     }
 
-    public static  getStyledAddressSingleValue(value: string, currentValue: string): string {
-        let displayValue = value;
+    private static appendHighlightedText(element: HTMLElement, value: string, currentValue: string): void {
+        const valueIndex = currentValue
+            ? value.toLowerCase().indexOf(currentValue.toLowerCase())
+            : -1;
 
-        const valueIndex = (displayValue || '').toLowerCase().indexOf(currentValue.toLowerCase());
-        if (valueIndex >= 0) {
-            displayValue = displayValue.substring(0, valueIndex) +
-                `<strong>${displayValue.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
-                displayValue.substring(valueIndex + currentValue.length);
+        if (valueIndex < 0) {
+            element.textContent = value;
+            return;
         }
 
-        return `<span class="main-part">${displayValue}</span>`
+        element.appendChild(document.createTextNode(value.substring(0, valueIndex)));
+
+        const highlightedElement = document.createElement("strong");
+        highlightedElement.textContent = value.substring(valueIndex, valueIndex + currentValue.length);
+        element.appendChild(highlightedElement);
+
+        element.appendChild(document.createTextNode(value.substring(valueIndex + currentValue.length)));
     }
 
-    public static getStyledAddress(featureProperties: any, currentValue: string): string {
+    private static appendNonVerifiedText(element: HTMLElement, value: string, nonVerifiedValues: string[]): void {
+        const ranges = nonVerifiedValues
+            .filter(nonVerifiedValue => nonVerifiedValue)
+            .map(nonVerifiedValue => {
+                const start = value.indexOf(nonVerifiedValue);
+                return { start, end: start + nonVerifiedValue.length };
+            })
+            .filter(range => range.start >= 0)
+            .sort((range1, range2) => range1.start - range2.start);
+
+        let currentIndex = 0;
+        ranges.forEach(range => {
+            if (range.start < currentIndex) {
+                return;
+            }
+
+            element.appendChild(document.createTextNode(value.substring(currentIndex, range.start)));
+
+            const nonVerifiedElement = document.createElement("span");
+            nonVerifiedElement.classList.add("non-verified");
+            nonVerifiedElement.textContent = value.substring(range.start, range.end);
+            element.appendChild(nonVerifiedElement);
+
+            currentIndex = range.end;
+        });
+
+        element.appendChild(document.createTextNode(value.substring(currentIndex)));
+    }
+
+    public static getStyledAddressSingleValue(value: string, currentValue: string): HTMLElement {
+        const mainPartElement = document.createElement("span");
+        mainPartElement.classList.add("main-part");
+        DomHelper.appendHighlightedText(mainPartElement, String(value ?? ""), currentValue);
+        return mainPartElement;
+    }
+
+    public static getStyledAddress(featureProperties: any, currentValue: string): DocumentFragment {
         let mainPart: string;
         let secondaryPart: string;
-        const parts = featureProperties.formatted.split(',').map((part: string) => part.trim());
+        const formatted = String(featureProperties.formatted ?? "");
+        const parts = formatted.split(',').map((part: string) => part.trim());
 
         if (featureProperties.name) {
             mainPart = parts[0];
@@ -144,21 +187,26 @@ export class DomHelper {
             secondaryPart = parts.slice(mainElements).join(', ');
         }
 
-        if (featureProperties.nonVerifiedParts && featureProperties.nonVerifiedParts.length) {
-            featureProperties.nonVerifiedParts.forEach((part: string) => {
-                mainPart = mainPart.replace(featureProperties[part], `<span class="non-verified">${featureProperties[part]}</span>`);
-            });
-        } else {
-            const valueIndex = mainPart.toLowerCase().indexOf(currentValue.toLowerCase());
-            if (valueIndex >= 0) {
-                mainPart = mainPart.substring(0, valueIndex) +
-                    `<strong>${mainPart.substring(valueIndex, valueIndex + currentValue.length)}</strong>` +
-                    mainPart.substring(valueIndex + currentValue.length);
+        const fragment = document.createDocumentFragment();
+        const mainPartElement = document.createElement("span");
+        mainPartElement.classList.add("main-part");
 
-            }
+        if (featureProperties.nonVerifiedParts?.length) {
+            const nonVerifiedValues = featureProperties.nonVerifiedParts
+                .map((part: string) => featureProperties[part])
+                .filter((value: unknown): value is string => typeof value === "string");
+            DomHelper.appendNonVerifiedText(mainPartElement, mainPart, nonVerifiedValues);
+        } else {
+            DomHelper.appendHighlightedText(mainPartElement, mainPart, currentValue);
         }
 
-        return `<span class="main-part">${mainPart}</span><span class="secondary-part">${secondaryPart}</span>`
+        const secondaryPartElement = document.createElement("span");
+        secondaryPartElement.classList.add("secondary-part");
+        secondaryPartElement.textContent = secondaryPart;
+
+        fragment.appendChild(mainPartElement);
+        fragment.appendChild(secondaryPartElement);
+        return fragment;
     }
 
     public static addDropdownIcon(feature: any, itemElement: HTMLDivElement) {

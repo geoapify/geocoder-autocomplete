@@ -81,6 +81,18 @@ describe('sendPlacesRequest - Bias and Filter Parameters', () => {
             expect(lastCall).toContain('filter=circle:10,20,5000');
         });
 
+        it('should support zero coordinates in Places filters and bias', async () => {
+            autocomplete.setPlacesBiasByProximity({ lon: 0, lat: 0 });
+            autocomplete.setPlacesFilterByCircle({ lon: 0, lat: 0, radiusMeters: 5000 });
+            mockPlacesApi(mockPlacesApiResponse);
+
+            await autocomplete.selectCategory('catering.cafe');
+
+            const lastCall = fetchMock.mock.calls[0][0] as string;
+            expect(lastCall).toContain('bias=proximity:0,0');
+            expect(lastCall).toContain('filter=circle:0,0,5000');
+        });
+
         it('should override options when bias and filter parameters are provided', async () => {
             const optionsWithBiasFilter: GeocoderAutocompleteOptions = {
                 ...options,
@@ -135,7 +147,6 @@ describe('sendPlacesRequest - Bias and Filter Parameters', () => {
         });
 
         it('should successfully make API call with offset = 0 when call more no append', async () => {
-            mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
 
             autocomplete.setPlacesLimit(50);
@@ -249,7 +260,6 @@ describe('sendPlacesRequest - Bias and Filter Parameters', () => {
         });
 
         it('should support bias (proximity) + filter (circle)', async () => {
-            mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
 
             autocomplete.setPlacesBiasByProximity({ lon: SF_LON, lat: SF_LAT });
@@ -437,7 +447,6 @@ describe('sendPlacesRequest - Bias and Filter Parameters', () => {
 
             // Clear filters
             fetchMock.resetMocks();
-            mockIpInfo(mockIpInfoResponse);
             mockPlacesApi(mockPlacesApiResponse);
             
             autocomplete.clearPlacesFilters();

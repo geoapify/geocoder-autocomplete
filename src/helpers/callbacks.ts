@@ -1,5 +1,7 @@
 import { GeocoderEventType, ItemType, Category } from "../types/external";
 
+type EventCallback = (...params: any[]) => any;
+
 export class Callbacks {
     public changeCallbacks: ((selectedOption: any) => void)[] = [];
     public suggestionsChangeCallbacks: ((options: any[]) => void)[] = [];
@@ -18,7 +20,7 @@ export class Callbacks {
 
     public clearCallbacks: ((itemType: ItemType) => void)[] = [];
 
-    addCallback(operation: GeocoderEventType, callback: (param: any) => void) {
+    addCallback(operation: GeocoderEventType, callback: EventCallback) {
         let currentCallbacks = this.getCallbacksByOperation(operation);
         if(currentCallbacks) {
             if (currentCallbacks.indexOf(callback) < 0) {
@@ -27,7 +29,7 @@ export class Callbacks {
         }
     }
 
-    removeCallback(operation: GeocoderEventType, callback?: (param: any) => any) {
+    removeCallback(operation: GeocoderEventType, callback?: EventCallback) {
         let currentCallbacks = this.getCallbacksByOperation(operation);
         if(currentCallbacks) {
             if (currentCallbacks.indexOf(callback) >= 0) {
@@ -158,7 +160,7 @@ export class Callbacks {
         return currentCallbacks;
     }
 
-    private setCallbacksByOperation(operation: GeocoderEventType, callbacks: ((data: any) => void)[]) {
+    private setCallbacksByOperation(operation: GeocoderEventType, callbacks: EventCallback[]) {
         switch (operation) {
             case 'select': {
                 this.changeCallbacks = callbacks;

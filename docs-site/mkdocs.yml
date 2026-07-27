@@ -27,6 +27,9 @@ nav:
   - API Reference:
       - GeocoderAutocomplete: api-reference/geocoder-autocomplete.md
       - GeocoderAutocompleteOptions: api-reference/geocoder-autocomplete-options.md
+  - Lifecycle and Errors: lifecycle-and-errors.md
+  - Production: production.md
+  - Migration: migration.md
   - Styling: styling.md
   - Interactive Demos: live-demos.md
 

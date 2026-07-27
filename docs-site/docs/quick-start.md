@@ -1,157 +1,133 @@
-Follow these steps to quickly add the **Geoapify Geocoder Autocomplete** to your web project.
-You’ll install the library, include the styles, and create your first working address autocomplete field powered by the [Geoapify Address Autocomplete API](https://www.geoapify.com/address-autocomplete/).
+# Quick start
 
-## Installation
+Add Geoapify Geocoder Autocomplete with a package manager or directly from a CDN.
 
-The **Geoapify Geocoder Autocomplete** library can be added to your project either via a **package manager** (recommended for web applications and build systems) or via a **CDN link** (ideal for CMS platforms or quick integration without a build step).
+## Get an API key
 
-### Option 1: Install via NPM or Yarn
+Create a Geoapify account and API key at [geoapify.com](https://www.geoapify.com/). The current free plan includes up to 3,000 address autocomplete requests per day; check the [pricing page](https://www.geoapify.com/pricing/) for current limits.
 
-Install the package using your preferred package manager:
+For a production website, restrict the key to the origins or referrers that should use it. See [Production guidance](production.md#protect-the-api-key).
+
+## Install with npm
 
 ```bash
 npm install @geoapify/geocoder-autocomplete
-# or
-yarn add @geoapify/geocoder-autocomplete
 ```
 
-Then import the library and stylesheet in your project:
+Import the constructor and one theme:
 
 ```javascript
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
-import '@geoapify/geocoder-autocomplete/styles/minimal.css'; // Available styles: minimal.css | minimal-dark.css | round-borders.css | round-borders-dark.css
+import '@geoapify/geocoder-autocomplete/styles/minimal.css';
+
+const addressAutocomplete = new GeocoderAutocomplete(
+  document.getElementById('autocomplete'),
+  'YOUR_API_KEY',
+  {
+    placeholder: 'Enter an address',
+    limit: 5
+  }
+);
 ```
 
-This method is recommended for applications built with frameworks such as **React**, **Vue**, **Angular**, or **Svelte**, and for bundlers like **Vite**, **Webpack**, or **Rollup**.
+## Load from a CDN
 
-### Option 2: Use from CDN (UMD build)
-
-If you are integrating the autocomplete directly into an HTML page or a CMS (e.g., WordPress, Drupal), you can include the prebuilt **UMD module** and stylesheet from a CDN such as [UNPKG](https://unpkg.com/):
+Pin the major version so a future breaking release is not loaded unexpectedly:
 
 ```html
-<html>
-  <head>
-    <script src="https://unpkg.com/@geoapify/geocoder-autocomplete@latest/dist/index.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@geoapify/geocoder-autocomplete@latest/styles/minimal.css">
-  </head>
-  <!-- Page content -->
-</html>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@geoapify/geocoder-autocomplete@3/styles/minimal.css"
+>
+<script src="https://unpkg.com/@geoapify/geocoder-autocomplete@3/dist/index.min.js"></script>
+
+<div id="autocomplete"></div>
+
+<script>
+  const addressAutocomplete = new autocomplete.GeocoderAutocomplete(
+    document.getElementById('autocomplete'),
+    'YOUR_API_KEY',
+    {
+      placeholder: 'Enter an address',
+      limit: 5
+    }
+  );
+</script>
 ```
 
-This approach loads the library directly in the browser, making it suitable for static sites, CMS-based websites, or when you need a lightweight integration without a build pipeline.
+The npm build exports `GeocoderAutocomplete` directly. The CDN UMD build exposes it as `autocomplete.GeocoderAutocomplete`.
 
-## Getting a Geoapify API Key
+## Add a container
 
-To use the Geoapify API for address search and autocomplete, you need an API key.
-You can **register for free** and get your key at [geoapify.com](https://www.geoapify.com/).
-
-Geoapify offers a flexible [Freemium pricing model](https://www.geoapify.com/pricing/) — the **Free plan** includes up to **3,000 autocomplete requests per day**, allowing you to start building and testing right away. You can easily upgrade later as your application scales.
-
-
-## Using `@geoapify/geocoder-autocomplete` in Your Project
-
-Follow the steps below to integrate the Geoapify Geocoder Autocomplete into your project.
-
-
-### Step 1. Add a container
-
-Add an element to your webpage where the autocomplete input will be rendered.
-The container should have `position: relative` or `position: absolute` to ensure proper dropdown placement.
+The control renders inside an existing element:
 
 ```html
 <div id="autocomplete" class="autocomplete-container"></div>
 ```
 
+Give the container a width appropriate for your layout. The control creates its own positioned wrapper for the dropdown.
+
 ```css
 .autocomplete-container {
-  position: relative;
+  width: min(100%, 32rem);
 }
 ```
 
-### Step 2. Initialize the autocomplete
+## Listen for selection
 
 ```javascript
-import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
+addressAutocomplete.on('select', (feature) => {
+  if (!feature) {
+    return;
+  }
 
-// When installed via npm or yarn, GeocoderAutocomplete is imported directly.
-// When loaded from CDN, use "autocomplete.GeocoderAutocomplete" instead.
-const addressAutocomplete = new GeocoderAutocomplete(
-  document.getElementById('autocomplete'),
+  console.log('Selected location:', feature);
+});
+
+addressAutocomplete.on('suggestions', (features) => {
+  console.log('Suggestions:', features);
+});
+```
+
+Programmatic `setValue()` calls only update the input; they do not issue a request or emit `input` or `select`.
+
+## Enable category search
+
+Category search uses the Geoapify Places API. Enable `showPlacesList` to render the built-in result list:
+
+```javascript
+const placesAutocomplete = new GeocoderAutocomplete(
+  document.getElementById('places-autocomplete'),
   'YOUR_API_KEY',
-  { /* Geocoder options */ }
-);
-
-addressAutocomplete.on('select', (location) => {
-  // Handle selected location
-});
-
-addressAutocomplete.on('suggestions', (suggestions) => {
-  // Handle suggestion updates
-});
-
-```
-
-### Step 3. Listen for address suggestions and selection
-
-Use event listeners to respond to user actions, such as selecting an address or receiving new suggestions.
-
-```javascript
-addressAutocomplete.on('select', (location) => {
-  // Triggered when the user selects a location from the dropdown
-  console.log('Selected location:', location);
-});
-
-addressAutocomplete.on('suggestions', (suggestions) => {
-  // Triggered whenever new suggestions are available
-  console.log('Suggestions:', suggestions);
-});
-```
-
-## Category Search and Places List
-
-The **Geoapify Geocoder Autocomplete** library can also perform **category-based place searches** using the [Geoapify Places API](https://www.geoapify.com/places-api/).
-This feature allows users to find **points of interest (POIs)** such as restaurants, cafes, hotels, parks, or stores — in addition to standard address lookup.
-
-
-### When It’s Useful
-
-Category search is ideal for:
-
-* Building “Find nearby” or “Explore around me” features.
-* Showing local amenities or businesses on a map.
-* Adding category-based discovery to your forms or map interface.
-* Enhancing location-based search experiences with dynamic data.
-
-
-### Enable Category Search
-
-To enable category-based search, set the `addCategorySearch` option.
-
-```javascript
-const autocomplete = new GeocoderAutocomplete(
-  document.getElementById("autocomplete"),
-  "YOUR_API_KEY",
   {
     addCategorySearch: true,
+    showPlacesList: true,
     placesFilter: {
-      circle: { lon: -74.006, lat: 40.7128, radiusMeters: 5000 }, // 5 km around New York City center
-    },
+      circle: {
+        lon: -74.006,
+        lat: 40.7128,
+        radiusMeters: 5000
+      }
+    }
   }
 );
 ```
 
-When users type a category name (e.g., *restaurant*, *gas station*), the autocomplete shows category suggestions alongside address results.
-If `showPlacesList` is enabled, matching places are automatically displayed below the input field.
+When `enablePlacesLazyLoading` is omitted, the list uses a **Load more** button. Set it to `true` for scroll-based loading.
 
-## Next Steps
+## Clean up
 
-You’ve successfully added **Geoapify Geocoder Autocomplete** to your project!
-From here, you can explore advanced configuration options, customize filters and bias, or enable category-based place search.
+Remove the control when its host page or framework component is unmounted:
 
-Check out more resources to continue building:
+```javascript
+addressAutocomplete.destroy();
+```
 
-* [API Reference](../api-reference/) — full list of options, methods, and events
-* [Playground](https://apidocs.geoapify.com/playground/geocoding/#autocomplete) — experiment with live API requests
-* [Places API](https://www.geoapify.com/places-api/) — discover how to integrate place and category search
+See [Lifecycle and errors](lifecycle-and-errors.md) for cancellation, request errors, custom request functions, and framework cleanup.
 
-With Geoapify, you can create intuitive, location-aware interfaces that make address entry and place discovery simple and reliable.
+## Next steps
+
+- [Options reference](api-reference/geocoder-autocomplete-options.md)
+- [Methods and events](api-reference/geocoder-autocomplete.md)
+- [Styling](styling.md)
+- [Interactive demos](live-demos.md)

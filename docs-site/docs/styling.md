@@ -1,68 +1,94 @@
-The Geoapify Geocoder Autocomplete library comes with multiple **predefined themes** and a rich set of **CSS classes** that make it easy to adapt the component to your website’s design system.
+# Styling
 
-### Built-in Themes
+The package includes four themes and CSS hooks for adapting the control to your application.
 
-You can quickly style the autocomplete widget by linking one of the built-in themes provided in the library.
-Each theme is optimized for light or dark backgrounds and can be swapped simply by including a different stylesheet.
+## Built-in themes
 
-1. **Minimal Theme** (`minimal.css`) – clean, modern look for light backgrounds.
-2. **Round Borders Theme** (`round-borders.css`) – similar to Minimal but with softly rounded input and dropdown corners.
-3. **Minimal Dark Theme** (`minimal-dark.css`) – best suited for dark background layouts.
-4. **Round Borders Dark Theme** (`round-borders-dark.css`) – combines dark tones with rounded visual elements.
+Import or link exactly one theme:
 
-These ready-to-use styles ensure seamless visual integration while maintaining clarity and accessibility.
+1. `minimal.css` — light, minimal styling.
+2. `round-borders.css` — light styling with rounded corners.
+3. `minimal-dark.css` — styling for dark backgrounds.
+4. `round-borders-dark.css` — dark styling with rounded corners.
 
-### Custom Styling
+For an npm installation:
 
-If you prefer to define your own appearance, the library offers full flexibility.
-You can override or extend the built-in CSS rules using the following class names:
+```javascript
+import '@geoapify/geocoder-autocomplete/styles/minimal.css';
+```
 
-| Class Name                                              | Description                                                        |
-| ------------------------------------------------------- | ------------------------------------------------------------------ |
-| `.geoapify-autocomplete-input`                          | Styles the input element.                                          |
-| `.geoapify-autocomplete-items`                          | Styles the dropdown list.                                          |
-| `.geoapify-autocomplete-items .active`                  | Styles the active (highlighted) suggestion.                        |
-| `.geoapify-autocomplete-item`                           | Styles individual dropdown items.                                  |
-| `.geoapify-autocomplete-item.icon`                      | Styles icons in suggestion items.                                  |
-| `.geoapify-autocomplete-item.text`                      | Styles text in suggestion items.                                   |
-| `.geoapify-close-button`                                | Styles the clear (X) button.                                       |
-| `.geoapify-autocomplete-items .main-part .non-verified` | Highlights non-verified parts of the address (e.g., house number). |
-| `.geoapify-places-list`                                 | Styles the container for the Places list.                          |
-| `.geoapify-places-item`                                 | Styles each place item in the list.                                |
-| `.geoapify-places-item .icon`                           | Styles category icons in Places items.                             |
-| `.geoapify-places-main-part`                            | Styles the main section of a place item.                           |
-| `.geoapify-places-details`                              | Styles additional place details.                                   |
-| `.geoapify-places-address-container`                    | Styles the address block in place details.                         |
-| `.geoapify-places-address-element`                      | Styles individual address fields.                                  |
-| `.geoapify-places-hours-container`                      | Styles the container for opening hours.                            |
-| `.geoapify-places-hours-text`                           | Styles the opening hours text.                                     |
-| `.geoapify-places-clock-icon`                           | Styles the clock icon near opening hours.                          |
-| `.geoapify-places-load-more-button`                     | Styles the “Load More” button.                                     |
-| `.geoapify-places-load-more-icon`                       | Styles the arrow icon inside the “Load More” button.               |
-| `.geoapify-places-spinner-icon`                         | Styles the spinner shown during loading.                           |
-| `.geoapify-input-wrapper`                               | Wrapper for the input field and clear button.                      |
-| `.geoapify-category-item`                               | Styles category suggestion elements.                               |
-| `.geoapify-places-title-bar`                            | Styles the top bar of the Places list.                             |
-| `.geoapify-places-title-icon`                           | Styles the icon in the title bar.                                  |
-| `.geoapify-places-title-label`                          | Styles the label text in the title bar.                            |
-| `.geoapify-places-scroll-container`                     | Styles the scrollable content area for Places.                     |
-| `.geoapify-places-text-container`                       | Styles the name-and-address container.                             |
-| `.geoapify-places-secondary-part`                       | Styles secondary text like addresses.                              |
-| `.geoapify-places-hours-info`                           | Styles the hours information block.                                |
-| `.geoapify-places-status-bar`                           | Styles the bottom status bar.                                      |
-| `.geoapify-places-status-count`                         | Styles the count display in the status bar.                        |
-| `.geoapify-places-status-selected`                      | Styles the “selected place” indicator.                             |
-| `.geoapify-places-load-more`                            | Styles the “load more” section container.                          |
-| `.geoapify-places-load-more-loading`                    | Styles the animated dots during loading.                           |
-| `.geoapify-places-empty-state`                          | Styles the “no results found” message.                             |
-| `.geoapify-places-empty-icon`                           | Styles the icon shown in empty state.                              |
-| `.geoapify-places-loading-overlay`                      | Styles the overlay shown while loading.                            |
-| `.geoapify-places-loading-indicator`                    | Styles the loader container.                                       |
-| `.geoapify-places-loading-dots`                         | Styles the animation for loading dots.                             |
+For a CDN installation:
 
-### Learn more
+```html
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@geoapify/geocoder-autocomplete@3/styles/minimal.css"
+>
+```
 
-* See the [Quick Start](../quick-start/) guide for setup and usage examples.
-* Explore the [API Reference](../api-reference/) for configuration details and advanced options.
-* Try the [Interactive Demos](../live-demos/) to experiment with themes and styling in real time.
+The themes provide a usable starting point. Test color contrast, keyboard focus, and zoom behavior after applying application-specific overrides.
 
+## Custom styling
+
+Place your overrides after the selected theme. These selectors are present in the current component markup:
+
+| Selector | Description |
+| --- | --- |
+| `.geoapify-geocoder-autocomplete-container` | Root element created inside your container. |
+| `.geoapify-input-wrapper` | Input and clear-button wrapper. |
+| `.geoapify-autocomplete-input` | Text input. |
+| `.geoapify-close-button` | Clear button. |
+| `.geoapify-autocomplete-items` | Suggestions dropdown. |
+| `.geoapify-autocomplete-item` | A suggestion row. |
+| `.geoapify-autocomplete-items .active` | Keyboard-highlighted suggestion. |
+| `.geoapify-autocomplete-item .icon` | Suggestion icon. |
+| `.geoapify-autocomplete-item .address` | Suggestion text wrapper. |
+| `.geoapify-autocomplete-item .main-part` | Main suggestion text. |
+| `.geoapify-autocomplete-item .secondary-part` | Secondary suggestion text. |
+| `.geoapify-autocomplete-item .non-verified` | An address part retained but not verified by the API match. |
+| `.geoapify-places-list` | Built-in Places list. |
+| `.geoapify-places-title-bar` | Places list header. |
+| `.geoapify-places-scroll-container` | Scrollable Places results. |
+| `.geoapify-places-item` | A Places result row. |
+| `.geoapify-places-item .icon` | Place category icon. |
+| `.geoapify-places-text-container` | Place name and address wrapper. |
+| `.geoapify-places-main-part` | Place name. |
+| `.geoapify-places-secondary-part` | Place address. |
+| `.geoapify-places-hours-info` | Opening-hours block. |
+| `.geoapify-places-hours-text` | Opening-hours text. |
+| `.geoapify-places-clock-icon` | Opening-hours icon. |
+| `.geoapify-places-status-bar` | Results/status footer. |
+| `.geoapify-places-status-count` | Result count. |
+| `.geoapify-places-status-selected` | Selected-place status. |
+| `.geoapify-places-load-more` | Load-more area. |
+| `.geoapify-places-load-more-button` | Load-more button. |
+| `.geoapify-places-load-more-loading` | Loading state in the load-more area. |
+| `.geoapify-places-empty-state` | Empty-results message. |
+| `.geoapify-places-empty-icon` | Empty-results icon. |
+| `.geoapify-places-loading-overlay` | Initial loading overlay. |
+| `.geoapify-places-loading-indicator` | Initial loading indicator. |
+| `.geoapify-places-loading-dots` | Animated loading dots. |
+
+For example:
+
+```css
+.geoapify-geocoder-autocomplete-container {
+  max-width: 32rem;
+}
+
+.geoapify-autocomplete-items .active {
+  background: #eef5ff;
+}
+
+.geoapify-autocomplete-item .non-verified {
+  text-decoration: underline dotted;
+}
+```
+
+Class names are part of the rendered markup but are not a substitute for visual regression testing when upgrading the package.
+
+## Learn more
+
+- See the [Quick Start](quick-start.md) for installation examples.
+- Explore the [API Reference](api-reference/geocoder-autocomplete.md).
+- Try the [Interactive Demos](live-demos.md).

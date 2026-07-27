@@ -47,18 +47,19 @@ export class PlacesApiHelper {
         return url;
     }
 
-    public static sendPlacesRequest(url: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            fetch(url)
-                .then((response) => {
-                    if (response.ok) {
-                        response.json().then(data => resolve(data));
-                    } else {
-                        response.json().then(data => reject(data));
-                    }
-                })
-                .catch(error => reject(error));
-        });
+    public static async sendPlacesRequest(url: string): Promise<any> {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw data;
+        }
+
+        if (!data || !Array.isArray(data.features)) {
+            throw new Error("Invalid Places response: expected a features array");
+        }
+
+        return data;
     }
 
     public static async getLocationForBias(
@@ -146,12 +147,17 @@ export class PlacesApiHelper {
             if (value) {
                 if (key === 'circle') {
                     const circleValue = value as ByCircleOptions;
-                    if (circleValue.lat && circleValue.lon && circleValue.radiusMeters) {
+                    if (CalculationHelper.isLatitude(circleValue.lat) &&
+                        CalculationHelper.isLongitude(circleValue.lon) &&
+                        circleValue.radiusMeters > 0) {
                         filters.push(`circle:${circleValue.lon},${circleValue.lat},${circleValue.radiusMeters}`);
                     }
                 } else if (key === 'rect') {
                     const rectValue = value as ByRectOptions;
-                    if (rectValue.lat1 && rectValue.lon1 && rectValue.lat2 && rectValue.lon2) {
+                    if (CalculationHelper.isLatitude(rectValue.lat1) &&
+                        CalculationHelper.isLongitude(rectValue.lon1) &&
+                        CalculationHelper.isLatitude(rectValue.lat2) &&
+                        CalculationHelper.isLongitude(rectValue.lon2)) {
                         filters.push(`rect:${rectValue.lon1},${rectValue.lat1},${rectValue.lon2},${rectValue.lat2}`);
                     }
                 } else if (key === 'place' || key === 'geometry') {
@@ -176,17 +182,23 @@ export class PlacesApiHelper {
                 const value = bias[key];
                 if (value && key === 'proximity') {
                     const proximityBias = value as ByProximityOptions;
-                    if (proximityBias.lat && proximityBias.lon) {
+                    if (CalculationHelper.isLatitude(proximityBias.lat) &&
+                        CalculationHelper.isLongitude(proximityBias.lon)) {
                         biases.push(`proximity:${proximityBias.lon},${proximityBias.lat}`);
                     }
                 } else if (key === 'rect') {
                     const rectValue = value as ByRectOptions;
-                    if (rectValue.lat1 && rectValue.lon1 && rectValue.lat2 && rectValue.lon2) {
+                    if (CalculationHelper.isLatitude(rectValue.lat1) &&
+                        CalculationHelper.isLongitude(rectValue.lon1) &&
+                        CalculationHelper.isLatitude(rectValue.lat2) &&
+                        CalculationHelper.isLongitude(rectValue.lon2)) {
                         biases.push(`rect:${rectValue.lon1},${rectValue.lat1},${rectValue.lon2},${rectValue.lat2}`);
                     }
                 } else if (key === 'circle') {
                     const circleValue = value as ByCircleOptions;
-                    if (circleValue.lat && circleValue.lon && circleValue.radiusMeters) {
+                    if (CalculationHelper.isLatitude(circleValue.lat) &&
+                        CalculationHelper.isLongitude(circleValue.lon) &&
+                        circleValue.radiusMeters > 0) {
                         biases.push(`circle:${circleValue.lon},${circleValue.lat},${circleValue.radiusMeters}`);
                     }
                 }

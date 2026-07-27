@@ -3,6 +3,7 @@ img
 tsconfig.json
 *.tgz
 .vscode/*
+.github
 rollup-config.mjs
 postcss.config.cjs
 docs-site

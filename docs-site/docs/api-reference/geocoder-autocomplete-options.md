@@ -1,4 +1,6 @@
-The `GeocoderAutocompleteOptions` object allows you to configure the behavior, appearance, and search logic of the Geoapify Geocoder Autocomplete control.
+# GeocoderAutocompleteOptions
+
+The `GeocoderAutocompleteOptions` object configures the behavior, appearance, and search logic of the Geoapify Geocoder Autocomplete control.
 
 ## Reference
 
@@ -6,13 +8,13 @@ Each property fine-tunes how address suggestions are fetched and displayed — f
 
 | Option                                                        | Type                                                                                                                                               | Default | Description                                                                                                        |
 | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------: | ------------------------------------------------------------------------------------------------------------------ |
-| [`type`](#type)                                               | [LocationType](#locationtype)                                                                                                                      |       — | Restrict suggestions to a specific type (e.g., `city`, `postcode`, `street`).                                      |
+| [`type`](#type)                                               | `LocationType`                                                                                                                                     |       — | Restrict suggestions to a specific type (e.g., `city`, `postcode`, `street`).                                      |
 | [`lang`](#lang)                                               | 2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code                                                                                                        |       — | Language of returned results.                                                                                      |
 | [`limit`](#limit)                                             | number                                                                                                                                             |   **5** | Maximum number of suggestions per query.                                                                           |
-| [`placeholder`](#placeholder)                                 | string                                                                                                                                             |       — | Placeholder text shown in the input.                                                                               |
+| [`placeholder`](#placeholder)                                 | string                                                                                                                                             | `Enter an address here` | Placeholder text shown in the input.                                                             |
 | [`debounceDelay`](#debouncedelay)                             | number (ms)                                                                                                                                        | **100** | Delay before sending requests after typing.                                                                        |
 | [`filter`](#filter)                                           | Object: keys with [ByCircleOptions](#bycircleoptions), [ByCountryCodeOptions](#bycountrycodeoptions), [ByRectOptions](#byrectoptions), or `string` |    `{}` | **Hard filter** for geocoder results (limit by country, circle, rect, or place).                                   |
-| [`bias`](#bias)                                               | Object: keys with [ByCircleOptions](#bycircleoptions), [ByRectOptions](#byrectoptions), [ByProximityOptions](#byproximityoptions)                  |    `{}` | **Soft bias** for geocoder results (prioritize by area or proximity).                                              |
+| [`bias`](#bias)                                               | Object: keys with [ByCountryCodeOptions](#bycountrycodeoptions), [ByCircleOptions](#bycircleoptions), [ByRectOptions](#byrectoptions), or [ByProximityOptions](#byproximityoptions) | `{}` | **Soft bias** for geocoder results (prioritize by country, area, or proximity). |
 | [`skipIcons`](#skipicons)                                     | boolean                                                                                                                                            | `false` | Hide icons in the dropdown.                                                                                        |
 | [`addDetails`](#adddetails)                                   | boolean                                                                                                                                            | `false` | Enrich selected result with details/geometry via [Place Details API](https://www.geoapify.com/place-details-api/). |
 | [`skipSelectionOnArrowKey`](#skipselectiononarrowkey)         | boolean                                                                                                                                            | `false` | Do not update input while navigating with arrow keys.                                                              |
@@ -21,9 +23,9 @@ Each property fine-tunes how address suggestions are fetched and displayed — f
 | [`addCategorySearch`](#addcategorysearch)                     | boolean                                                                                                                                            | `false` | Enable category/POI search via [Places API](https://www.geoapify.com/places-api/).                                 |
 | [`showPlacesList`](#showplaceslist)                           | boolean                                                                                                                                            | `false` | Show built-in places list under the input (when category search is enabled).                                       |
 | [`hidePlacesListAfterSelect`](#hideplaceslistafterselect)     | boolean                                                                                                                                            | `false` | Auto-hide the places list after a selection.                                                                       |
-| [`enablePlacesLazyLoading`](#enableplaceslazyloading)         | boolean                                                                                                                                            |  `true` | Load additional places as the user scrolls the list.                                                               |
+| [`enablePlacesLazyLoading`](#enableplaceslazyloading)         | boolean                                                                                                                                            | `false` | Load additional places as the user scrolls the list.                                                               |
 | [`placesLimit`](#placeslimit)                                 | number                                                                                                                                             |  **20** | Page size for places requests.                                                                                     |
-| [`placesFilter`](#placesfilter)                               | Object: keys with [ByCircleOptions](#bycircleoptions), [ByRectOptions](#byrectoptions), or `string`                                                |    `{}` | **Hard filter** for Places results (e.g., circle/rect area).                                                       |
+| [`placesFilter`](#placesfilter)                               | Object: keys with [ByCircleOptions](#bycircleoptions), [ByRectOptions](#byrectoptions), `place`, or `geometry`                                    |    `{}` | **Hard filter** for Places results.                                                                                |
 | [`placesBias`](#placesbias)                                   | Object: keys with [ByCircleOptions](#bycircleoptions), [ByRectOptions](#byrectoptions), [ByProximityOptions](#byproximityoptions)                  |    `{}` | **Soft bias** for Places results (e.g., proximity to a point).                                                     |
 
 Below are detailed explanations and usage examples for each option.
@@ -35,7 +37,7 @@ Below are detailed explanations and usage examples for each option.
 Specifies the **location type** for the autocomplete results.
 This option helps narrow down the suggestions to a specific level of the address hierarchy, such as country, city, street, or amenity.
 
-**Type:** [`LocationType`](#locationtype)
+**Type:** `LocationType`
 **Default:** none
 
 **Accepted values:**
@@ -46,6 +48,7 @@ This option helps narrow down the suggestions to a specific level of the address
 * `postcode` — limits results to postal codes.
 * `street` — returns only street names.
 * `amenity` — returns facilities such as restaurants, schools, hospitals, etc.
+* `locality` — returns administrative areas including cities, districts, and postcodes.
 
 **Example:**
 
@@ -67,7 +70,7 @@ Defines the **language** of the returned address suggestions.
 Use this option to localize the autocomplete results and display place names in a specific language (when available).
 
 **Type:** 2-character [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code
-**Default:** 'en'
+**Default:** not set; the API chooses its default or fallback language
 
 If the chosen language is not available for a specific location, the API automatically falls back to English or another supported language.
 
@@ -83,7 +86,24 @@ const autocomplete = new GeocoderAutocomplete(
 );
 ```
 
-In this configuration, the autocomplete suggestions will be returned in **French** (e.g., “Allemagne”, “États-Unis d'Amérique”).
+In this configuration, the autocomplete asks the API to return French names when available.
+
+### `limit`
+
+Sets the maximum number of address suggestions returned for each autocomplete request.
+
+**Type:** `number`
+**Default:** `5`
+
+```javascript
+const autocomplete = new GeocoderAutocomplete(
+  document.getElementById('autocomplete'),
+  'YOUR_API_KEY',
+  {
+    limit: 10
+  }
+);
+```
 
 ### `placeholder`
 
@@ -91,7 +111,7 @@ Defines the **placeholder text** shown inside the autocomplete input field befor
 This is useful for guiding users on what type of input is expected, such as a city, address, or postal code.
 
 **Type:** `string`
-**Default:** none
+**Default:** `Enter an address here`
 
 **Example:**
 
@@ -136,7 +156,7 @@ Unlike `bias` (which only prioritizes certain results), filters **exclude all ad
 Filters are essential for applications where results must be **strictly limited** to a region, country, or bounding area — for example, delivery zones, city boundaries, or marketplace coverage.
 
 **Type:** object — accepts the following keys:  
-- `countrycode`: [ByCountryCodeOptions](#bycountrycodeoptions)  
+- `countrycode`: [ByCountryCodeOptions](#bycountrycodeoptions)
 - `circle`: [ByCircleOptions](#bycircleoptions)  
 - `rect`: [ByRectOptions](#byrectoptions)  
 - `place`: `string`
@@ -219,6 +239,7 @@ Defines **soft preferences** that influence the ranking of autocomplete results 
 It helps prioritize results within or near a specified area — for example, around the user’s location or the visible part of a map.
 
 **Type:** object — accepts the following keys:  
+- `countrycode`: [ByCountryCodeOptions](#bycountrycodeoptions)
 - `circle`: [ByCircleOptions](#bycircleoptions)  
 - `rect`: [ByRectOptions](#byrectoptions)  
 - `proximity`: [ByProximityOptions](#byproximityoptions)
@@ -287,7 +308,7 @@ const autocomplete = new GeocoderAutocomplete(
 );
 ```
 
-Use `addDetails` when your application needs **precise geometries** (e.g., city or building boundaries) for mapping, highlighting areas, or validating user selections.
+Use `addDetails` when your application needs **detailed geometries** (e.g., city or building boundaries) for mapping or highlighting areas.
 
 ### `skipSelectionOnArrowKey`
 
@@ -312,9 +333,7 @@ Use `skipSelectionOnArrowKey` to avoid visual flickering or text changes in situ
 
 ### `allowNonVerifiedHouseNumber`
 
-Allows the autocomplete to include **non-verified house numbers** in results.  
-By default, the geocoder returns only verified and accurate addresses.  
-However, in regions where house number data is incomplete or still being updated, enabling this option helps users find approximate or newly added addresses.
+Allows the autocomplete to retain a house number typed by the user when the API matched a broader feature but did not verify that house number.
 
 **Type:** `boolean`  
 **Default:** `false`
@@ -334,8 +353,7 @@ Use this option when your application serves areas with **partial or changing ad
 
 #### Working with Non-Verified Address Components
 
-In some cases, Geoapify may return **non-verified address components**, such as newly built streets or buildings not yet present in official databases.
-These components are still valid but carry a lower verification confidence.
+In some cases, the library can retain an address component typed by the user even when the API did not verify it against the matched feature.
 
 You can handle them in several ways:
 
@@ -361,16 +379,15 @@ When non-verified elements are present, the result object includes a `nonVerifie
 }
 ```
 
-The library ensures that **GPS coordinates remain accurate**, even for non-verified entries.
-These fields are automatically marked with a `"non-verified"` CSS class, allowing developers to style or flag them in the UI.
+The coordinates still belong to the broader feature returned by the API. They may not locate the retained house number or street precisely. Inspect `nonVerifiedParts` and the result's rank/confidence data, and ask the user to confirm the location when precision matters.
+
+These fields are marked with a `"non-verified"` CSS class in the built-in suggestion list, allowing developers to style or flag them in the UI.
 
 This provides both **data transparency** and **flexibility**, letting you inform users when address data might not be fully validated while still offering the most complete search experience possible.
 
 ### `allowNonVerifiedStreet`
 
-Allows the autocomplete to include **non-verified street names** in address suggestions.  
-By default, the autocomplete returns only verified street data.  
-However, enabling this option ensures that new or unconfirmed streets — often found in developing areas or new housing projects — can still appear in the search results.
+Allows the autocomplete to retain a street name typed by the user when the API matched a broader feature but did not verify that street.
 
 **Type:** `boolean`  
 **Default:** `false`
@@ -475,7 +492,7 @@ Controls whether the **places list** supports **lazy loading** — automatically
 This allows users to explore more POIs without needing to manually trigger additional requests.
 
 **Type:** `boolean`  
-**Default:** `true`
+**Default:** `false`
 
 **Example:**
 ```javascript
@@ -490,8 +507,7 @@ const autocomplete = new GeocoderAutocomplete(
 );
 ```
 
-Keep this enabled to provide a smooth, **infinite-scroll experience** for category search results.
-You can disable it if you prefer to manage pagination manually or display a limited set of results.
+Enable it for an infinite-scroll experience. When it is `false`, the built-in list shows a **Load more** button while another page may be available. You can also call [`resendPlacesRequestForMore(true)`](geocoder-autocomplete.md#resendplacesrequestformore) when rendering a custom list.
 
 ### `placesLimit`
 
@@ -528,7 +544,8 @@ Use this option to focus category searches on a specific **geographic area** —
 **Type:** object — accepts the following keys:  
 - `circle`: [ByCircleOptions](#bycircleoptions)  
 - `rect`: [ByRectOptions](#byrectoptions)  
-- `place`: `string` — a place identifier or GeoJSON geometry string
+- `place`: `string` — a Geoapify place ID
+- `geometry`: `string` — a Geoapify geometry ID, such as an ID returned by the Isoline API
 
 **Example:**
 ```javascript
@@ -544,7 +561,7 @@ const autocomplete = new GeocoderAutocomplete(
 );
 ```
 
-Filters are especially useful when the search should be limited to a specific **map view**, **user’s detected position**, or **known region**.
+Filters are especially useful when the search should be limited to a specific **map view**, **user’s detected position**, or **known region**. A geometry filter expects a stored Geoapify geometry ID; it does not accept WKT or raw GeoJSON.
 
 ### `placesBias`
 
@@ -575,5 +592,5 @@ for instance, to show nearby restaurants or hotels first while still including o
 
 
 ## Learn more
-- See how to use these options in the [`GeocoderAutocomplete`](../geocoder-autocomplete/) constructor.
-- Try live examples in the [Interactive Demos](../../live-demos/).
+- See how to use these options in the [`GeocoderAutocomplete`](geocoder-autocomplete.md) constructor.
+- Try live examples in the [Interactive Demos](../live-demos.md).
